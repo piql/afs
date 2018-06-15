@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/boxing/!svn/ver/1029/trunk/boxinglib/afs/xsd
+END
+control_frame.xsd
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/boxing/!svn/ver/1029/trunk/boxinglib/afs/xsd/control_frame.xsd
+END
+boxing_format.xsd
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/boxing/!svn/ver/1029/trunk/boxinglib/afs/xsd/boxing_format.xsd
+END
+tocdatafile.xsd
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/boxing/!svn/ver/1029/trunk/boxinglib/afs/xsd/tocdatafile.xsd
+END
+tocdata.xsd
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/boxing/!svn/ver/1029/trunk/boxinglib/afs/xsd/tocdata.xsd
+END

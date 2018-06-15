@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+ targetNamespace="http://www.piql.com/afs"
+ xmlns:ns="http://www.piql.com/afs"
+ elementFormDefault="qualified">
+
+    <xs:annotation>
+        <xs:appinfo>Control Frame XML validation schema.</xs:appinfo>
+        <xs:documentation>
+            The control frame contains information about who to decode the rest of the reel. It has the
+            boxing format used on this reel and points to the reel table of contents.
+        </xs:documentation>
+    </xs:annotation>
+
+    <xs:include schemaLocation="boxing_format.xsd"/>
+
+    <xs:complexType name="Tocs">
+        <xs:sequence>
+            <xs:any minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="BoxerFormat">
+        <xs:sequence>
+            <xs:element name="work" type="ns:BoxingFormat"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="AdministrativeMetadata">
+        <xs:annotation>
+            <xs:appinfo>Administrative Metadata</xs:appinfo>
+            <xs:documentation>Metadata about usage and creation of the reel.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="ReelId" type="xs:string"/>
+            <xs:element name="PrintReelId" type="xs:string"/>
+            <xs:element name="JobId" type="xs:string"/>
+            <xs:element name="Title" type="xs:string"/>
+            <xs:element name="Description" type="xs:string"/>
+            <xs:element name="Creator" type="xs:string"/>
+            <xs:element name="CreationDate" type="xs:dateTime"/>
+            <xs:element name="Location" type="xs:string"/>
+        </xs:sequence>
+        <xs:attribute name="version" type="xs:string"/>
+    </xs:complexType>
+
+    <xs:complexType name="TechnicalMetadata">
+        <xs:annotation>
+            <xs:appinfo>Technical Metadata</xs:appinfo>
+            <xs:documentation>Metadata needed to decode the rest of the reel.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="BoxerFormat" type="ns:BoxerFormat"/>
+            <xs:element name="Tocs" type="ns:Tocs"/>
+        </xs:sequence>
+        <xs:attribute name="version" type="xs:string"/>
+    </xs:complexType>
+
+    <xs:element name="ControlFrame">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="AdministrativeMetadata" type="ns:AdministrativeMetadata"/>
+                <xs:element name="TechnicalMetadata" type="ns:TechnicalMetadata"/>
+            </xs:sequence>
+            <xs:attribute name="version" type="xs:string"/>
+        </xs:complexType>        
+    </xs:element>
+    
+</xs:schema>

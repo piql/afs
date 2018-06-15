@@ -1,0 +1,173 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:annotation>
+    <xs:appinfo>Table of content file.</xs:appinfo>
+    <xs:documentation xml:lang="en">
+      The file entity points to the file on the reel, both the digital and visual version. It
+      also contains various types of technical metadata, like checksum and creation date.
+      Multiple sources of custom metadata can be added.
+      <!--example>
+            <file formatId="afs/metadata-txt">
+              <id>20</id>
+              <uniqueId>asdfliu234fsadf</uniqueId>
+              <name>filename with spaces.txt</name>
+              <date>10:10:2014</date>
+              <parentId>10</parentId>
+              <data>
+                <checksum>sdfsdfsadfasd</checksum>
+                <size>123123</size>
+                <start frame="000001" byte="324"/>
+                <end frame="003240" byte="3421435"/>
+              </data>
+              <preview>
+                <dpi>80</dpi>
+                <pages layoutId="1" frame="000090" section="0" count="10" dimension="10000x10000" overlap="10x10"/>
+                <pages layoutId="2" frame="000100" section="3" count="20" dimension="200x100"/>
+              </preview>
+              <metadata>
+                <source fileId="21" sourceId="1">
+                  <data formatId="afs/metadata-xml">This is metadata</data>
+                </source>
+              </metadata>
+            </file>
+            <example-->
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:element name="file" type="FileType"/>
+
+  <xs:complexType name="FileType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:integer"/>
+      <xs:element name="uniqueId" type="xs:string"/>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="date" type="DateType">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">File creation date.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="parentId" type="ParentIdType" minOccurs="0"/>
+
+      <xs:element name="data" type="DataType"/>
+      <xs:element name="preview" type="PreviewType" minOccurs="0"/>
+      <xs:element name="metadata" type="FileMetadataType" minOccurs="0"/>
+    </xs:sequence>
+
+    <xs:attribute name="formatId" type="xs:string">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">File format of source file.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="DataType">
+    <xs:sequence>
+      
+      <xs:element name="checksum" type="xs:string">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Default format is SHA1</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      
+      <xs:element name="size" type="xs:unsignedInt">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Size of file in bytes.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      
+      <xs:element name="start" type="LocationType"/>
+      <xs:element name="end" type="LocationType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="LocationType">
+    <xs:attribute name="frame" type="xs:unsignedInt"/>
+    <xs:attribute name="byte" type="xs:unsignedInt"/>
+  </xs:complexType>
+
+  <xs:complexType name="PreviewType">
+    <xs:sequence>
+      <xs:element name="dpi" type="xs:unsignedInt" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The number of dots in printed image that represents an inch in the original</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="pages" type="PagesType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="PagesType">
+    <xs:attribute name="layoutId" type="xs:unsignedInt"/>
+    <xs:attribute name="frame" type="xs:unsignedInt"/>
+    <xs:attribute name="section" type="xs:unsignedInt"/>
+    <xs:attribute name="count" type="xs:unsignedInt"/>
+    <xs:attribute name="dimension" type="DimensionType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+          Dimension of printed image in pixels. Format WIDTHxHEIGHT.
+          If the WIDTH or HEIGHT is larger than the layout, the image is printed across multiple frames.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="overlap" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="FileMetadataType">
+    <xs:sequence>
+      <xs:element name="source" type="FileMetadataSourceType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="FileMetadataSourceType">
+    <xs:sequence>
+      <xs:element name="data" type="FileMetadataSourceDataType"/>
+    </xs:sequence>
+    <xs:attribute name="fileId" type="xs:unsignedInt">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">Points to file on reel that contains metadata for this file.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="sourceId" type="xs:unsignedInt">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+          Points to Index/metadata/source element that contains more
+          information about the source of the metadata.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="FileMetadataSourceDataType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="formatId" type="xs:string">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">Format of metadata contained in data tag.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:element name="parentId" type="xs:integer" minOccurs="0"/>
+  
+  <xs:simpleType name="ParentIdType">
+    <xs:restriction base="xs:integer">
+      <xs:pattern value="(-[0]*[1|2])|([0-9]+)"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="DateType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\s*((\d{2}(:|-)\d{2}(:|-)\d{4})|(\d{4}(:|-)\d{2}(:|-)\d{2}))(( |T)\d{2}:\d{2}:\d{2})?\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="DimensionType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d*(x|X)\d*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>
