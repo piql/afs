@@ -25,13 +25,15 @@
 
 // PRIVATE INTERFACE
 //
+
 typedef struct afs_administrative_metadata_tag_s
 {
-    const char* tag;
-    char** content;
+    const char * tag;
+    char **  content;
 } afs_administrative_metadata_tag;
 
-static afs_administrative_metadata_tag* get_tags_list(afs_administrative_metadata* control_data);
+static afs_administrative_metadata_tag * get_tags_list(afs_administrative_metadata* control_data);
+static const char *                      whitespace_cb(mxml_node_t *node, int where);
 
 
 /*! 
@@ -70,58 +72,39 @@ static afs_administrative_metadata_tag* get_tags_list(afs_administrative_metadat
  *  \return instance of allocated afs_administrative_metadata structure.
  */
 
-afs_administrative_metadata* afs_administrative_metadata_create()
+afs_administrative_metadata * afs_administrative_metadata_create()
 {
-    afs_administrative_metadata* administrative_metadata = BOXING_MEMORY_ALLOCATE_TYPE(afs_administrative_metadata);
-    afs_administrative_metadata_init(administrative_metadata);
-    return administrative_metadata;
-}
-
-
-//----------------------------------------------------------------------------
-/*!
- *  \brief Initializes all structure pointers with NULL value.
- *
- *  Initializes all input structure pointers with NULL values.
- *  If input pointer is NULL, then return without initialization.
- *
- *  \param[in]  administrative_metadata  Pointer to the afs_administrative_metadata structure.
- */
-
-void afs_administrative_metadata_init(afs_administrative_metadata* administrative_metadata)
-{
-    if (administrative_metadata == NULL)
-    {
-        return;
-    }
-
+    afs_administrative_metadata * administrative_metadata = BOXING_MEMORY_ALLOCATE_TYPE(afs_administrative_metadata);
+    
     administrative_metadata->reel_id = NULL;
     administrative_metadata->print_reel_id = NULL;
     administrative_metadata->title = NULL;
     administrative_metadata->description = NULL;
     administrative_metadata->creator = NULL;
     administrative_metadata->creation_date = NULL;
+    
+    return administrative_metadata;
 }
 
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Initializes all structure pointers.
+ *  \brief Create an administrative metadata instance.
  *
- *  Initializes all input structure pointers with specified values.
- *  If one of the input pointers is NULL, then return without initialization.
+ *  Allocate memory for the afs_administrative_metadata type
+ *  and initialize structure data with specified input values.
+ *  Return instance of allocated structure.
  *
- *  \param[in]  administrative_metadata  Pointer to the afs_administrative_metadata structure.
  *  \param[in]  reel_id                  Pointer to the reel_id string.
  *  \param[in]  print_reel_id            Pointer to the print_reel_id string.
  *  \param[in]  title                    Pointer to the title string.
  *  \param[in]  description              Pointer to the description string.
  *  \param[in]  creator                  Pointer to the creator string.
  *  \param[in]  creation_date            Pointer to the creation_date string.
+ *  \return instance of allocated afs_administrative_metadata structure.
  */
 
-void afs_administrative_metadata_init2(
-    afs_administrative_metadata* administrative_metadata,
+afs_administrative_metadata * afs_administrative_metadata_create2(
     const char* reel_id,
     const char* print_reel_id,
     const char* title,
@@ -129,17 +112,14 @@ void afs_administrative_metadata_init2(
     const char* creator,
     const char* creation_date)
 {
-    if (administrative_metadata == NULL || reel_id == NULL || print_reel_id == NULL || title == NULL || description == NULL || creator == NULL || creation_date == NULL)
-    {
-        return;
-    }
-
+    afs_administrative_metadata * administrative_metadata = BOXING_MEMORY_ALLOCATE_TYPE(afs_administrative_metadata);
     administrative_metadata->reel_id = boxing_string_clone(reel_id);
     administrative_metadata->print_reel_id = boxing_string_clone(print_reel_id);
     administrative_metadata->title = boxing_string_clone(title);
     administrative_metadata->description = boxing_string_clone(description);
     administrative_metadata->creator = boxing_string_clone(creator);
     administrative_metadata->creation_date = boxing_string_clone(creation_date);
+    return administrative_metadata;
 }
 
 
@@ -152,7 +132,7 @@ void afs_administrative_metadata_init2(
  *  \param[in]  administrative_metadata  Pointer to the afs_administrative_metadata structure.
  */
 
-void afs_administrative_metadata_free(afs_administrative_metadata* administrative_metadata)
+void afs_administrative_metadata_free(afs_administrative_metadata * administrative_metadata)
 {
     if (administrative_metadata == NULL)
     {
@@ -171,6 +151,341 @@ void afs_administrative_metadata_free(afs_administrative_metadata* administrativ
 
 //----------------------------------------------------------------------------
 /*!
+ *  \brief Function create a copy of input afs_administrative_metadata structure.
+ *
+ *  Function create a copy of input afs_administrative_metadata structure and return it.
+ *  If administrative metadata structure pointer is NULL function return NULL.
+ *
+ *  \param[in]  administrative_metadata  Pointer to the afs_administrative_metadata structure.
+ *  \return new copy of afs_administrative_metadata structure or NULL.
+ */
+
+afs_administrative_metadata * afs_administrative_metadata_clone(const afs_administrative_metadata * administrative_metadata)
+{
+    // If administrative metadata pointer is NULL return NULL.
+    if (administrative_metadata == NULL)
+    {
+        return NULL;
+    }
+
+    afs_administrative_metadata * return_administrative_metadata = afs_administrative_metadata_create();
+    return_administrative_metadata->reel_id = boxing_string_clone(administrative_metadata->reel_id);
+    return_administrative_metadata->print_reel_id = boxing_string_clone(administrative_metadata->print_reel_id);
+    return_administrative_metadata->title = boxing_string_clone(administrative_metadata->title);
+    return_administrative_metadata->description = boxing_string_clone(administrative_metadata->description);
+    return_administrative_metadata->creator = boxing_string_clone(administrative_metadata->creator);
+    return_administrative_metadata->creation_date = boxing_string_clone(administrative_metadata->creation_date);
+
+    return return_administrative_metadata;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function checks two instances of the afs_administrative_metadata structures on the identity.
+ *
+ *  Function checks two instances of the afs_administrative_metadata structures on the identity.
+ *
+ *  \param[in]   administrative_metadata1  Pointer to the first instance of the afs_administrative_metadata structure.
+ *  \param[in]   administrative_metadata2  Pointer to the second instance of the afs_administrative_metadata structure.
+ *  \return sign of identity of the input structures.
+ */
+
+DBOOL afs_administrative_metadata_equal(const afs_administrative_metadata * administrative_metadata1, const afs_administrative_metadata * administrative_metadata2)
+{
+    if (administrative_metadata1 == NULL && administrative_metadata2 == NULL)
+    {
+        return DTRUE;
+    }
+
+    if (administrative_metadata1 == NULL || administrative_metadata2 == NULL)
+    {
+        return DFALSE;
+    }
+
+    if (boxing_string_equal(administrative_metadata1->reel_id, administrative_metadata2->reel_id) &&
+        boxing_string_equal(administrative_metadata1->print_reel_id, administrative_metadata2->print_reel_id) &&
+        boxing_string_equal(administrative_metadata1->title, administrative_metadata2->title) &&
+        boxing_string_equal(administrative_metadata1->description, administrative_metadata2->description) &&
+        boxing_string_equal(administrative_metadata1->creator, administrative_metadata2->creator) &&
+        boxing_string_equal(administrative_metadata1->creation_date, administrative_metadata2->creation_date))
+    {
+        return DTRUE;
+    }
+
+    return DFALSE;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function sets a new reel id string in the administrative metadata structure.
+ *
+ *  Function sets a new reel id string in the administrative metadata structure.
+ *
+ *  \param[in] administrative_metadata  Pointer to the afs_administrative_metadata structure.
+ *  \param[in] reel_id                  Reel id string.
+ */
+
+void afs_administrative_metadata_set_reel_id(afs_administrative_metadata * administrative_metadata, const char * reel_id)
+{
+    // If administrative metadata pointer is NULL return
+    if (administrative_metadata == NULL)
+    {
+        return;
+    }
+
+    if (administrative_metadata->reel_id != NULL)
+    {
+        boxing_string_free(administrative_metadata->reel_id);
+    }
+
+    administrative_metadata->reel_id = boxing_string_clone(reel_id);
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function sets a new print reel id string in the administrative metadata structure.
+ *
+ *  Function sets a new print reel id string in the administrative metadata structure.
+ *
+ *  \param[in] administrative_metadata  Pointer to the afs_administrative_metadata structure.
+ *  \param[in] print_reel_id            Print reel id string.
+ */
+
+void afs_administrative_metadata_set_print_reel_id(afs_administrative_metadata * administrative_metadata, const char * print_reel_id)
+{
+    // If administrative metadata pointer is NULL return
+    if (administrative_metadata == NULL)
+    {
+        return;
+    }
+
+    if (administrative_metadata->print_reel_id != NULL)
+    {
+        boxing_string_free(administrative_metadata->print_reel_id);
+    }
+
+    administrative_metadata->print_reel_id = boxing_string_clone(print_reel_id);
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function sets a new title string in the administrative metadata structure.
+ *
+ *  Function sets a new title string in the administrative metadata structure.
+ *
+ *  \param[in] administrative_metadata  Pointer to the afs_administrative_metadata structure.
+ *  \param[in] title                    Title string.
+ */
+
+void afs_administrative_metadata_set_title(afs_administrative_metadata * administrative_metadata, const char * title)
+{
+    // If administrative metadata pointer is NULL return
+    if (administrative_metadata == NULL)
+    {
+        return;
+    }
+
+    if (administrative_metadata->title != NULL)
+    {
+        boxing_string_free(administrative_metadata->title);
+    }
+
+    administrative_metadata->title = boxing_string_clone(title);
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function sets a new description string in the administrative metadata structure.
+ *
+ *  Function sets a new description string in the administrative metadata structure.
+ *
+ *  \param[in] administrative_metadata  Pointer to the afs_administrative_metadata structure.
+ *  \param[in] description              Description string.
+ */
+
+void afs_administrative_metadata_set_description(afs_administrative_metadata * administrative_metadata, const char * description)
+{
+    // If administrative metadata pointer is NULL return
+    if (administrative_metadata == NULL)
+    {
+        return;
+    }
+
+    if (administrative_metadata->description != NULL)
+    {
+        boxing_string_free(administrative_metadata->description);
+    }
+
+    administrative_metadata->description = boxing_string_clone(description);
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function sets a new creator string in the administrative metadata structure.
+ *
+ *  Function sets a new creator string in the administrative metadata structure.
+ *
+ *  \param[in] administrative_metadata  Pointer to the afs_administrative_metadata structure.
+ *  \param[in] creator                  Creator string.
+ */
+
+void afs_administrative_metadata_set_creator(afs_administrative_metadata * administrative_metadata, const char * creator)
+{
+    // If administrative metadata pointer is NULL return
+    if (administrative_metadata == NULL)
+    {
+        return;
+    }
+
+    if (administrative_metadata->creator != NULL)
+    {
+        boxing_string_free(administrative_metadata->creator);
+    }
+
+    administrative_metadata->creator = boxing_string_clone(creator);
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function sets a new creation date string in the administrative metadata structure.
+ *
+ *  Function sets a new creation date string in the administrative metadata structure.
+ *
+ *  \param[in] administrative_metadata  Pointer to the afs_administrative_metadata structure.
+ *  \param[in] creation_date            Creation date string.
+ */
+
+void afs_administrative_metadata_set_creation_date(afs_administrative_metadata * administrative_metadata, const char * creation_date)
+{
+    // If administrative metadata pointer is NULL return
+    if (administrative_metadata == NULL)
+    {
+        return;
+    }
+
+    if (administrative_metadata->creation_date != NULL)
+    {
+        boxing_string_free(administrative_metadata->creation_date);
+    }
+
+    administrative_metadata->creation_date = boxing_string_clone(creation_date);
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function translates the input afs_administrative_metadata structure to the XML file.
+ *
+ *  Function translates the input afs_administrative_metadata structure to the XML file.
+ *  If translates is successful, then function return DTRUE, else function return DFALSE.
+ *
+ *  \param[in]   administrative_metadata  Pointer to the afs_administrative_metadata structure.
+ *  \param[in]   file_name                Name of the XML file.
+ *  \param[in]   compact                  If compact is DFALSE then in the resulting XML file needs to add formatting (new lines and tabs).
+ *  \return DTRUE on success.
+ */
+
+DBOOL afs_administrative_metadata_save_file(afs_administrative_metadata * administrative_metadata, const char * file_name, DBOOL compact)
+{
+    if (file_name == NULL || administrative_metadata == NULL)
+    {
+        return DFALSE;
+    }
+
+    mxml_node_t *tree = mxmlNewXML("1.0");
+
+#ifndef WIN32
+    FILE * fp_save = fopen(file_name, "w+");
+#else
+    FILE * fp_save = fopen(file_name, "w+b");
+#endif
+
+    if (fp_save == NULL)
+    {
+        return DFALSE;
+    }
+
+    if (!afs_administrative_metadata_save_xml(administrative_metadata, tree))
+    {
+        fclose(fp_save);
+        mxmlDelete(tree);
+        return DFALSE;
+    }
+
+    mxmlSetWrapMargin(0);
+
+    if (compact == DTRUE)
+    {
+        mxmlSaveFile(tree, fp_save, MXML_NO_CALLBACK);
+    }
+    else
+    {
+        mxmlSaveFile(tree, fp_save, whitespace_cb);
+    }
+
+
+    fclose(fp_save);
+    mxmlDelete(tree);
+
+    return DTRUE;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function translates the input afs_administrative_metadata structure to the XML string.
+ *
+ *  Function translates the input afs_administrative_metadata structure to the XML string.
+ *  If translates is successful, then function return resulting string, else function return NULL.
+ *
+ *  \param[in]   administrative_metadata     Pointer to the afs_administrative_metadata structure.
+ *  \param[in]   compact                     If compact is DFALSE then in the resulting XML string needs to add formatting (new lines and tabs).
+ *  \return resulting string or NULL.
+ */
+
+char * afs_administrative_metadata_save_string(afs_administrative_metadata * administrative_metadata, DBOOL compact)
+{
+    // If TOC data reel pointer is NULL return DFALSE
+    if (administrative_metadata == NULL)
+    {
+        return NULL;
+    }
+
+    struct mxml_node_s * document = mxmlNewXML("1.0");
+
+    if (!afs_administrative_metadata_save_xml(administrative_metadata, document))
+    {
+        mxmlDelete(document);
+        return NULL;
+    }
+
+    char * xmlString;
+    mxmlSetWrapMargin(0);
+
+    if (compact)
+    {
+        xmlString = mxmlSaveAllocString(document, MXML_NO_CALLBACK);
+    }
+    else
+    {
+        xmlString = mxmlSaveAllocString(document, whitespace_cb);
+    }
+
+    mxmlDelete(document);
+
+    return xmlString;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
  *  \brief Function translates the input afs_administrative_metadata structure to the XML nodes.
  *
  *  Function translates the input afs_administrative_metadata structure to the XML nodes.
@@ -181,7 +496,7 @@ void afs_administrative_metadata_free(afs_administrative_metadata* administrativ
  *  \return DTRUE on success.
  */
 
-DBOOL afs_administrative_metadata_save_xml(mxml_node_t * out, afs_administrative_metadata* administrative_metadata)
+DBOOL afs_administrative_metadata_save_xml(afs_administrative_metadata * administrative_metadata, mxml_node_t * out)
 {
     // If output node pointer is NULL or administrative metadata pointer is NULL return DFALSE
     if (out == NULL || administrative_metadata == NULL)
@@ -189,17 +504,100 @@ DBOOL afs_administrative_metadata_save_xml(mxml_node_t * out, afs_administrative
         return DFALSE;
     }
 
-    mxml_node_t *administrative_metadata_node = mxmlNewElement(out, "AdministrativeMetadata");
+    mxml_node_t * administrative_metadata_node = mxmlNewElement(out, "AdministrativeMetadata");
 
-    afs_administrative_metadata_tag* tags = get_tags_list(administrative_metadata);
+    afs_administrative_metadata_tag * tags = get_tags_list(administrative_metadata);
 
     for (unsigned int i = 0; i < AFS_ADMINISTRATIVE_METADATA_TAG_COUNT; i++)
     {
-        mxml_node_t *current_tag = mxmlNewElement(administrative_metadata_node, tags[i].tag);
+        mxml_node_t * current_tag = mxmlNewElement(administrative_metadata_node, tags[i].tag);
         afs_xmlutils_set_node_text(*tags[i].content, current_tag);
     }
 
     boxing_memory_free(tags);
+
+    return DTRUE;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function translates the input XML file to the afs_administrative_metadata structure.
+ *
+ *  Function translates the input XML file to the afs_administrative_metadata structure.
+ *  If translates is successful, then function return DTRUE, else function return DFALSE.
+ *
+ *  \param[out]  administrative_metadata  Pointer to the afs_administrative_metadata structure.
+ *  \param[in]   file_name                Name of the XML file.
+ *  \return DTRUE on success.
+ */
+
+DBOOL afs_administrative_metadata_load_file(afs_administrative_metadata * administrative_metadata, const char * file_name)
+{
+    // If input file name string pointer is NULL or administrative metadata pointer is NULL return DFALSE
+    if (file_name == NULL || administrative_metadata == NULL)
+    {
+        return DFALSE;
+    }
+
+#ifndef WIN32
+    FILE * fp_load = fopen(file_name, "r");
+#else
+    FILE * fp_load = fopen(file_name, "rb");
+#endif
+
+    if (fp_load == NULL)
+    {
+        return DFALSE;
+    }
+
+    mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
+    
+    if (document == NULL)
+    {
+        fclose(fp_load);
+        mxmlDelete(document);
+
+        return DFALSE;
+    }
+    
+    DBOOL return_value = afs_administrative_metadata_load_xml(administrative_metadata, document);
+    
+    fclose(fp_load);
+    mxmlDelete(document);
+
+    return return_value;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function translates the input XML string to the afs_administrative_metadata structure.
+ *
+ *  Function translates the input XML string to the afs_administrative_metadata structure.
+ *  If translates is successful, then function return DTRUE, else function return DFALSE.
+ *
+ *  \param[out]  administrative_metadata  Pointer to the afs_administrative_metadata structure.
+ *  \param[in]   in                       Pointer to the input XML string.
+ *  \return DTRUE on success.
+ */
+
+DBOOL afs_administrative_metadata_load_string(afs_administrative_metadata * administrative_metadata, const char * in)
+{
+    // If input string pointer is NULL or TOC data reel pointer is NULL return DFALSE
+    if (in == NULL || boxing_string_equal(in, "") || administrative_metadata == NULL)
+    {
+        return DFALSE;
+    }
+
+    mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
+
+    if (!afs_administrative_metadata_load_xml(administrative_metadata, document))
+    {
+        return DFALSE;
+    }
+
+    mxmlDelete(document);
 
     return DTRUE;
 }
@@ -262,9 +660,9 @@ DBOOL afs_administrative_metadata_load_xml(afs_administrative_metadata* administ
 // PRIVATE AFS ADMINISTRATIVE METADATA FUNCTIONS
 //
 
-static afs_administrative_metadata_tag* get_tags_list(afs_administrative_metadata* control_data)
+static afs_administrative_metadata_tag * get_tags_list(afs_administrative_metadata * control_data)
 {
-    afs_administrative_metadata_tag* tags = BOXING_MEMORY_ALLOCATE_TYPE_ARRAY(afs_administrative_metadata_tag, AFS_ADMINISTRATIVE_METADATA_TAG_COUNT);
+    afs_administrative_metadata_tag * tags = BOXING_MEMORY_ALLOCATE_TYPE_ARRAY(afs_administrative_metadata_tag, AFS_ADMINISTRATIVE_METADATA_TAG_COUNT);
     tags[0].tag = "ReelId";
     tags[0].content = &control_data->reel_id;
 
@@ -284,4 +682,42 @@ static afs_administrative_metadata_tag* get_tags_list(afs_administrative_metadat
     tags[5].content = &control_data->creation_date;
 
     return tags;
+}
+
+
+static const char * whitespace_cb(mxml_node_t * node, int where)
+{
+    const char * name, * parent_name;
+
+    /*
+    * We can conditionally break to a new line
+    * before or after any element. These are
+    * just common HTML elements...
+    */
+
+    name = mxmlGetElement(node);
+    parent_name = mxmlGetElement(node->parent);
+
+    if (boxing_string_equal("AdministrativeMetadata", name))
+    {
+        if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
+        {
+            return ("\n");
+        }
+    }
+
+    if (boxing_string_equal("AdministrativeMetadata", parent_name))
+    {
+        if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
+        {
+            return ("\n    ");
+        }
+
+        if (where == MXML_WS_AFTER_OPEN)
+        {
+            return ("\n        ");
+        }
+    }
+
+    return (NULL);
 }

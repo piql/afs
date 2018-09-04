@@ -15,13 +15,13 @@
 **
 *****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "boxing/bool.h"
 #include "mxml.h"
 #include "toc/previewlayoutdefinitions.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // Definition structure afs_toc_file_preview_page
 typedef struct afs_toc_file_preview_page_s

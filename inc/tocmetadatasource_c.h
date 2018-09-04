@@ -15,13 +15,13 @@
 **
 *****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "boxing/config.h"
 #include "gvector.h"
 #include "mxml.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /*!
@@ -45,22 +45,22 @@ typedef struct afs_toc_metadata_source_s
     char *                         format;
     int                            id;
     int                            file_id;
-    char *                         xml_data;
+    char *                         data;
     afs_toc_metadata_source_tags * tags;
 } afs_toc_metadata_source;
 
 afs_toc_metadata_source * afs_toc_metadata_source_create();
 afs_toc_metadata_source * afs_toc_metadata_source_create2(const char * format, int file_id);
 afs_toc_metadata_source * afs_toc_metadata_source_create3(const char * format, int file_id, int id);
-afs_toc_metadata_source * afs_toc_metadata_source_create4(const char * format, int file_id, const char * xml_data);
-afs_toc_metadata_source * afs_toc_metadata_source_create5(const char * format, int file_id, const char * xml_data, int id);
-afs_toc_metadata_source * afs_toc_metadata_source_create6(const char * format, int file_id, const char * xml_data, const char * tags);
-afs_toc_metadata_source * afs_toc_metadata_source_create7(const char * format, int file_id, const char * xml_data, const char * tags, int id);
+afs_toc_metadata_source * afs_toc_metadata_source_create4(const char * format, int file_id, const char * data);
+afs_toc_metadata_source * afs_toc_metadata_source_create5(const char * format, int file_id, const char * data, int id);
+afs_toc_metadata_source * afs_toc_metadata_source_create6(const char * format, int file_id, const char * data, const char * tags);
+afs_toc_metadata_source * afs_toc_metadata_source_create7(const char * format, int file_id, const char * data, const char * tags, int id);
 afs_toc_metadata_source * afs_toc_metadata_source_create8(const char * format, int file_id, afs_toc_metadata_source_tags * tags);
 afs_toc_metadata_source * afs_toc_metadata_source_create9(const char * format, int file_id, afs_toc_metadata_source_tags * tags, int id);
 
 void afs_toc_metadata_source_init(afs_toc_metadata_source * toc_metadata_source);
-void afs_toc_metadata_source_init2(afs_toc_metadata_source * toc_metadata_source, const char * format, int file_id, const char * xml_data, const char * tags, int id);
+void afs_toc_metadata_source_init2(afs_toc_metadata_source * toc_metadata_source, const char * format, int file_id, const char * data, const char * tags, int id);
 void afs_toc_metadata_source_init3(afs_toc_metadata_source * toc_metadata_source, const char * format, int file_id, afs_toc_metadata_source_tags * tags, int id);
 
 void afs_toc_metadata_source_free(afs_toc_metadata_source * toc_metadata_source);

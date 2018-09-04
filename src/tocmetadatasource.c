@@ -38,26 +38,26 @@ static char *       get_substring(const char* input_string, size_t start_index, 
 //----------------------------------------------------------------------------
 /*!
  *  \var enum  ID_UNDEFINED
- *  \brief     File ID undefined.
+ *  \brief     Uninitialized source ID
  *  
- *  A sign that the file id is undefined.
+ *  Source ID uninitialized constant.
  */
 
 
 //----------------------------------------------------------------------------
 /*!
  *  \var enum  FILE_ID_UNDEFINED
- *  \brief     ID undefined.
+ *  \brief     Uninitialized file ID
  *
- *  A sign that the id is undefined.
+ *  File ID uninitialized constant.
  */
 
 
 /*! 
  *  \typedef  gvector afs_toc_metadata_sources
- *  \brief Array of afs_toc_metadata_source structure instances.
+ *  \brief Array of afs_toc_metadata_source pointers.
  *
- *  Array of afs_toc_metadata_source structure instances with the ability to add new instances.
+ *  Dynamic array of afs_toc_metadata_source pointers.
  */
 
 
@@ -65,22 +65,40 @@ static char *       get_substring(const char* input_string, size_t start_index, 
  *  \typedef  gvector afs_toc_metadata_source_tags
  *  \brief Array of metadata tag strings.
  *
- *  Array of metadata tag strings with the ability to add new tags.
+ *  Dynamic array of metadata tag strings.
  */
 
 
 //----------------------------------------------------------------------------
 /*!
  *  \struct     afs_toc_metadata_source_s  tocmetadatasource_c.h
- *  \brief      TOC metadata source storage.
+ *  \brief      Describes a metadata source.
  *
- *  \param format     Format name.
- *  \param id         Metadata id.
+ *  \param format     Data format.
+ *  \param id         Source id.
  *  \param file_id    File id.
- *  \param xml_data   XML data.
- *  \param tags       XML tags.
+ *  \param data       Data.
+ *  \param tags       Tags.
  *
- *  Structure for storing toc metadata source.
+ *  A metadata source is an element in the TOC describing where more metadata 
+ *  for the job can be found, it can also be used to define the tags for the 
+ *  file metadata entries.
+ *  
+ *  If file_id is not FILE_ID_UNDEFINED, the source point to a file in the TOC 
+ *  that has metadata for the job. In this case data can contain data extracted 
+ *  from the file, and format defines the format of that data. If tags is not 
+ *  NULL, the data should be a list of semicolon separated values (;) and 
+ *  tags should contain a list of semicolon separated keys corresponding to those
+ *  values.
+ *
+ *  If file_id equals FILE_ID_UNDEFINED and data is not NULL, the source can 
+ *  contains manually entered metadata (metadata added during reel creation) in 
+ *  data. If tags is not NULL it has the same function as described above.
+ *
+ *  If file_id equals FILE_ID_UNDEFINED and data is NULL, the tags should be a
+ *  list of semicolon separated keys. File metadata in the toc will point to 
+ *  this source. This ways multiple file entries can use the same set of keys, 
+ *  this avoids duplication and saves space.
  */
 
 // PUBLIC AFS TOC METADATA SOURCE FUNCTIONS
@@ -158,14 +176,14 @@ afs_toc_metadata_source * afs_toc_metadata_source_create3(const char * format, i
  *
  *  \param[in] format     Format name.
  *  \param[in] file_id    File id.
- *  \param[in] xml_data   XML data.
+ *  \param[in] data       XML data.
  *  \return instance of allocated afs_toc_metadata_source structure.
  */
 
-afs_toc_metadata_source * afs_toc_metadata_source_create4(const char * format, int file_id, const char * xml_data)
+afs_toc_metadata_source * afs_toc_metadata_source_create4(const char * format, int file_id, const char * data)
 {
     afs_toc_metadata_source * toc_metadata_source = afs_toc_metadata_source_create();
-    afs_toc_metadata_source_init2(toc_metadata_source, format, file_id, xml_data, NULL, ID_UNDEFINED);
+    afs_toc_metadata_source_init2(toc_metadata_source, format, file_id, data, NULL, ID_UNDEFINED);
     return toc_metadata_source;
 }
 
@@ -180,15 +198,15 @@ afs_toc_metadata_source * afs_toc_metadata_source_create4(const char * format, i
  *
  *  \param[in] format     Format name.
  *  \param[in] file_id    File id.
- *  \param[in] xml_data   XML data.
+ *  \param[in] data       XML data.
  *  \param[in] id         Metadata id.
  *  \return instance of allocated afs_toc_metadata_source structure.
  */
 
-afs_toc_metadata_source * afs_toc_metadata_source_create5(const char * format, int file_id, const char * xml_data, int id)
+afs_toc_metadata_source * afs_toc_metadata_source_create5(const char * format, int file_id, const char * data, int id)
 {
     afs_toc_metadata_source * toc_metadata_source = afs_toc_metadata_source_create();
-    afs_toc_metadata_source_init2(toc_metadata_source, format, file_id, xml_data, NULL, id);
+    afs_toc_metadata_source_init2(toc_metadata_source, format, file_id, data, NULL, id);
     return toc_metadata_source;
 }
 
@@ -203,15 +221,15 @@ afs_toc_metadata_source * afs_toc_metadata_source_create5(const char * format, i
  *
  *  \param[in] format     Format name.
  *  \param[in] file_id    File id.
- *  \param[in] xml_data   XML data.
+ *  \param[in] data       XML data.
  *  \param[in] tags       XML tags. (string format)
  *  \return instance of allocated afs_toc_metadata_source structure.
  */
 
-afs_toc_metadata_source * afs_toc_metadata_source_create6(const char * format, int file_id, const char * xml_data, const char * tags)
+afs_toc_metadata_source * afs_toc_metadata_source_create6(const char * format, int file_id, const char * data, const char * tags)
 {
     afs_toc_metadata_source * toc_metadata_source = afs_toc_metadata_source_create();
-    afs_toc_metadata_source_init2(toc_metadata_source, format, file_id, xml_data, tags, ID_UNDEFINED);
+    afs_toc_metadata_source_init2(toc_metadata_source, format, file_id, data, tags, ID_UNDEFINED);
     return toc_metadata_source;
 }
 
@@ -226,16 +244,16 @@ afs_toc_metadata_source * afs_toc_metadata_source_create6(const char * format, i
  *
  *  \param[in] format     Format name.
  *  \param[in] file_id    File id.
- *  \param[in] xml_data   XML data.
+ *  \param[in] data       XML data.
  *  \param[in] tags       XML tags. (string format)
  *  \param[in] id         Metadata id.
  *  \return instance of allocated afs_toc_metadata_source structure.
  */
 
-afs_toc_metadata_source * afs_toc_metadata_source_create7(const char * format, int file_id, const char * xml_data, const char * tags, int id)
+afs_toc_metadata_source * afs_toc_metadata_source_create7(const char * format, int file_id, const char * data, const char * tags, int id)
 {
     afs_toc_metadata_source * toc_metadata_source = afs_toc_metadata_source_create();
-    afs_toc_metadata_source_init2(toc_metadata_source, format, file_id, xml_data, tags, id);
+    afs_toc_metadata_source_init2(toc_metadata_source, format, file_id, data, tags, id);
     return toc_metadata_source;
 }
 
@@ -305,7 +323,7 @@ void afs_toc_metadata_source_init(afs_toc_metadata_source * toc_metadata_source)
     toc_metadata_source->format = NULL;
     toc_metadata_source->id = ID_UNDEFINED;
     toc_metadata_source->file_id = FILE_ID_UNDEFINED;
-    toc_metadata_source->xml_data = NULL;
+    toc_metadata_source->data = NULL;
     toc_metadata_source->tags = NULL;
 }
 
@@ -320,12 +338,12 @@ void afs_toc_metadata_source_init(afs_toc_metadata_source * toc_metadata_source)
  *  \param[in] toc_metadata_source  Pointer to the afs_toc_metadata_source structure.
  *  \param[in] format               Format name.
  *  \param[in] file_id              File id.
- *  \param[in] xml_data             XML data.
+ *  \param[in] data                 XML data.
  *  \param[in] tags                 XML tags. (string format)
  *  \param[in] id                   Metadata id.
  */
 
-void afs_toc_metadata_source_init2(afs_toc_metadata_source * toc_metadata_source, const char * format, int file_id, const char * xml_data, const char * tags, int id)
+void afs_toc_metadata_source_init2(afs_toc_metadata_source * toc_metadata_source, const char * format, int file_id, const char * data, const char * tags, int id)
 {
     if (toc_metadata_source == NULL)
     {
@@ -335,7 +353,7 @@ void afs_toc_metadata_source_init2(afs_toc_metadata_source * toc_metadata_source
     toc_metadata_source->format = boxing_string_clone(format);
     toc_metadata_source->id = id;
     toc_metadata_source->file_id = file_id;
-    toc_metadata_source->xml_data = boxing_string_clone(xml_data);
+    toc_metadata_source->data = boxing_string_clone(data);
     toc_metadata_source->tags = boxing_string_split(tags, ";");
 }
 
@@ -364,7 +382,7 @@ void afs_toc_metadata_source_init3(afs_toc_metadata_source * toc_metadata_source
     toc_metadata_source->format = boxing_string_clone(format);
     toc_metadata_source->id = id;
     toc_metadata_source->file_id = file_id;
-    toc_metadata_source->xml_data = NULL;
+    toc_metadata_source->data = NULL;
     toc_metadata_source->tags = tags;
 }
 
@@ -395,7 +413,7 @@ void afs_toc_metadata_source_free(afs_toc_metadata_source * toc_metadata_source)
     }
 
     boxing_string_free(toc_metadata_source->format);
-    boxing_string_free(toc_metadata_source->xml_data);
+    boxing_string_free(toc_metadata_source->data);
     gvector_free(toc_metadata_source->tags);
     boxing_memory_free(toc_metadata_source);
 }
@@ -425,7 +443,7 @@ afs_toc_metadata_source * afs_toc_metadata_source_clone(afs_toc_metadata_source 
     return_copy->format = boxing_string_clone(toc_metadata_source->format);
     return_copy->id = toc_metadata_source->id;
     return_copy->file_id = toc_metadata_source->file_id;
-    return_copy->xml_data = boxing_string_clone(toc_metadata_source->xml_data);
+    return_copy->data = boxing_string_clone(toc_metadata_source->data);
     
     if (toc_metadata_source->tags != NULL)
     {
@@ -473,7 +491,7 @@ DBOOL afs_toc_metadata_source_equal(afs_toc_metadata_source * toc_metadata_sourc
         boxing_string_equal(toc_metadata_source1->format, toc_metadata_source2->format) == DFALSE ||
         toc_metadata_source1->id != toc_metadata_source2->id ||
         toc_metadata_source1->file_id != toc_metadata_source2->file_id ||
-        boxing_string_equal(toc_metadata_source1->xml_data, toc_metadata_source2->xml_data) == DFALSE)
+        boxing_string_equal(toc_metadata_source1->data, toc_metadata_source2->data) == DFALSE)
     {
         return DFALSE;
     }
@@ -504,7 +522,7 @@ DBOOL afs_toc_metadata_source_is_valid(afs_toc_metadata_source * toc_metadata_so
     if (toc_metadata_source->format == NULL ||
         boxing_string_equal(toc_metadata_source->format, "") == DTRUE ||
         (toc_metadata_source->file_id != FILE_ID_UNDEFINED && toc_metadata_source->file_id < 0) ||
-        (toc_metadata_source->file_id == FILE_ID_UNDEFINED && (toc_metadata_source->xml_data == NULL || boxing_string_equal(toc_metadata_source->xml_data, ""))))
+        (toc_metadata_source->file_id == FILE_ID_UNDEFINED && (toc_metadata_source->data == NULL || boxing_string_equal(toc_metadata_source->data, ""))))
     {
         return DFALSE;
     }
@@ -624,10 +642,10 @@ DBOOL afs_toc_metadata_source_save_xml(afs_toc_metadata_source * toc_metadata_so
     mxmlElementSetAttrf(source_node, "id", "%d", toc_metadata_source->id);
     mxmlElementSetAttrf(source_node, "fileId", "%d", toc_metadata_source->file_id);
 
-    if (toc_metadata_source->xml_data != NULL)
+    if (toc_metadata_source->data != NULL) //  && boxing_string_length(toc_metadata_source->data)
     {
         mxml_node_t * data_node = mxmlNewElement(source_node, "data");
-        mxmlNewCDATA(data_node, toc_metadata_source->xml_data);
+        mxmlNewCDATA(data_node, toc_metadata_source->data);
     }
 
     if (toc_metadata_source->tags != NULL)
@@ -809,11 +827,11 @@ DBOOL afs_toc_metadata_source_load_xml(afs_toc_metadata_source * toc_metadata_so
                 const size_t cdataLength = strlen(cdata);
                 if (cdata[cdataLength - 1] == ']' && cdata[cdataLength - 2] == ']')
                 {
-                    toc_metadata_source->xml_data = get_substring(cdata, 0, cdataLength - 2);
+                    toc_metadata_source->data = get_substring(cdata, 0, cdataLength - 2);
                 }
                 else
                 {
-                    toc_metadata_source->xml_data = boxing_string_clone(cdata);
+                    toc_metadata_source->data = boxing_string_clone(cdata);
                 }
                 break;
             }
@@ -821,9 +839,9 @@ DBOOL afs_toc_metadata_source_load_xml(afs_toc_metadata_source * toc_metadata_so
             cdataNode = mxmlWalkNext(cdataNode, data_node, MXML_NO_DESCEND);
         }
 
-        if (toc_metadata_source->xml_data == NULL)
+        if (toc_metadata_source->data == NULL)
         {
-            toc_metadata_source->xml_data = afs_xmlutils_get_node_text(data_node);
+            toc_metadata_source->data = afs_xmlutils_get_node_text(data_node);
         }
     }
 

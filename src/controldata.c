@@ -30,7 +30,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
  *  \ingroup afs
  *
  *  The control frame is always frame number 1 in the reel. It has metadata
- *  giving a bries description of the reel content and a boxing format. The
+ *  giving a brief description of the reel content and a boxing format. The
  *  boxing format contained in the control frame should be used when decoding 
  *  the rest of the reel. The control frame also points to the locations of 
  *  the table of content.
@@ -71,57 +71,38 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
  *  \return instance of allocated afs_control_data structure.
  */
 
-afs_control_data*  afs_control_data_create()
+afs_control_data *  afs_control_data_create()
 {
     afs_control_data* control_data = BOXING_MEMORY_ALLOCATE_TYPE(afs_control_data);
-    afs_control_data_init(control_data);
+
+    control_data->administrative_metadata = NULL;
+    control_data->technical_metadata = NULL;
+
     return control_data;
 }
 
 
 //----------------------------------------------------------------------------
-/*! 
- *  \brief Initializes all structure pointers with NULL value.
- *
- *  Initializes all input structure pointers with NULL values.
- *  If input pointer is NULL, then return without initialization.
- *
- *  \param[in]  control_data  Pointer to the afs_control_data structure.
- */
-
-void afs_control_data_init(afs_control_data* control_data)
-{
-    if (control_data == NULL)
-    {
-        return;
-    }
-
-    control_data->administrative_metadata = NULL;
-    control_data->technical_metadata = NULL;
-}
-
-
-//----------------------------------------------------------------------------
 /*!
- *  \brief Initializes all structure pointers.
+ *  \brief Create a control data instance.
  *
- *  Initializes all input structure pointers with specified values.
- *  If one of the input pointers is NULL, then return without initialization.
+ *  Allocate memory for the afs_control_data type
+ *  and initialize afs_administrative_metadata and afs_technical_metadata structures with specified input value.
+ *  Return instance of allocated structure.
  *
- *  \param[in]  control_data             Pointer to the afs_control_data structure.
  *  \param[in]  administrative_metadata  Pointer to the afs_administrative_metadata structure.
  *  \param[in]  technical_metadata       Pointer to the afs_technical_metadata structure.
+ *  \return instance of allocated afs_control_data structure.
  */
 
-void afs_control_data_init2(afs_control_data* control_data, afs_administrative_metadata* administrative_metadata, afs_technical_metadata* technical_metadata)
+afs_control_data * afs_control_data_create2(afs_administrative_metadata * administrative_metadata, afs_technical_metadata * technical_metadata)
 {
-    if (control_data == NULL || administrative_metadata == NULL || technical_metadata == NULL)
-    {
-        return;
-    }
+    afs_control_data * control_data = BOXING_MEMORY_ALLOCATE_TYPE(afs_control_data);
 
     control_data->administrative_metadata = administrative_metadata;
     control_data->technical_metadata = technical_metadata;
+
+    return control_data;
 }
 
 
@@ -134,7 +115,7 @@ void afs_control_data_init2(afs_control_data* control_data, afs_administrative_m
  *  \param[in]  control_data  Pointer to the afs_control_data structure.
  */
 
-void afs_control_data_free(afs_control_data* control_data)
+void afs_control_data_free(afs_control_data * control_data)
 {
     if (control_data == NULL)
     {
@@ -144,6 +125,180 @@ void afs_control_data_free(afs_control_data* control_data)
     afs_administrative_metadata_free(control_data->administrative_metadata);
     afs_technical_metadata_free(control_data->technical_metadata);
     boxing_memory_free(control_data);
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function create a copy of input afs_control_data structure.
+ *
+ *  Function create a copy of input afs_control_data structure and return it.
+ *  If control data structure pointer is NULL function return NULL.
+ *
+ *  \param[in]  control_data  Pointer to the afs_control_data structure.
+ *  \return new copy of afs_control_data structure or NULL.
+ */
+
+afs_control_data * afs_control_data_clone(const afs_control_data * control_data)
+{
+    // If control data pointer is NULL return NULL.
+    if (control_data == NULL)
+    {
+        return NULL;
+    }
+
+    afs_control_data * return_control_data = afs_control_data_create();
+    return_control_data->administrative_metadata = afs_administrative_metadata_clone(control_data->administrative_metadata);
+    return_control_data->technical_metadata = afs_technical_metadata_clone(control_data->technical_metadata);
+
+    return return_control_data;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function checks two instances of the afs_control_data structures on the identity.
+ *
+ *  Function checks two instances of the afs_control_data structures on the identity.
+ *
+ *  \param[in]   control_data1  Pointer to the first instance of the afs_control_data structure.
+ *  \param[in]   control_data2  Pointer to the second instance of the afs_control_data structure.
+ *  \return sign of identity of the input structures.
+ */
+
+DBOOL afs_control_data_equal(const afs_control_data * control_data1, const afs_control_data * control_data2)
+{
+    if (control_data1 == NULL && control_data2 == NULL)
+    {
+        return DTRUE;
+    }
+
+    if (control_data1 == NULL || control_data2 == NULL)
+    {
+        return DFALSE;
+    }
+
+    if (afs_administrative_metadata_equal(control_data1->administrative_metadata, control_data2->administrative_metadata) == DTRUE &&
+        afs_technical_metadata_equal(control_data1->technical_metadata, control_data2->technical_metadata) == DTRUE)
+    {
+        return DTRUE;
+    }
+
+    return DFALSE;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function translates the input afs_control_data structure to the XML file.
+ *
+ *  Function translates the input afs_control_data structure to the XML file.
+ *  If translates is successful, then function return DTRUE, else function return DFALSE.
+ *
+ *  \param[in]   control_data  Pointer to the afs_control_data structure.
+ *  \param[in]   file_name     Name of the XML file.
+ *  \param[in]   compact       If compact is DFALSE then in the resulting XML file needs to add formatting (new lines and tabs).
+ *  \return DTRUE on success.
+ */
+
+DBOOL afs_control_data_save_file(afs_control_data * control_data, const char * file_name, DBOOL compact)
+{
+    if (file_name == NULL || control_data == NULL)
+    {
+        return DFALSE;
+    }
+
+    if (control_data->administrative_metadata == NULL || control_data->technical_metadata == NULL)
+    {
+        return DFALSE;
+    }
+
+    mxml_node_t * tree = mxmlNewXML("1.0");
+
+    if (!afs_control_data_save_xml(control_data, tree))
+    {
+        mxmlDelete(tree);
+        return DFALSE;
+    }
+
+#ifndef WIN32
+    FILE * fp_save = fopen(file_name, "w+");
+#else
+    FILE * fp_save = fopen(file_name, "w+b");
+#endif
+
+    if (fp_save == NULL)
+    {
+        return DFALSE;
+    }
+
+    mxmlSetWrapMargin(0);
+
+    if (compact == DTRUE)
+    {
+        mxmlSaveFile(tree, fp_save, MXML_NO_CALLBACK);
+    }
+    else
+    {
+        mxmlSaveFile(tree, fp_save, whitespace_cb);
+    }
+
+
+    fclose(fp_save);
+    mxmlDelete(tree);
+
+    return DTRUE;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function translates the input afs_control_data structure to the XML string.
+ *
+ *  Function translates the input afs_control_data structure to the XML string.
+ *  If translates is successful, then function return resulting string, else function return NULL.
+ *
+ *  \param[in]   control_data  Pointer to the afs_control_data structure.
+ *  \param[in]   compact       If compact is DFALSE then in the resulting XML string needs to add formatting (new lines and tabs).
+ *  \return resulting string or NULL.
+ */
+
+char * afs_control_data_save_string(afs_control_data * control_data, DBOOL compact)
+{
+    // If control data pointer is NULL return DFALSE
+    if (control_data == NULL)
+    {
+        return NULL;
+    }
+
+    if (control_data->administrative_metadata == NULL || control_data->technical_metadata == NULL)
+    {
+        return NULL;
+    }
+
+    struct mxml_node_s * document = mxmlNewXML("1.0");
+
+    if (!afs_control_data_save_xml(control_data, document))
+    {
+        mxmlDelete(document);
+        return NULL;
+    }
+
+    char * xmlString;
+    mxmlSetWrapMargin(0);
+
+    if (compact)
+    {
+        xmlString = mxmlSaveAllocString(document, MXML_NO_CALLBACK);
+    }
+    else
+    {
+        xmlString = mxmlSaveAllocString(document, whitespace_cb);
+    }
+
+    mxmlDelete(document);
+
+    return xmlString;
 }
 
 
@@ -159,72 +314,102 @@ void afs_control_data_free(afs_control_data* control_data)
  *  \return DTRUE on success.
  */
 
-DBOOL afs_control_data_save_xml(mxml_node_t * out, afs_control_data* control_data)
+DBOOL afs_control_data_save_xml(afs_control_data * control_data, mxml_node_t * out)
 {
     if (out == NULL || control_data == NULL)
     {
         return DFALSE;
     }
 
-    afs_administrative_metadata_save_xml(out, control_data->administrative_metadata);
-    afs_technical_metadata_save_xml(out, control_data->technical_metadata);
+    DBOOL result = afs_administrative_metadata_save_xml(control_data->administrative_metadata, out);
 
-    return DTRUE;
+    if (result == DFALSE)
+    {
+        return DFALSE;
+    }
+
+    return afs_technical_metadata_save_xml(control_data->technical_metadata, out);
 }
 
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function translates the input afs_control_data structure to the XML file.
+ *  \brief Function translates the input XML file to the afs_control_data structure.
  *
- *  Function translates the input afs_control_data structure to the XML file.
+ *  Function translates the input XML file to the afs_control_data structure.
  *  If translates is successful, then function return DTRUE, else function return DFALSE.
  *
+ *  \param[out]  control_data  Pointer to the afs_control_data structure.
  *  \param[in]   file_name     Name of the XML file.
- *  \param[in]   control_data  Pointer to the afs_control_data structure.
- *  \param[in]   compact       If compact is DFALSE then in the resulting XML file needs to add formatting (new lines and tabs).
  *  \return DTRUE on success.
  */
 
-DBOOL afs_control_data_save_xml_file(const char * file_name, afs_control_data* control_data, DBOOL compact)
+DBOOL afs_control_data_load_file(afs_control_data * control_data, const char * file_name)
 {
+    // If input file name string pointer is NULL or control data pointer is NULL return DFALSE
     if (file_name == NULL || control_data == NULL)
     {
         return DFALSE;
     }
 
-    mxml_node_t *tree = mxmlNewXML("1.0");
-
 #ifndef WIN32
-    FILE * fp_save = fopen(file_name, "w+");
+    FILE * fp_load = fopen(file_name, "r");
 #else
-    FILE * fp_save = fopen(file_name, "w+b");
+    FILE * fp_load = fopen(file_name, "rb");
 #endif
 
-    if (fp_save == NULL)
+    if (fp_load == NULL)
     {
         return DFALSE;
     }
 
-    if (afs_control_data_save_xml(tree, control_data) == DFALSE)
+    mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
+    
+    if (document == NULL)
     {
-        fclose(fp_save);
-        mxmlDelete(tree);
+        fclose(fp_load);
+        mxmlDelete(document);
+
+        return DFALSE;
+    }
+    
+    DBOOL return_value = afs_control_data_load_xml(control_data, document);
+    
+    fclose(fp_load);
+    mxmlDelete(document);
+
+    return return_value;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function translates the input XML string to the afs_control_data structure.
+ *
+ *  Function translates the input XML string to the afs_control_data structure.
+ *  If translates is successful, then function return DTRUE, else function return DFALSE.
+ *
+ *  \param[out]  control_data  Pointer to the afs_control_data structure.
+ *  \param[in]   in            Pointer to the input XML string.
+ *  \return DTRUE on success.
+ */
+
+DBOOL afs_control_data_load_string(afs_control_data * control_data, const char * in)
+{
+    // If input string pointer is NULL or control data pointer is NULL return DFALSE
+    if (in == NULL || boxing_string_equal(in, "") || control_data == NULL)
+    {
         return DFALSE;
     }
 
-    if (compact == DTRUE)
+    mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
+
+    if (!afs_control_data_load_xml(control_data, document))
     {
-        mxmlSaveFile(tree, fp_save, MXML_NO_CALLBACK);
-    }
-    else
-    {
-        mxmlSaveFile(tree, fp_save, whitespace_cb);
+        return DFALSE;
     }
 
-
-    fclose(fp_save);
-    mxmlDelete(tree);
+    mxmlDelete(document);
 
     return DTRUE;
 }
@@ -251,66 +436,33 @@ DBOOL afs_control_data_load_xml(afs_control_data* control_data, mxml_node_t * in
 
     if (mxmlFindElement(in, in, "AdministrativeMetadata", NULL, NULL, MXML_DESCEND) != NULL)
     {
+        if (control_data->administrative_metadata != NULL)
+        {
+            afs_administrative_metadata_free(control_data->administrative_metadata);
+        }
         control_data->administrative_metadata = afs_administrative_metadata_create();
         afs_administrative_metadata_load_xml(control_data->administrative_metadata, in);
+    }
+    else
+    {
+        return DFALSE;
     }
 
     if (mxmlFindElement(in, in, "TechnicalMetadata", NULL, NULL, MXML_DESCEND) != NULL)
     {
+        if (control_data->technical_metadata != NULL)
+        {
+            afs_technical_metadata_free(control_data->technical_metadata);
+        }
         control_data->technical_metadata = afs_technical_metadata_create();
         afs_technical_metadata_load_xml(control_data->technical_metadata, in);
     }
+    else
+    {
+        return DFALSE;
+    }
 
     return DTRUE;
-}
-
-
-//----------------------------------------------------------------------------
-/*!
- *  \brief Function translates the input XML file to the afs_control_data structure.
- *
- *  Function translates the input XML file to the afs_control_data structure.
- *  If translates is successful, then function return DTRUE, else function return DFALSE.
- *
- *  \param[out]  control_data  Pointer to the afs_control_data structure.
- *  \param[in]   file_name     Name of the XML file.
- *  \return DTRUE on success.
- */
-
-DBOOL afs_control_data_load_xml_file(afs_control_data* control_data, const char * file_name)
-{
-    if (control_data == NULL || file_name == NULL)
-    {
-        return DFALSE;
-    }
-
-#ifndef WIN32
-    FILE * fp_load = fopen(file_name, "r");
-#else
-    FILE * fp_load = fopen(file_name, "rb");
-#endif
-
-    if (fp_load == NULL)
-    {
-        return DFALSE;
-    }
-
-    mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
-
-    if (document == NULL)
-    {
-        fclose(fp_load);
-        mxmlDelete(document);
-
-        return DFALSE;
-    }
-
-    DBOOL return_value = afs_control_data_load_xml(control_data, document);
-
-    fclose(fp_load);
-    mxmlDelete(document);
-
-    return return_value;
 }
 
 

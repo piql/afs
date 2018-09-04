@@ -1,4 +1,4 @@
-#+TITLE:AFS Libaray
+#+TITLE:AFS Library
 #+EMAIL:office@piql.com
 #+DATE:2018.06.12
 #+DESCRIPTION:Archival File System Library

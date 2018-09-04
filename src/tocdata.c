@@ -53,12 +53,17 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
 
 //----------------------------------------------------------------------------
 /*! \defgroup  preview  Preview.
- *  \brief     Files renedered as analogue images.
+ *  \brief     Files rendered as analogue images.
  *  \ingroup   toc
  *
  *  Previews are digital files (documents or images) rendered as analogue 
  *  images on the reel. Each digital file are rendered as one or more pages
  *  on the reel.
+ *
+ *  A frame is split up into one or more sections, where each section is a
+ *  rectangular area of the frame. Sections are not allowed to overlap. The
+ *  arrangment of sections in a frame is defined by afs_toc_preview_layout_definition_s
+ *  which holds an array of afs_toc_preview_section_s sections.
  */
 
 
@@ -240,9 +245,9 @@ DBOOL afs_toc_data_equal(afs_toc_data * toc_data1, afs_toc_data * toc_data2)
         boxing_string_equal(toc_data1->index_type, toc_data2->index_type) &&
         boxing_string_equal(toc_data1->job_id, toc_data2->job_id) &&
         boxing_string_equal(toc_data1->reel_id, toc_data2->reel_id) &&
-        afs_toc_data_reels_equal(toc_data1->reels, toc_data2->reels) &&
-        afs_toc_metadata_equal(toc_data1->metadata, toc_data2->metadata) &&
-        afs_toc_preview_layout_definitions_equal(toc_data1->preview_layout_definitions, toc_data2->preview_layout_definitions))
+        (afs_toc_data_reels_equal(toc_data1->reels, toc_data2->reels) || (afs_toc_data_reel_count(toc_data1) == 0 && afs_toc_data_reel_count(toc_data2) == 0)) &&
+        (afs_toc_metadata_equal(toc_data1->metadata, toc_data2->metadata) || (afs_toc_data_metadata_source_count(toc_data1) == 0 && afs_toc_data_metadata_source_count(toc_data2) == 0)) &&
+        (afs_toc_preview_layout_definitions_equal(toc_data1->preview_layout_definitions, toc_data2->preview_layout_definitions) || (afs_toc_data_preview_layout_definition_count(toc_data1) == 0 && afs_toc_data_preview_layout_definition_count(toc_data2) == 0)))
     {
         return DTRUE;
     }
@@ -928,12 +933,12 @@ DBOOL afs_toc_data_is_valid(const afs_toc_data * toc_data)
         return DFALSE;
     }
 
-    if (afs_toc_data_reels_is_valid(toc_data->reels) == DFALSE)
+    if (afs_toc_data_reels_is_valid(toc_data->reels) == DFALSE && toc_data->reels != NULL)
     {
         return DFALSE;
     }
 
-    if (afs_toc_preview_layout_definitions_is_valid(toc_data->preview_layout_definitions) == DFALSE)
+    if (afs_toc_preview_layout_definitions_is_valid(toc_data->preview_layout_definitions) == DFALSE && toc_data->preview_layout_definitions != NULL)
     {
         return DFALSE;
     }
@@ -1138,14 +1143,20 @@ DBOOL afs_toc_data_save_xml(afs_toc_data * toc_data, mxml_node_t* out)
         }
     }
 
-    if (afs_toc_preview_layout_definitions_save_xml(toc_data->preview_layout_definitions, index_node) == DFALSE)
+    if (afs_toc_preview_layout_definitions_get_count(toc_data->preview_layout_definitions) != 0)
     {
-        return DFALSE;
+        if (afs_toc_preview_layout_definitions_save_xml(toc_data->preview_layout_definitions, index_node) == DFALSE)
+        {
+            return DFALSE;
+        }
     }
 
-    if (afs_toc_data_reels_save_xml(toc_data->reels, index_node) == DFALSE)
+    if (afs_toc_data_reels_get_reels_count(toc_data->reels) != 0)
     {
-        return DFALSE;
+        if (afs_toc_data_reels_save_xml(toc_data->reels, index_node) == DFALSE)
+        {
+            return DFALSE;
+        }
     }
     
     return DTRUE;
@@ -1264,25 +1275,47 @@ DBOOL afs_toc_data_load_xml(afs_toc_data * toc_data, mxml_node_t * node)
         return DFALSE;
     }
 
+    if (toc_data->version != NULL)
+    {
+        boxing_string_free(toc_data->version);
+    }
+
     toc_data->version = boxing_string_clone(mxmlElementGetAttr(index_node, "version"));
 
     mxml_node_t * index_type_node = mxmlFindElement(index_node, index_node, "indexType", NULL, NULL, MXML_DESCEND);
     if (index_type_node != NULL)
     {
+        if (toc_data->index_type != NULL)
+        {
+            boxing_string_free(toc_data->index_type);
+        }
+
         toc_data->index_type = afs_xmlutils_get_node_text(index_type_node);
     }
 
     mxml_node_t * job_id_node = mxmlFindElement(index_node, index_node, "jobId", NULL, NULL, MXML_DESCEND);
     if (job_id_node != NULL)
     {
+        if (toc_data->job_id != NULL)
+        {
+            boxing_string_free(toc_data->job_id);
+        }
+
         toc_data->job_id = afs_xmlutils_get_node_text(job_id_node);
     }
 
     mxml_node_t * reel_id_node = mxmlFindElement(index_node, index_node, "reelId", NULL, NULL, MXML_DESCEND);
     if (reel_id_node != NULL)
     {
+        if (toc_data->reel_id != NULL)
+        {
+            boxing_string_free(toc_data->reel_id);
+        }
+
         toc_data->reel_id = afs_xmlutils_get_node_text(reel_id_node);
     }
+
+    DBOOL metadata_loaded = DFALSE;
 
     mxml_node_t * metadata_node = mxmlFindElement(index_node, index_node, "metadata", NULL, NULL, MXML_DESCEND);
 
@@ -1290,14 +1323,19 @@ DBOOL afs_toc_data_load_xml(afs_toc_data * toc_data, mxml_node_t * node)
     {
         if (boxing_string_equal(metadata_node->parent->value.element.name, "Index") == DTRUE)
         {
-            toc_data->metadata = afs_toc_metadata_create();
-
-            DBOOL load_metadata_result = afs_toc_metadata_load_xml(toc_data->metadata, metadata_node);
+            afs_toc_metadata * load_toc_metadata = afs_toc_metadata_create();
+            
+            DBOOL load_metadata_result = afs_toc_metadata_load_xml(load_toc_metadata, metadata_node);
 
             if (load_metadata_result == DFALSE)
             {
+                afs_toc_metadata_free(load_toc_metadata);
                 return DFALSE;
             }
+
+            afs_toc_metadata_free(toc_data->metadata);
+            toc_data->metadata = load_toc_metadata;
+            metadata_loaded = DTRUE;
 
             break;
         }
@@ -1305,32 +1343,64 @@ DBOOL afs_toc_data_load_xml(afs_toc_data * toc_data, mxml_node_t * node)
         metadata_node = mxmlFindElement(metadata_node, index_node, "metadata", NULL, NULL, MXML_DESCEND);
     }
 
+    DBOOL definitions_loaded = DFALSE;
+
     mxml_node_t * layout_definitions_node = mxmlFindElement(index_node, index_node, "layoutDefinitions", NULL, NULL, MXML_DESCEND);
 
     if (layout_definitions_node != NULL)
     {
-        toc_data->preview_layout_definitions = afs_toc_preview_layout_definitions_create();
+        afs_toc_preview_layout_definitions * load_toc_preview_layout_definitions = afs_toc_preview_layout_definitions_create();
 
-        DBOOL load_layout_definitions_result = afs_toc_preview_layout_definitions_load_xml(toc_data->preview_layout_definitions, layout_definitions_node);
+        DBOOL load_layout_definitions_result = afs_toc_preview_layout_definitions_load_xml(load_toc_preview_layout_definitions, layout_definitions_node);
 
         if (load_layout_definitions_result == DFALSE)
         {
+            afs_toc_preview_layout_definitions_free(load_toc_preview_layout_definitions);
             return DFALSE;
         }
+
+        afs_toc_preview_layout_definitions_free(toc_data->preview_layout_definitions);
+        toc_data->preview_layout_definitions = load_toc_preview_layout_definitions;
+        definitions_loaded = DTRUE;
     }
+
+    DBOOL reels_loaded = DFALSE;
 
     mxml_node_t * reels_node = mxmlFindElement(index_node, index_node, "reels", NULL, NULL, MXML_DESCEND);
 
     if (reels_node != NULL)
     {
-        toc_data->reels = afs_toc_data_reels_create();
+        afs_toc_data_reels * load_toc_data_reels = afs_toc_data_reels_create();
 
-        DBOOL load_reels_result = afs_toc_data_reels_load_xml(toc_data->reels, reels_node);
+        DBOOL load_reels_result = afs_toc_data_reels_load_xml(load_toc_data_reels, reels_node);
 
         if (load_reels_result == DFALSE)
         {
+            afs_toc_data_reels_free(load_toc_data_reels);
             return DFALSE;
         }
+
+        afs_toc_data_reels_free(toc_data->reels);
+        toc_data->reels = load_toc_data_reels;
+        reels_loaded = DTRUE;
+    }
+
+    if (metadata_loaded == DFALSE)
+    {
+        afs_toc_metadata_free(toc_data->metadata);
+        toc_data->metadata = NULL;
+    }
+
+    if (definitions_loaded == DFALSE)
+    {
+        afs_toc_preview_layout_definitions_free(toc_data->preview_layout_definitions);
+        toc_data->preview_layout_definitions = NULL;
+    }
+
+    if (reels_loaded == DFALSE)
+    {
+        afs_toc_data_reels_free(toc_data->reels);
+        toc_data->reels = NULL;
     }
 
     return DTRUE;

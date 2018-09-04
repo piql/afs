@@ -18,6 +18,7 @@
 #include "boxing/string.h"
 #include "boxing/platform/memory.h"
 #include "boxing/log.h"
+#include "boxing/math/math.h"
 
 
 // PRIVATE INTERFACE
@@ -62,7 +63,7 @@ static layout_definitions_lengths get_max_layout_id_lenght(const afs_toc_preview
 //----------------------------------------------------------------------------
 /*!
  *  \struct     afs_toc_preview_layout_definitions_s  previewlayoutdefinitions.h
- *  \brief      TOC preview layout definitions storage.
+ *  \brief      Array of afs_toc_preview_layout_definition_s.
  *
  *  \param layout_definitions  Vector with afs_toc_preview_layout_definition pointers.
  *
@@ -603,31 +604,36 @@ char * afs_toc_preview_layout_definitions_save_as_table(const afs_toc_preview_la
         return NULL;
     }
 
-    const char * header = "=========================\nVISUAL LAYOUT DEFINITIONS\n=========================\n\n";
-
+    const char * string_id_pad = "00000000000";
+    const char * header =
+        "VISUAL LAYOUT DEFINITIONS\n"
+        "=========================\n";
+    const char * definition_columns = "<layoutId> <sections> <name>\n";
+    const char * layout_columns = "\n<layoutId> <sectionId> <x> <y> <width> <height> <rotation>\n";
+    
     layout_definitions_lengths lengths = get_max_layout_id_lenght(toc_preview_layout_definitions);
     unsigned int definitions_count = afs_toc_preview_layout_definitions_get_count(toc_preview_layout_definitions);
 
     unsigned int header_length = (unsigned int)boxing_string_length(header);
     unsigned int table1_width =  lengths.layout_id_length + lengths.sections_length + lengths.name_length + 3;
-    unsigned int table1_length = table1_width + table1_width * definitions_count + 1;
+    unsigned int table1_length = strlen(definition_columns) + table1_width * definitions_count + 1;
     unsigned int table2_width =  lengths.layout_id_length + lengths.section_id_length + lengths.x_length + lengths.y_length +
                                  lengths.width_length + lengths.height_length + lengths.rotation_length + 7;
-    unsigned int table2_length = table2_width + table2_width * lengths.sections_count + 1;
+    unsigned int table2_length = strlen(layout_columns) + table2_width * lengths.sections_count + 1;
 
-    char * return_string = boxing_string_allocate(header_length + table1_length + table2_length);
+    char * return_string = boxing_string_allocate(header_length + table1_length + table2_length + strlen("\n"));
     char * current_string = return_string;
-    current_string += sprintf(current_string, "%s%-*s %-*s %-*s\n", header, lengths.layout_id_length, "<layoutId>", lengths.sections_length, "<sections>", lengths.name_length, "<name>");
+    current_string += sprintf(current_string, "%s%s", header, definition_columns);
 
     for (unsigned int i = 0; i < definitions_count; i++)
     {
         afs_toc_preview_layout_definition * toc_preview_layout_definition = afs_toc_preview_layout_definitions_get_layout_definition_by_index(toc_preview_layout_definitions, i);
         unsigned int sections_count = afs_toc_preview_layout_definition_get_section_count(toc_preview_layout_definition);
 
-        current_string += sprintf(current_string, "%-*s %-*u %-*s\n", lengths.layout_id_length, toc_preview_layout_definition->id, lengths.sections_length, sections_count, lengths.name_length, toc_preview_layout_definition->name);
+        current_string += sprintf(current_string, "%.*s%s %0*u %s\n", (int)(lengths.layout_id_length - boxing_string_length(toc_preview_layout_definition->id)), string_id_pad, toc_preview_layout_definition->id, lengths.sections_length, sections_count, toc_preview_layout_definition->name);
     }
 
-    current_string += sprintf(current_string, "\n%-*s %-*s %-*s %-*s %-*s %-*s %s\n", lengths.layout_id_length, "<layoutId>", lengths.section_id_length, "<sectionId>", lengths.x_length, "<x>", lengths.y_length, "<y>", lengths.width_length, "<width>", lengths.height_length, "<height>",  "<rotation>");
+    current_string += sprintf(current_string, layout_columns);
 
     for (unsigned int i = 0; i < definitions_count; i++)
     {
@@ -638,10 +644,16 @@ char * afs_toc_preview_layout_definitions_save_as_table(const afs_toc_preview_la
         {
             afs_toc_preview_section * current_toc_preview_section = afs_toc_preview_layout_definition_get_section(toc_preview_layout_definition, j);
 
-            current_string += sprintf(current_string, "%-*s %-*u %-*u %-*u %-*u %-*u %u\n", lengths.layout_id_length, toc_preview_layout_definition->id, lengths.section_id_length, current_toc_preview_section->id, lengths.x_length, current_toc_preview_section->x, lengths.y_length, current_toc_preview_section->y, lengths.width_length, current_toc_preview_section->width, lengths.height_length, current_toc_preview_section->height, current_toc_preview_section->rotation);
+            current_string += sprintf(
+                current_string, "%.*s%s %0*u %0*u %0*u %0*u %0*u %0*u\n", (int)(lengths.layout_id_length - boxing_string_length(toc_preview_layout_definition->id)), string_id_pad, toc_preview_layout_definition->id, lengths.section_id_length, current_toc_preview_section->id, lengths.x_length, current_toc_preview_section->x, lengths.y_length, current_toc_preview_section->y, lengths.width_length, current_toc_preview_section->width, lengths.height_length, current_toc_preview_section->height, lengths.rotation_length, current_toc_preview_section->rotation);
         }
     }
 
+    if ( definitions_count )
+    {
+        strcat( return_string, "\n" );
+    }
+    
     return return_string;
 }
 
@@ -837,15 +849,15 @@ static layout_definitions_lengths get_max_layout_id_lenght(const afs_toc_preview
 {
     layout_definitions_lengths lengths;
 
-    lengths.layout_id_length = (unsigned int)boxing_string_length("<layoutId>");
-    lengths.sections_length = (unsigned int)boxing_string_length("<sections>");
-    lengths.name_length = (unsigned int)boxing_string_length("<name>");
-    lengths.section_id_length = (unsigned int)boxing_string_length("<sectionId>");
-    lengths.x_length = (unsigned int)boxing_string_length("<x>");
-    lengths.y_length = (unsigned int)boxing_string_length("<y>");
-    lengths.width_length = (unsigned int)boxing_string_length("<width>");
-    lengths.height_length = (unsigned int)boxing_string_length("<height>");
-    lengths.rotation_length = (unsigned int)boxing_string_length("<rotation>");
+    lengths.layout_id_length = 0; //(unsigned int)boxing_string_length("<layoutId>");
+    lengths.sections_length = 0; //(unsigned int)boxing_string_length("<sections>");
+    lengths.name_length = 0; //(unsigned int)boxing_string_length("<name>");
+    lengths.section_id_length = 0; //(unsigned int)boxing_string_length("<sectionId>");
+    lengths.x_length = 0; //(unsigned int)boxing_string_length("<x>");
+    lengths.y_length = 0; //(unsigned int)boxing_string_length("<y>");
+    lengths.width_length = 0; //(unsigned int)boxing_string_length("<width>");
+    lengths.height_length = 0; //(unsigned int)boxing_string_length("<height>");
+    lengths.rotation_length = 3; //(unsigned int)boxing_string_length("<rotation>");
     lengths.sections_count = 0;
 
 
@@ -864,21 +876,21 @@ static layout_definitions_lengths get_max_layout_id_lenght(const afs_toc_preview
         afs_toc_preview_layout_definition * toc_preview_layout_definition = GVECTORN(toc_preview_layout_definitions->layout_definitions, afs_toc_preview_layout_definition *, i);
         unsigned int sections_count = afs_toc_preview_layout_definition_get_section_count(toc_preview_layout_definition);
 
-        lengths.layout_id_length = (unsigned int)boxing_string_length(toc_preview_layout_definition->id) > lengths.layout_id_length ? (unsigned int)boxing_string_length(toc_preview_layout_definition->id) : lengths.layout_id_length;
-        lengths.sections_length = get_digits_count(sections_count) > lengths.sections_length ? get_digits_count(sections_count) : lengths.sections_length;
-        lengths.name_length = (unsigned int)boxing_string_length(toc_preview_layout_definition->name) > lengths.name_length ? (unsigned int)boxing_string_length(toc_preview_layout_definition->name) : lengths.name_length;
+        lengths.layout_id_length = BOXING_MATH_MAX((unsigned int)boxing_string_length(toc_preview_layout_definition->id), lengths.layout_id_length);
+        lengths.sections_length = BOXING_MATH_MAX(get_digits_count(sections_count), lengths.sections_length);
+        lengths.name_length = BOXING_MATH_MAX((unsigned int)boxing_string_length(toc_preview_layout_definition->name), lengths.name_length);
 
         for (unsigned int j = 0; j < sections_count; j++)
         {
             afs_toc_preview_section * current_toc_preview_section = afs_toc_preview_layout_definition_get_section(toc_preview_layout_definition, j);
             lengths.sections_count++;
 
-            lengths.section_id_length = get_digits_count(current_toc_preview_section->id) > lengths.section_id_length ? get_digits_count(current_toc_preview_section->id) : lengths.section_id_length;
-            lengths.x_length = get_digits_count(current_toc_preview_section->x) > lengths.x_length ? get_digits_count(current_toc_preview_section->x) : lengths.x_length;
-            lengths.y_length = get_digits_count(current_toc_preview_section->y) > lengths.y_length ? get_digits_count(current_toc_preview_section->y) : lengths.y_length;
-            lengths.width_length = get_digits_count(current_toc_preview_section->width) > lengths.width_length ? get_digits_count(current_toc_preview_section->width) : lengths.width_length;
-            lengths.height_length = get_digits_count(current_toc_preview_section->height) > lengths.height_length ? get_digits_count(current_toc_preview_section->height) : lengths.height_length;
-            lengths.rotation_length = get_digits_count(current_toc_preview_section->rotation) > lengths.rotation_length ? get_digits_count(current_toc_preview_section->rotation) : lengths.rotation_length;
+            lengths.section_id_length = BOXING_MATH_MAX(get_digits_count(current_toc_preview_section->id), lengths.section_id_length);
+            lengths.x_length = BOXING_MATH_MAX(get_digits_count(current_toc_preview_section->x), lengths.x_length);
+            lengths.y_length = BOXING_MATH_MAX(get_digits_count(current_toc_preview_section->y), lengths.y_length);
+            lengths.width_length = BOXING_MATH_MAX(get_digits_count(current_toc_preview_section->width), lengths.width_length);
+            lengths.height_length = BOXING_MATH_MAX(get_digits_count(current_toc_preview_section->height), lengths.height_length);
+            lengths.rotation_length = BOXING_MATH_MAX(get_digits_count(current_toc_preview_section->rotation), lengths.rotation_length);
         }
     }
 

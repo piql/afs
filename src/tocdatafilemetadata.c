@@ -500,12 +500,12 @@ char * afs_toc_data_file_metadata_save_string(afs_toc_data_file_metadata * toc_d
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function translates the input afs_toc_data_file_metadata structure to the string table.
+ *  \brief Write metadata as table
  *
- *  Function translates the input afs_toc_data_file_metadata structure to the string table.
- *  If translates is successful, then function return resulting string, else function return NULL.
+ *  Write metadata in ASCII table format. This function will allocate and return 
+ *  the output string, it must be freed by the caller.
  *
- *  \param[in]   toc_data_file_metadata Pointer to the afs_toc_data_file_metadata structure.
+ *  \param[in]   toc_data_file_metadata Instance to be printed
  *  \return resulting string or NULL.
  */
 
@@ -517,23 +517,26 @@ char * afs_toc_data_file_metadata_save_as_table(const afs_toc_data_file_metadata
         return NULL;
     }
 
-    const char * header = "================\nMETADATA SOURCES\n================\n\n";
+    const char * header =
+        "METADATA SOURCES\n"
+        "================\n"
+        "<id> <fileId> <sourceId> <formatId> <data>\n";
 
     toc_data_file_metadata_lengths lengths = get_max_toc_data_file_metadata_lenght(toc_data_file_metadata);
     unsigned int sources_count = afs_toc_data_file_metadata_get_sources_count(toc_data_file_metadata);
 
     unsigned int header_length = (unsigned int)boxing_string_length(header);
-    unsigned int table_width = lengths.id_length + lengths.file_id_length + lengths.source_id_length + lengths.format_id_length + lengths.data_length + 5;
-    unsigned int table_length = table_width + table_width * sources_count + 1;
+    unsigned int table_width = lengths.id_length + lengths.file_id_length + lengths.source_id_length + lengths.format_id_length + lengths.data_length + 4 + strlen("\n");
+    unsigned int table_length = table_width * sources_count + 1;
 
     char * return_string = boxing_string_allocate(header_length + table_length);
     char * current_string = return_string;
-    current_string += sprintf(current_string, "%s%-*s %-*s %-*s %-*s %s\n", header, lengths.id_length, "<id>", lengths.file_id_length, "<fileId>", lengths.source_id_length, "<sourceId>", lengths.format_id_length, "<formatId>", "<data>");
+    current_string += sprintf(current_string, "%s", header);
 
     for (unsigned int i = 0; i < sources_count; i++)
     {
         afs_toc_data_file_metadata_source * toc_data_file_metadata_source = afs_toc_data_file_metadata_get_source(toc_data_file_metadata, i);
-        current_string += sprintf(current_string, "%-*u %-*u %-*u %-*s %s\n", lengths.id_length, i, lengths.file_id_length, toc_data_file_metadata_source->file_id, lengths.source_id_length, toc_data_file_metadata_source->source_id, lengths.format_id_length, toc_data_file_metadata_source->format_id, toc_data_file_metadata_source->data);
+        current_string += sprintf(current_string, "%0*u %0*u %0*u %-*s %s\n", lengths.id_length, i, lengths.file_id_length, toc_data_file_metadata_source->file_id, lengths.source_id_length, toc_data_file_metadata_source->source_id, lengths.format_id_length, toc_data_file_metadata_source->format_id, toc_data_file_metadata_source->data);
     }
 
     return return_string;
@@ -795,11 +798,11 @@ static toc_data_file_metadata_lengths get_max_toc_data_file_metadata_lenght(cons
 {
     toc_data_file_metadata_lengths lengths;
 
-    lengths.id_length = (unsigned int)boxing_string_length("<id>");
-    lengths.file_id_length = (unsigned int)boxing_string_length("<fileId>");
-    lengths.source_id_length = (unsigned int)boxing_string_length("<sourceId>");
-    lengths.format_id_length = (unsigned int)boxing_string_length("<formatId>");
-    lengths.data_length = (unsigned int)boxing_string_length("<data>");
+    lengths.id_length = 1; //(unsigned int)boxing_string_length("<id>");
+    lengths.file_id_length = 0;//(unsigned int)boxing_string_length("<fileId>");
+    lengths.source_id_length = 0;//(unsigned int)boxing_string_length("<sourceId>");
+    lengths.format_id_length = 0;//(unsigned int)boxing_string_length("<formatId>");
+    lengths.data_length = 0;//(unsigned int)boxing_string_length("<data>");
 
     if (toc_data_file_metadata == NULL)
     {

@@ -38,7 +38,7 @@ static void  close_file(FILE *file, const char* file_name);
  *  \brief         Calculation of sha1 checksums.
  *  \ingroup afs
  *
- *  Checksums are used to protect the integrity of the files in the AFS.
+ *  Checksums are used to protect the integrity of the files.
  */
 
 

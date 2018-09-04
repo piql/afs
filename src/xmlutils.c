@@ -26,10 +26,10 @@
 //----------------------------------------------------------------------------
 /*! 
  *  \defgroup utils Utilities
- *  \brief          Various utility functions.
+ *  \brief          XML utility functions.
  *  \ingroup afs
  *
- *  Helper functions.
+ *  Helper functions for working with XML files.
  */
 
 

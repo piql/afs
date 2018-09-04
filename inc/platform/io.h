@@ -15,11 +15,11 @@
 **
 *****************************************************************************/
 
+#include "boxing/platform/memory.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "boxing/platform/memory.h"
 
 #define _OPEN_SYS_ITOA_EXT
 

@@ -15,11 +15,11 @@
 **
 *****************************************************************************/
 
+#include "boxing/platform/types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "boxing/platform/types.h"
 
 int   afs_sha1_test(void);
 char* afs_sha1_sum1(const char* file_name);

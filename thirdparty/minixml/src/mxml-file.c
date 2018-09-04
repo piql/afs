@@ -247,7 +247,11 @@ mxmlSaveAllocString(
   if ((s = malloc(bytes + 1)) == NULL)
     return (NULL);
 
-  mxmlSaveString(node, s, bytes + 1, cb);
+  if ( mxmlSaveString(node, s, bytes + 1, cb) != bytes)
+  {
+      free(s);
+      return NULL;
+  }
 
  /*
   * Return the allocated string...
@@ -365,7 +369,7 @@ mxmlSaveString(mxml_node_t    *node,	/* I - Node to write */
                mxml_save_cb_t cb)	/* I - Whitespace callback or MXML_NO_CALLBACK */
 {
   int	col;				/* Final column */
-  char	*ptr[2];			/* Pointers for putc_cb */
+  char	*ptr[3];			/* Pointers for putc_cb */
   _mxml_global_t *global = _mxml_global();
 					/* Global data */
 
@@ -376,7 +380,7 @@ mxmlSaveString(mxml_node_t    *node,	/* I - Node to write */
 
   ptr[0] = buffer;
   ptr[1] = buffer + bufsize;
-
+  ptr[2] = 0;
   if ((col = mxml_write_node(node, ptr, cb, 0, mxml_string_putc, global)) < 0)
     return (-1);
 
@@ -387,7 +391,7 @@ mxmlSaveString(mxml_node_t    *node,	/* I - Node to write */
   * Nul-terminate the buffer...
   */
 
-  if (ptr[0] >= ptr[1])
+  if (ptr[0] == ptr[1])
     buffer[bufsize - 1] = '\0';
   else
     ptr[0][0] = '\0';
@@ -396,7 +400,7 @@ mxmlSaveString(mxml_node_t    *node,	/* I - Node to write */
   * Return the number of characters...
   */
 
-  return (unsigned int)(ptr[0] - buffer);
+  return (unsigned int)ptr[2];
 }
 
 
@@ -2619,10 +2623,11 @@ mxml_string_putc(int  ch,		/* I - Character to write */
   pp = (char **)p;
 
   if (pp[0] < pp[1])
+  {
     pp[0][0] = ch;
-
-  pp[0] ++;
-
+    pp[0] ++;
+  }
+  pp[2]++;
   return (0);
 }
 

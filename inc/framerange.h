@@ -15,11 +15,11 @@
 **
 *****************************************************************************/
 
+#include "boxing/bool.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "boxing/bool.h"
 
 typedef unsigned int afs_frame_range_type;
 

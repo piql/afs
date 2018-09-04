@@ -15,14 +15,14 @@
 **
 *****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include    "administrativemetadata.h"
 #include    "technicalmetadata.h"
 #include    "boxing/bool.h"
 #include    "mxml.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // Definition structure afs_control_data
 typedef struct afs_control_data_s
@@ -31,15 +31,20 @@ typedef struct afs_control_data_s
     afs_technical_metadata *      technical_metadata;
 } afs_control_data;
 
-afs_control_data*  afs_control_data_create();
-void               afs_control_data_init(afs_control_data*);
-void               afs_control_data_init2(afs_control_data*, afs_administrative_metadata*, afs_technical_metadata*);
-void               afs_control_data_free(afs_control_data*);
+afs_control_data * afs_control_data_create();
+afs_control_data * afs_control_data_create2(afs_administrative_metadata * administrative_metadata, afs_technical_metadata * technical_metadata);
+void               afs_control_data_free(afs_control_data * control_data);
 
-DBOOL              afs_control_data_save_xml(mxml_node_t * out, afs_control_data* control_data);
-DBOOL              afs_control_data_save_xml_file(const char * file_name, afs_control_data* control_data, DBOOL compact);
-DBOOL              afs_control_data_load_xml(afs_control_data* control_data, mxml_node_t * in);
-DBOOL              afs_control_data_load_xml_file(afs_control_data* control_data, const char * file_name);
+afs_control_data * afs_control_data_clone(const afs_control_data * control_data);
+DBOOL              afs_control_data_equal(const afs_control_data * control_data1, const afs_control_data * control_data2);
+
+DBOOL              afs_control_data_save_file(afs_control_data * control_data, const char * file_name, DBOOL compact);
+char *             afs_control_data_save_string(afs_control_data * control_data, DBOOL compact);
+DBOOL              afs_control_data_save_xml(afs_control_data * control_data, mxml_node_t * out);
+
+DBOOL              afs_control_data_load_file(afs_control_data * control_data, const char * file_name);
+DBOOL              afs_control_data_load_string(afs_control_data * control_data, const char * in);
+DBOOL              afs_control_data_load_xml(afs_control_data * control_data, mxml_node_t * in);
 
 
 #ifdef __cplusplus

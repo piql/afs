@@ -15,11 +15,11 @@
 **
 *****************************************************************************/
 
+#include "boxing/image8.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "boxing/image8.h"
 
 // Definition structure afs_zero_reference_mark
 typedef struct afs_zero_reference_mark_s

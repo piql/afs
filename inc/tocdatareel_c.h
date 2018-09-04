@@ -15,14 +15,14 @@
 **
 *****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "tocfiles.h"
 #include "frameranges.h"
 #include "gvector.h"
 #include "mxml.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum afs_toc_data_reel_section
 {

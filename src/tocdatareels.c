@@ -322,14 +322,9 @@ DBOOL afs_toc_data_reels_is_valid(afs_toc_data_reels * toc_data_reels)
         return DFALSE;
     }
 
-    if (toc_data_reels->reels == NULL)
+    if (afs_toc_data_reels_get_reels_count(toc_data_reels) == 0)
     {
-        return DFALSE;
-    }
-
-    if (toc_data_reels->reels->size == 0)
-    {
-        return DFALSE;
+        return DTRUE;
     }
 
     for (unsigned int i = 0; i < toc_data_reels->reels->size; i++)
@@ -638,7 +633,7 @@ DBOOL afs_toc_data_reels_load_xml(afs_toc_data_reels * toc_data_reels, mxml_node
 
 static const char * whitespace_cb(mxml_node_t *node, int where)
 {
-    const char *name, *parent_name;
+    const char *name, *parent_name, *parent_parent_name;
 
     /*
     * We can conditionally break to a new line
@@ -648,8 +643,9 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
 
     name = mxmlGetElement(node);
     parent_name = mxmlGetElement(node->parent);
+    parent_parent_name = (node->parent != NULL) ? mxmlGetElement(node->parent->parent) : NULL;
 
-    if (boxing_string_equal("files", name))
+    if (boxing_string_equal("reels", name))
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -657,7 +653,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("file", name))
+    if (boxing_string_equal("reel", name))
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -665,14 +661,9 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("file", parent_name) && !boxing_string_equal("data", name) && !boxing_string_equal("preview", name))
+    if (boxing_string_equal("id", name) && boxing_string_equal("reel", parent_name))
     {
-        if (where == MXML_WS_BEFORE_OPEN)
-        {
-            return ("\n        ");
-        }
-
-        if (where == MXML_WS_BEFORE_CLOSE)
+        if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
             return ("\n        ");
         }
@@ -683,7 +674,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("data", name) || boxing_string_equal("preview", name))
+    if (boxing_string_equal("files", name))
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -691,15 +682,73 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("data", parent_name))
+    if (boxing_string_equal("file", name))
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
             return ("\n            ");
         }
-        if (where == MXML_WS_AFTER_OPEN && !boxing_string_equal("start", name) && !boxing_string_equal("end", name))
+    }
+
+    if (boxing_string_equal("file", parent_name) && !boxing_string_equal("data", name) && !boxing_string_equal("preview", name) && !boxing_string_equal("metadata", name))
+    {
+        if (where == MXML_WS_BEFORE_OPEN)
         {
             return ("\n                ");
+        }
+
+        if (where == MXML_WS_BEFORE_CLOSE)
+        {
+            return ("\n                ");
+        }
+
+        if (where == MXML_WS_AFTER_OPEN)
+        {
+            return ("\n                    ");
+        }
+    }
+
+    if ((boxing_string_equal("data", name) && boxing_string_equal("file", parent_name)) || boxing_string_equal("preview", name) || boxing_string_equal("metadata", name))
+    {
+        if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
+        {
+            return ("\n                ");
+        }
+    }
+
+    if (boxing_string_equal("metadata", parent_name) && boxing_string_equal("file", parent_parent_name))
+    {
+        if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
+        {
+            return ("\n                    ");
+        }
+    }
+
+    if (boxing_string_equal("source", parent_name) && boxing_string_equal("metadata", parent_parent_name))
+    {
+        if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
+        {
+            return ("\n                        ");
+        }
+    }
+
+    if (boxing_string_equal("data", parent_name) && boxing_string_equal("source", parent_parent_name))
+    {
+        if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
+        {
+            return ("\n                            ");
+        }
+    }
+
+    if (boxing_string_equal("data", parent_name) && boxing_string_equal("file", parent_parent_name))
+    {
+        if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
+        {
+            return ("\n                    ");
+        }
+        if (where == MXML_WS_AFTER_OPEN && !boxing_string_equal("start", name) && !boxing_string_equal("end", name))
+        {
+            return ("\n                        ");
         }
     }
 
@@ -707,7 +756,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
     {
         if (where == MXML_WS_BEFORE_OPEN)
         {
-            return ("\n            ");
+            return ("\n                    ");
         }
     }
 

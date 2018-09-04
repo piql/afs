@@ -38,5 +38,5 @@ A design goal is to have as few dependencies as possible.
     git clone https://github.com/piql/afs
     cd afs
     ./autogen.sh
-    ./configure
+    ./configure LIBUNBOXING_DIR=<path to unboxinglib>
     make

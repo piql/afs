@@ -15,13 +15,12 @@
 **
 *****************************************************************************/
 
+#include "tocdatafilemetadatasource_c.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "tocdatafilemetadatasource_c.h"
-
-// Definition structure afs_toc_data_file_metadata
 typedef struct afs_toc_data_file_metadata_s
 {
     afs_toc_data_file_metadata_sources * sources;

@@ -35,7 +35,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
  *
  *  The boxing format controls the layout and properties of a frame in the 
  *  AFS file system. It is therefore the configuration object when boxing and unboxing 
- *  frames. The AFS library has a set of compiled in formats, used when decoding 
+ *  frames. The AFS library has a set of predefined formats, used when decoding 
  *  the control frame. The control frame itself contains another boxing format,
  *  used when unboxing the rest of the reel.
  */

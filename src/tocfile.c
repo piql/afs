@@ -40,48 +40,49 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
 //----------------------------------------------------------------------------
 /*!
  *  \enum   afs_toc_file_type tocfile.h
- *  \brief  The enumeration for specifying the file type.
+ *  \brief  File type constants.
  *  
  *  \param AFS_TOC_FILE_TYPE_UNDEFINED  (0x0) Undefined file type.
  *  \param AFS_TOC_FILE_TYPE_DIGITAL    (0x1) Digital file type.
  *  \param AFS_TOC_FILE_TYPE_PREVIEW    (0x2) Preview file type.
  *  \param AFS_TOC_FILE_TYPE_ALL        (0x3) Digital and preview file type.
  *
- *  The enumeration for specifying the file type.
+ *  File type contants. A file can be both digital and preview.
  */
 
 
 //----------------------------------------------------------------------------
 /*!
  *  \var enum  AFS_TOC_FILE_PARENT
- *  \brief     Structure is parent.
+ *  \brief     Parent file.
  *  
- *  A sign that the structure is the parent.
+ *  A parent file has a collection of files inside it, fex a tar archve 
+ *  is a parent file with one or more tar items inside.
  */
 
 
 //----------------------------------------------------------------------------
 /*!
  *  \var enum  AFS_TOC_FILE_NO_PARENT
- *  \brief     Structure is not parent.
+ *  \brief     File is not a parent.
  *  
- *  A sign that the structure is not a parent.
+ *  The file is not a parent file.
  */
 
 
 //----------------------------------------------------------------------------
 /*!
  *  \var enum  AFS_TOC_FILE_ID_UNDEFINED
- *  \brief     Not defined parent state.
+ *  \brief     The file ID is not set.
  *  
- *  A sign that the structure parent state not defined.
+ *  File IS is undefined.
  */
 
 
 //----------------------------------------------------------------------------
 /*!
  *  \struct     afs_toc_file_s  tocfile.h
- *  \brief      TOC data file storage.
+ *  \brief      TOC file entry.
  *
  *  \param name         File name.
  *  \param date         File creation date.
@@ -99,7 +100,9 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
  *  \param file_format  File format.
  *  \param metadata     Pointer to toc_data_file_metadata instance.
  *
- *  Structure for storing toc data file.
+ *  The structure defines a file element in the TOC. The file entry points
+ *  to the location (both digital and/or preview) of the file on the reel, 
+ *  and it has techincal file metadata, like file name, size on bytes etc.
  */
 
 
@@ -108,11 +111,10 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Create an toc data file instance.
+ *  \brief Return new toc data file instance.
  *
  *  Allocate memory for the afs_toc_file type
- *  and initializes all structure pointers with NULL values.
- *  Return instance of allocated structure.
+ *  and initializes all values to 0 or undefined.
  *
  *  \return instance of allocated afs_toc_file structure.
  */
@@ -129,9 +131,7 @@ afs_toc_file* afs_toc_file_create()
 /*!
  *  \brief Create an toc data file instance.
  *
- *  Allocate memory for the afs_toc_file type
- *  and initializes all structure pointers with specified input values.
- *  Return instance of allocated structure.
+ *  Allocate memory for the afs_toc_file type and initialize members.
  *
  *  \param[in] name         Name string.
  *  \param[in] date         Date string.
@@ -192,9 +192,8 @@ afs_toc_file* afs_toc_file_create2(
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Initializes all structure pointers with NULL value.
+ *  \brief Initializes all members to 0 / NULL.
  *
- *  Initializes all input structure pointers with NULL values.
  *  If input pointer is NULL, then return without initialization.
  *
  *  \param[in]  toc_data_file  Pointer to the afs_toc_file structure.
@@ -294,9 +293,9 @@ void afs_toc_file_init2(
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Frees occupied memory of afs_toc_file structure.
+ *  \brief Free afs_toc_file instance.
  *
- *  Frees occupied memory of all internal structure pointers and structure pointer.
+ *  Frees all memory used by toc file instance and instance itself.
  *
  *  \param[in]  toc_data_file  Pointer to the afs_toc_file structure.
  */
@@ -321,10 +320,10 @@ void afs_toc_file_free(afs_toc_file* toc_data_file)
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function create a copy of input afs_toc_file structure.
+ *  \brief Clone afs_toc_file instance.
  *
- *  Function create a copy of input afs_toc_file structure and return it.
- *  If TOC data file pointer is NULL function return NULL.
+ *  Create a copy of input afs_toc_file structure and return it.
+ *  If toc_data_file is NULL functions return NULL.
  *
  *  \param[in]  toc_data_file  Pointer to the afs_toc_file structure.
  *  \return new copy of toc_data_file structure or NULL.
@@ -359,13 +358,13 @@ afs_toc_file * afs_toc_file_clone(afs_toc_file * toc_data_file)
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function checks two instances of the afs_toc_file structures on the identity.
+ *  \brief Compare toc data file instances
  *
- *  Function checks two instances of the afs_toc_file structures on the identity.
+ *  Compare toc data file instances content.
  *
- *  \param[in]   toc_data_file1  Pointer to the first instance of the afs_toc_file structure.
- *  \param[in]   toc_data_file2  Pointer to the second instance of the afs_toc_file structure.
- *  \return sign of identity of the input structures.
+ *  \param[in]   toc_data_file1  Pointer to the first instance
+ *  \param[in]   toc_data_file2  Pointer to the second instance
+ *  \return DTRUE if instances has equal content.
  */
 
 DBOOL afs_toc_file_equal(afs_toc_file * toc_data_file1, afs_toc_file * toc_data_file2)
@@ -405,13 +404,13 @@ DBOOL afs_toc_file_equal(afs_toc_file * toc_data_file1, afs_toc_file * toc_data_
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function checks two instances of the afs_toc_file structures on the distinction.
+ *  \brief Check for inequality
  *
- *  Function checks two instances of the afs_toc_file structures on the distinction.
+ *  Compare toc data file instances content.
  *
- *  \param[in]   toc_data_file1  Pointer to the first instance of the afs_toc_file structure.
- *  \param[in]   toc_data_file2  Pointer to the second instance of the afs_toc_file structure.
- *  \return sign of distinction of the input structures.
+ *  \param[in]   toc_data_file1  Pointer to the first instance
+ *  \param[in]   toc_data_file2  Pointer to the second instance
+ *  \return DTRUE if instances has different content.
  */
 
 DBOOL afs_toc_file_not_equal(afs_toc_file * toc_data_file1, afs_toc_file * toc_data_file2)
@@ -422,12 +421,12 @@ DBOOL afs_toc_file_not_equal(afs_toc_file * toc_data_file1, afs_toc_file * toc_d
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function adds an offset to the frames in the TOC data file structure.
+ *  \brief Add frame offset
  *
- *  Function adds an offset to the frames in the TOC data file structure.
+ *  Update reel position of digital file with a frame offset.
  *
  *  \param[in]   toc_data_file  Pointer to the afs_toc_file structure.
- *  \param[in]   offset         Offset to the frames.
+ *  \param[in]   offset         Offset in frames.
  */
 
 void afs_toc_file_add_frame_offset(afs_toc_file * toc_data_file, unsigned int offset)
@@ -450,9 +449,9 @@ void afs_toc_file_add_frame_offset(afs_toc_file * toc_data_file, unsigned int of
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function adds a new type to the TOC data file structure.
+ *  \brief Update file type
  *
- *  Function adds a new type to the TOC data file structure.
+ *  Adds a new type to the TOC data file structure.
  *
  *  \param[in]   toc_data_file  Pointer to the afs_toc_file structure.
  *  \param[in]   type           Type to be added.
@@ -472,9 +471,9 @@ void afs_toc_file_add_type(afs_toc_file * toc_data_file, unsigned int type)
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function sets a new name in the TOC data file structure.
+ *  \brief Set file name
  *
- *  Function sets a new name in the TOC data file structure.
+ *  Sets a new file name.
  *
  *  \param[in] toc_data_file  Pointer to the afs_toc_file structure.
  *  \param[in] name           Name string.
@@ -499,9 +498,9 @@ void afs_toc_file_set_name(afs_toc_file * toc_data_file, const char * name)
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function sets a new date in the TOC data file structure.
+ *  \brief Set date.
  *
- *  Function sets a new date in the TOC data file structure.
+ *  Sets a new date.
  *
  *  \param[in] toc_data_file  Pointer to the afs_toc_file structure.
  *  \param[in] date           Date string.
@@ -526,9 +525,9 @@ void afs_toc_file_set_date(afs_toc_file * toc_data_file, const char * date)
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function sets a new checksum in the TOC data file structure.
+ *  \brief Sets checksum
  *
- *  Function sets a new checksum in the TOC data file structure.
+ *  Sets a new checksum.
  *
  *  \param[in] toc_data_file  Pointer to the afs_toc_file structure.
  *  \param[in] checksum       Checksum string.
@@ -553,12 +552,12 @@ void afs_toc_file_set_checksum(afs_toc_file * toc_data_file, const char * checks
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function sets a new unique id in the TOC data file structure.
+ *  \brief Set unique ID
  *
- *  Function sets a new unique id in the TOC data file structure.
+ *  Set new unique ID.
  *
  *  \param[in] toc_data_file  Pointer to the afs_toc_file structure.
- *  \param[in] unique_id      Unique id string.
+ *  \param[in] unique_id      Unique ID string.
  */
 
 void afs_toc_file_set_unique_id(afs_toc_file * toc_data_file, const char * unique_id)
@@ -580,9 +579,9 @@ void afs_toc_file_set_unique_id(afs_toc_file * toc_data_file, const char * uniqu
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function sets a new file format in the TOC data file structure.
+ *  \brief Set file format
  *
- *  Function sets a new file format in the TOC data file structure.
+ *  Set new file format.
  *
  *  \param[in] toc_data_file  Pointer to the afs_toc_file structure.
  *  \param[in] file_format    File format string.
@@ -607,9 +606,10 @@ void afs_toc_file_set_file_format(afs_toc_file * toc_data_file, const char * fil
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function sets a new afs_toc_file_preview instance in the TOC data file structure.
+ *  \brief Set preview
  *
- *  Function sets a new afs_toc_file_preview instance in the TOC data file structure.
+ *  Sets a new afs_toc_file_preview. Note: Does not take ownership of 
+ *  preview pointer.
  *
  *  \param[in] toc_data_file     Pointer to the afs_toc_file structure.
  *  \param[in] toc_file_preview  New afs_toc_file_preview instance.
@@ -635,9 +635,9 @@ void afs_toc_file_set_preview(afs_toc_file * toc_data_file, const afs_toc_file_p
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function sets a new afs_toc_data_file_metadata instance in the TOC data file structure.
+ *  \brief Set metadata
  *
- *  Function sets a new afs_toc_data_file_metadata instance in the TOC data file structure.
+ *  Set new metadata. Note: Does not take ownership of metadata pointer.
  *
  *  \param[in] toc_data_file           Pointer to the afs_toc_file structure.
  *  \param[in] toc_data_file_metadata  New afs_toc_data_file_metadata instance.
@@ -662,10 +662,9 @@ void afs_toc_file_set_metadata(afs_toc_file * toc_data_file, const afs_toc_data_
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function translates the input XML nodes to the afs_toc_file structure.
+ *  \brief Load from XML file.
  *
- *  Function translates the input XML nodes to the afs_toc_file structure.
- *  If translates is successful, then function return DTRUE, else function return DFALSE.
+ *  Load file from XML.
  *
  *  \param[out]  toc_data_file  Pointer to the afs_toc_file structure.
  *  \param[in]   file_name      Name of the XML file.
@@ -712,10 +711,9 @@ DBOOL afs_toc_file_load_file(afs_toc_file * toc_data_file, const char * file_nam
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function translates the input XML string to the afs_toc_file structure.
+ *  \brief Load XML from string
  *
- *  Function translates the input XML string to the afs_toc_file structure.
- *  If translates is successful, then function return DTRUE, else function return DFALSE.
+ *  Load from XML string.
  *
  *  \param[out]  toc_data_file  Pointer to the afs_toc_file structure.
  *  \param[in]   in             Pointer to the input XML string.
@@ -745,10 +743,9 @@ DBOOL afs_toc_file_load_string(afs_toc_file * toc_data_file, const char * in)
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function translates the input XML nodes to the TOC data file structure.
+ *  \brief Load XML from tree node.
  *
- *  Function translates the input XML nodes to the TOC data file structure.
- *  If translates is successful, then function return DTRUE, else function return DFALSE.
+ *  Load XML from XML parser tree node.
  *
  *  \param[out]  toc_data_file  Pointer to the afs_toc_file structure.
  *  \param[in]   node           Pointer to the input XML node.
@@ -882,11 +879,9 @@ DBOOL afs_toc_file_load_xml(afs_toc_file * toc_data_file, mxml_node_t* node)
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function translates the input XML nodes to the TOC data file structure frame data (version 1).
+ *  \brief Load V1 of data section.
  *
- *  Function translates the input XML nodes to the TOC data file structure frame data.
- *  Version one of digital datablock. Early TOCs where 'data' tag is missing and digital attributes direct childs of file tag
- *  If translates is successful, then function return DTRUE, else function return DFALSE.
+ *  Read version one of digital datablock. Early TOCs where 'data' tag is missing and digital attributes direct childs of file tag
  *
  *  \param[out]  toc_data_file  Pointer to the afs_toc_file structure.
  *  \param[in]   node           Pointer to the input XML node.
@@ -935,11 +930,9 @@ DBOOL afs_toc_file_load_data_v1(afs_toc_file * toc_data_file, mxml_node_t* node)
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function translates the input XML nodes to the TOC data file structure frame data (version 2).
+ *  \brief Load V2 of digital data block.
  *
- *  Function translates the input XML nodes to the TOC data file structure frame data.
- *  Version two of digital datablock. Digital attributes childs of data tag.
- *  If translates is successful, then function return DTRUE, else function return DFALSE.
+ *  Load version two of digital datablock. Digital attributes childs of data tag.
  *
  *  \param[out]  toc_data_file  Pointer to the afs_toc_file structure.
  *  \param[in]   node           Pointer to the input XML node.
@@ -988,14 +981,13 @@ DBOOL afs_toc_file_load_data_v2(afs_toc_file * toc_data_file, mxml_node_t* node)
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function translates the input afs_toc_file structure to the XML nodes.
+ *  \brief Save to XML tree node.
  *
- *  Function translates the input afs_toc_file structure to the XML nodes.
- *  If translates is successful, then function return DTRUE, else function return DFALSE.
+ *  Save to XML tree node.
  *
  *  \param[in]   toc_data_file   Pointer to the afs_toc_file structure.
  *  \param[out]  out             Pointer to the XML node.
- *  \param[in]   data_v1         A sign that the data should be saved in the first version of the format.
+ *  \param[in]   data_v1         If DTRUE use V1 of digital data block.
  *  \return DTRUE on success.
  */
 
@@ -1026,8 +1018,6 @@ DBOOL afs_toc_file_save_xml(afs_toc_file * toc_data_file, mxml_node_t* out, DBOO
 
     if (afs_toc_file_is_digital(toc_data_file))
     {
-        //DBOOL data_v1 = DFALSE;
-
         if (data_v1)
         {
             if (!save_data_v1(toc_data_file, file_node))
@@ -1062,14 +1052,13 @@ DBOOL afs_toc_file_save_xml(afs_toc_file * toc_data_file, mxml_node_t* out, DBOO
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function translates the input afs_toc_file structure to the XML string.
+ *  \brief Save XML to string.
  *
- *  Function translates the input afs_toc_file structure to the XML string.
- *  If translates is successful, then function return resulting string, else function return NULL.
+ *  Save XML to string.
  *
  *  \param[in]   toc_data_file  Pointer to the afs_toc_file structure.
- *  \param[in]   compact        If compact is DFALSE then in the resulting XML string needs to add formatting (new lines and tabs).
- *  \param[in]   data_v1        A sign that the data should be saved in the first version of the format.
+ *  \param[in]   compact        If DTRUE write unformatted XML (no whitespace).
+ *  \param[in]   data_v1        If DTRUE use V1 of the digital data block.
  *  \return resulting string or NULL.
  */
 
@@ -1109,15 +1098,14 @@ char * afs_toc_file_save_string(afs_toc_file * toc_data_file, DBOOL compact, DBO
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function translates the input afs_toc_file structure to the XML file.
+ *  \brief Save XML to file.
  *
- *  Function translates the input afs_toc_file structure to the XML file.
- *  If translates is successful, then function return DTRUE, else function return DFALSE.
+ *  Write XML to file.
  *
  *  \param[in]   file_name      Name of the XML file.
  *  \param[in]   toc_data_file  Pointer to the afs_toc_file structure.
- *  \param[in]   compact        If compact is DFALSE then in the resulting XML file needs to add formatting (new lines and tabs).
- *  \param[in]   data_v1        A sign that the data should be saved in the first version of the format.
+ *  \param[in]   compact        If DTRUE write unformatted XML (no whitespace).
+ *  \param[in]   data_v1        If DTRUE use V1 of the digital data block.
  *  \return DTRUE on success.
  */
 
@@ -1169,13 +1157,12 @@ DBOOL afs_toc_file_save_file(afs_toc_file * toc_data_file, const char * file_nam
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief The function returns an indication whether there is a parent.
+ *  \brief Check if file has a parent
  *
- *  The function returns an indication whether there is a parent for a given afs_toc_file instance.
- *  If TOC data file pointer is NULL then function return DFALSE.
+ *  Check if file has a parent.
  *
- *  \param[in]   toc_data_file   Pointer to the afs_toc_file structure.
- *  \return an indication whether there is a parent.
+ *  \param[in]   toc_data_file   afs_toc_file pointer.
+ *  \return DTRUE if parent.
  */
 
 DBOOL afs_toc_file_has_parent(afs_toc_file * toc_data_file)
@@ -1197,13 +1184,12 @@ DBOOL afs_toc_file_has_parent(afs_toc_file * toc_data_file)
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief The function returns an indication whether the afs_toc_file instance is standalone.
+ *  \brief Check if standalone
  *
- *  The function returns an indication whether the afs_toc_file instance is standalone.
- *  If TOC data file pointer is NULL then function return DFALSE.
+ *  A standalone file is not a parent file and not a child of a parent file.
  *
  *  \param[in]   toc_data_file   Pointer to the afs_toc_file structure.
- *  \return an indication whether the afs_toc_file instance is standalone.
+ *  \return DTRUE if file is standalone.
  */
 
 DBOOL afs_toc_file_is_standalone(afs_toc_file * toc_data_file)
@@ -1225,13 +1211,12 @@ DBOOL afs_toc_file_is_standalone(afs_toc_file * toc_data_file)
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief The function returns an indication whether the structure is parent.
+ *  \brief Check if file is a parent
  *
- *  The function returns the sign, the current structure is the parent or not.
- *  If TOC data file pointer is NULL then function return DFALSE.
+ *  Check if file is of type parent.
  *
  *  \param[in]   toc_data_file   Pointer to the afs_toc_file structure.
- *  \return an indication whether the structure is parent.
+ *  \return DTRUE if parent.
  */
 
 DBOOL afs_toc_file_is_parent(const afs_toc_file * toc_data_file)
@@ -1253,13 +1238,12 @@ DBOOL afs_toc_file_is_parent(const afs_toc_file * toc_data_file)
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief The function returns an indication whether the afs_toc_file structure type is digital.
+ *  \brief Check if file is digital
  *
- *  The function returns the sign, the current structure type is the digital or not.
- *  If TOC data file pointer is NULL then function return DFALSE.
+ *  Check if file is of type digital.
  *
  *  \param[in]   toc_data_file   Pointer to the afs_toc_file structure.
- *  \return an indication whether the structure type is digital.
+ *  \return DTRUE if file is digital.
  */
 
 DBOOL afs_toc_file_is_digital(const afs_toc_file * toc_data_file)
@@ -1281,13 +1265,12 @@ DBOOL afs_toc_file_is_digital(const afs_toc_file * toc_data_file)
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief The function returns an indication whether the afs_toc_file structure type is preview.
+ *  \brief Check if file has a preview.
  *
- *  The function returns the sign, the current structure type is the preview or not.
- *  If TOC data file pointer is NULL then function return DFALSE.
+ *  Check if file has a preview.
  *
  *  \param[in]   toc_data_file   Pointer to the afs_toc_file structure.
- *  \return an indication whether the structure type is preview.
+ *  \return DTRUE if file has a preview.
  */
 
 DBOOL afs_toc_file_is_preview(const afs_toc_file * toc_data_file)
@@ -1309,13 +1292,12 @@ DBOOL afs_toc_file_is_preview(const afs_toc_file * toc_data_file)
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief The function returns an indication whether the afs_toc_file structure has a metadata.
+ *  \brief Check if file has metadata
  *
- *  The function returns the sign, the current structure has a metadata or not.
- *  If TOC data file pointer is NULL then function return DFALSE.
+ *  Check if file has metadata.
  *
  *  \param[in]   toc_data_file   Pointer to the afs_toc_file structure.
- *  \return an indication whether the structure has a metadata.
+ *  \return DTRUE if file has metadata
  */
 
 DBOOL afs_toc_file_has_metadata(const afs_toc_file * toc_data_file)
@@ -1337,13 +1319,14 @@ DBOOL afs_toc_file_has_metadata(const afs_toc_file * toc_data_file)
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief The function returns the sign of integrity the afs_toc_file structure.
+ *  \brief Check if file is valid.
  *
- *  The function returns the sign of integrity the current structure.
- *  If TOC data file pointer is NULL then function return DFALSE.
+ *  Check if the structure represents a valid file: File name is set, has 
+ *  digital and/or preview or is a parent file, positiion on reel is valid, 
+ *  etc.
  *
  *  \param[in]   toc_data_file   Pointer to the afs_toc_file structure.
- *  \return the sign of integrity the afs_toc_file structure.
+ *  \return DTRUE if file is valid.
  */
 
 DBOOL afs_toc_file_is_valid(const afs_toc_file * toc_data_file)
@@ -1415,9 +1398,9 @@ DBOOL afs_toc_file_is_valid(const afs_toc_file * toc_data_file)
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief The function returns a duration frames.
+ *  \brief Duration of digital frames
  *
- *  The function returns a duration frames from the input afs_toc_file instance.
+ *  Return number of frames the digital version of the file occupies.
  *
  *  \param[in]   toc_file  Pointer to the instance of the afs_toc_file structure.
  *  \return duration frames.

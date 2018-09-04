@@ -15,13 +15,13 @@
 **
 *****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "tocdatareels.h"
 #include "tocmetadata_c.h"
 #include "mxml.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct afs_toc_data_s
 {

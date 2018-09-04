@@ -34,20 +34,33 @@ typedef struct afs_administrative_metadata_s
 } afs_administrative_metadata;
 
 
-afs_administrative_metadata* afs_administrative_metadata_create();
-void                         afs_administrative_metadata_init(afs_administrative_metadata*);
-void                         afs_administrative_metadata_init2(
-                                 afs_administrative_metadata* administrative_metadata,
-                                 const char* reel_id,
-                                 const char* print_reel_id,
-                                 const char* title,
-                                 const char* description,
-                                 const char* creator,
-                                 const char* creation_date);
-void                         afs_administrative_metadata_free(afs_administrative_metadata*);
+afs_administrative_metadata * afs_administrative_metadata_create();
+afs_administrative_metadata * afs_administrative_metadata_create2(
+                                  const char * reel_id,
+                                  const char * print_reel_id,
+                                  const char * title,
+                                  const char * description,
+                                  const char * creator,
+                                  const char * creation_date);
+void                          afs_administrative_metadata_free(afs_administrative_metadata * administrative_metadata);
 
-DBOOL                        afs_administrative_metadata_save_xml(mxml_node_t * out, afs_administrative_metadata* control_data);
-DBOOL                        afs_administrative_metadata_load_xml(afs_administrative_metadata* control_data, mxml_node_t * in);
+afs_administrative_metadata * afs_administrative_metadata_clone(const afs_administrative_metadata * administrative_metadata);
+DBOOL                         afs_administrative_metadata_equal(const afs_administrative_metadata * administrative_metadata1, const afs_administrative_metadata * administrative_metadata2);
+
+void                          afs_administrative_metadata_set_reel_id(afs_administrative_metadata * administrative_metadata, const char * reel_id);
+void                          afs_administrative_metadata_set_print_reel_id(afs_administrative_metadata * administrative_metadata, const char * print_reel_id);
+void                          afs_administrative_metadata_set_title(afs_administrative_metadata * administrative_metadata, const char * title);
+void                          afs_administrative_metadata_set_description(afs_administrative_metadata * administrative_metadata, const char * description);
+void                          afs_administrative_metadata_set_creator(afs_administrative_metadata * administrative_metadata, const char * creator);
+void                          afs_administrative_metadata_set_creation_date(afs_administrative_metadata * administrative_metadata, const char * creation_date);
+
+DBOOL                         afs_administrative_metadata_save_file(afs_administrative_metadata * administrative_metadata, const char * file_name, DBOOL compact);
+char *                        afs_administrative_metadata_save_string(afs_administrative_metadata * administrative_metadata, DBOOL compact);
+DBOOL                         afs_administrative_metadata_save_xml(afs_administrative_metadata * administrative_metadata, mxml_node_t * out);
+
+DBOOL                         afs_administrative_metadata_load_file(afs_administrative_metadata * administrative_metadata, const char * file_name);
+DBOOL                         afs_administrative_metadata_load_string(afs_administrative_metadata * administrative_metadata, const char * in);
+DBOOL                         afs_administrative_metadata_load_xml(afs_administrative_metadata * administrative_metadata, mxml_node_t * in);
 
 #ifdef __cplusplus
 } /* extern "C" */

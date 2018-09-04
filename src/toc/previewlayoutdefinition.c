@@ -34,13 +34,16 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
 //----------------------------------------------------------------------------
 /*!
  *  \struct     afs_toc_preview_layout_definition_s  previewlayoutdefinition.h
- *  \brief      Preview layout definition data storage.
+ *  \brief      Frame preview layout.
  *
  *  \param id        Preview layout definition ID.
  *  \param name      Preview layout definition name.
  *  \param sections  Preview layout definition sections storage vector.
  *
- *  Structure for storing TOC preview layout definition data.
+ *  The preview layout definition spilt a frame into sections, where each section 
+ *  can store a page/image from a file. The preview block of a toc_data_file_s 
+ *  refer to the layout definition, multiple file instances can refer to the same
+ *  definition.
  */
 
 // PUBLIC AFS TOC PREVIEW LAYOUT DEFINITION FUNCTIONS

@@ -15,13 +15,13 @@
 **
 *****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "mxml.h"
 #include "gvector.h"
 #include "tocfilepreviewpage.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef gvector afs_toc_file_preview_pages;
 

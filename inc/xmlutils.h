@@ -15,13 +15,13 @@
 **
 *****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "mxml.h"
 #include "boxing/bool.h"
 #include "boxing/platform/types.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void  afs_xmlutils_set_node_text(const char* text, mxml_node_t* node);
 char* afs_xmlutils_get_node_text(mxml_node_t* node);

@@ -35,7 +35,6 @@
  * 
  *  \section Definitions
  *
- *  sampled-image 
  *  \subsection AFS
  *  Archival File System.
  *  \subsection  human-readable-data 

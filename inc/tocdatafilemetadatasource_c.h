@@ -15,13 +15,13 @@
 **
 *****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "boxing/config.h"
 #include "gvector.h"
 #include "mxml.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef gvector afs_toc_data_file_metadata_sources;
 

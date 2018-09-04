@@ -15,14 +15,14 @@
 **
 *****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "tocmetadatasource_c.h"
 #include "boxing/config.h"
 #include "gvector.h"
 #include "mxml.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // Definition structure afs_toc_file
 typedef struct afs_toc_metadata_s

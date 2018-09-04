@@ -66,7 +66,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Create an toc data reel instance.
+ *  \brief Create a toc data reel instance.
  *
  *  Allocate memory for the afs_toc_data_reel type
  *  and initializes all structure pointers with NULL values.
@@ -86,7 +86,7 @@ afs_toc_data_reel * afs_toc_data_reel_create()
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Create an toc data reel instance.
+ *  \brief Create a toc data reel instance.
  *
  *  Allocate memory for the afs_toc_data_reel type
  *  and initialize id string with specified input value, initialize files pointer with NULL value.
@@ -428,11 +428,23 @@ afs_toc_files * afs_toc_data_reel_get_parent_files(const afs_toc_data_reel * toc
 
     afs_toc_files * toc_files = NULL;
 
+    int type = 0;
+
+    if (types & AFS_TOC_DATA_REEL_SECTION_DIGITAL)
+    {
+        type |= AFS_TOC_FILE_TYPE_DIGITAL;
+    }
+
+    if (types & AFS_TOC_DATA_REEL_SECTION_PREVIEW)
+    {
+        type |= AFS_TOC_FILE_TYPE_PREVIEW;
+    }
+
     for (unsigned int i = 0; i < toc_data_reel->files->tocs->size; i++)
     {
         afs_toc_file * toc_file = GVECTORN(toc_data_reel->files->tocs, afs_toc_file *, i);
 
-        if (afs_toc_file_is_parent(toc_file) == DTRUE && (toc_file->types & types) != 0)
+        if (afs_toc_file_is_parent(toc_file) == DTRUE && (toc_file->types & type) != 0)
         {
             if (toc_files == NULL)
             {
@@ -482,18 +494,36 @@ afs_toc_files * afs_toc_data_reel_get_child_files(const afs_toc_data_reel * toc_
 
     afs_toc_files * toc_files = NULL;
 
+    int type = 0;
+
+    if (types & AFS_TOC_DATA_REEL_SECTION_DIGITAL)
+    {
+        type |= AFS_TOC_FILE_TYPE_DIGITAL;
+    }
+
+    if (types & AFS_TOC_DATA_REEL_SECTION_PREVIEW)
+    {
+        type |= AFS_TOC_FILE_TYPE_PREVIEW;
+    }
+
     for (unsigned int i = 0; i < toc_data_reel->files->tocs->size; i++)
     {
         afs_toc_file * toc_file = GVECTORN(toc_data_reel->files->tocs, afs_toc_file *, i);
 
-        if (afs_toc_file_is_parent(toc_file) == DFALSE && (toc_file->types & types) != 0)
+        if (afs_toc_file_is_parent(toc_file) == DFALSE && (toc_file->types & type) != 0)
         {
             if (toc_files == NULL)
             {
                 toc_files = afs_toc_files_create();
             }
 
-            afs_toc_files_add_toc(toc_files, afs_toc_file_clone(toc_file));
+            afs_toc_file * toc_file_add = afs_toc_file_clone(toc_file);
+            DBOOL result = afs_toc_files_add_toc(toc_files, toc_file_add);
+
+            if (result == DFALSE)
+            {
+                afs_toc_file_free(toc_file_add);
+            }
         }
     }
 
@@ -536,11 +566,23 @@ afs_toc_files * afs_toc_data_reel_get_standalone_files(const afs_toc_data_reel *
 
     afs_toc_files * toc_files = NULL;
 
+    int type = 0;
+
+    if (types & AFS_TOC_DATA_REEL_SECTION_DIGITAL)
+    {
+        type |= AFS_TOC_FILE_TYPE_DIGITAL;
+    }
+
+    if (types & AFS_TOC_DATA_REEL_SECTION_PREVIEW)
+    {
+        type |= AFS_TOC_FILE_TYPE_PREVIEW;
+    }
+
     for (unsigned int i = 0; i < toc_data_reel->files->tocs->size; i++)
     {
         afs_toc_file * toc_file = GVECTORN(toc_data_reel->files->tocs, afs_toc_file *, i);
 
-        if (afs_toc_file_is_standalone(toc_file) == DTRUE && (toc_file->types & types) != 0)
+        if (afs_toc_file_is_standalone(toc_file) == DTRUE && (toc_file->types & type) != 0)
         {
             if (toc_files == NULL)
             {
@@ -820,7 +862,7 @@ DBOOL afs_toc_data_reel_is_valid(const afs_toc_data_reel * toc_data_reel)
         return DFALSE;
     }
 
-    if (afs_toc_files_is_valid(toc_data_reel->files) == DFALSE)
+    if (afs_toc_data_reel_file_count(toc_data_reel) != 0 && afs_toc_files_is_valid(toc_data_reel->files) == DFALSE)
     {
         return DFALSE;
     }
@@ -1006,7 +1048,7 @@ DBOOL afs_toc_data_reel_save_xml(afs_toc_data_reel * toc_data_reel, mxml_node_t*
     mxml_node_t * reel_node = mxmlNewElement(out, "reel");
     afs_xmlutils_add_new_text_node(reel_node, "id", toc_data_reel->id);
 
-    if (!afs_toc_files_save_xml(toc_data_reel->files, reel_node))
+    if (toc_data_reel->files != NULL && afs_toc_files_save_xml(toc_data_reel->files, reel_node) == DFALSE)
     {
         return DFALSE;
     }
@@ -1017,9 +1059,9 @@ DBOOL afs_toc_data_reel_save_xml(afs_toc_data_reel * toc_data_reel, mxml_node_t*
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function translates the input XML nodes to the afs_toc_data_reel structure.
+ *  \brief Function translates the input XML file to the afs_toc_data_reel structure.
  *
- *  Function translates the input XML nodes to the afs_toc_data_reel structure.
+ *  Function translates the input XML file to the afs_toc_data_reel structure.
  *  If translates is successful, then function return DTRUE, else function return DFALSE.
  *
  *  \param[out]  toc_data_reel  Pointer to the afs_toc_data_reel structure.

@@ -15,14 +15,14 @@
 **
 *****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "tocdatareel_c.h"
 #include "toc/previewlayoutdefinitions.h"
 #include "gvector.h"
 #include "mxml.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // Definition structure afs_toc_files
 typedef gvector afs_toc_data_reels_vector;

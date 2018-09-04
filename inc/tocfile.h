@@ -15,15 +15,15 @@
 **
 *****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "tocfilepreview.h"
 #include "tocdatafilemetadata_c.h"
 #include "boxing/config.h"
 #include "gvector.h"
 #include "mxml.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum afs_toc_file_type
 {
