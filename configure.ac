@@ -54,7 +54,7 @@ AC_FUNC_REALLOC
 AC_CHECK_FUNCS([floor memmove memset pow sqrt strcasecmp strchr strtol strtoull])
 
 
-AC_ARG_VAR(LIBUNBOXING_DIR, path to unboxing lib)
+AC_ARG_VAR(LIBBOXING_DIR, path to boxing lib)
 
 
 AC_CONFIG_FILES([
