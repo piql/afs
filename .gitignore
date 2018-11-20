@@ -1,0 +1,16 @@
+aclocal.m4
+autom4te.cache/
+compile
+config.log
+config.status
+configure
+depcomp
+install-sh
+missing
+*Makefile.in
+*.o
+*Makefile
+*.deps/
+*.dirstamp
+doc/
+src/libafs.a
