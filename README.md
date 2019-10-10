@@ -6,6 +6,8 @@ The key components in the **AFS** is the **zero-reference-mark** indicating the 
 
 See LICENSE for software licensing.
 
+This library contains a version of the third party library Mini-XML, which is Copyright 2003-2016 by Michael R Sweet.
+
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
