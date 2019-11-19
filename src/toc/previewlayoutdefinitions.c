@@ -501,8 +501,6 @@ DBOOL afs_toc_preview_layout_definitions_save_file(const afs_toc_preview_layout_
         return DFALSE;
     }
 
-    mxml_node_t *tree = mxmlNewXML("1.0");
-
 #ifndef WIN32
     FILE * fp_save = fopen(file_name, "w+");
 #else
@@ -513,6 +511,8 @@ DBOOL afs_toc_preview_layout_definitions_save_file(const afs_toc_preview_layout_
     {
         return DFALSE;
     }
+
+    mxml_node_t *tree = mxmlNewXML("1.0");
 
     if (!afs_toc_preview_layout_definitions_save_xml(toc_preview_layout_definitions, tree))
     {
