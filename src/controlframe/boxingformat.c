@@ -212,6 +212,7 @@ char * afs_boxing_format_save_string(afs_boxing_format* boxing_format, DBOOL com
 
     if (!afs_boxing_format_save_xml(document, boxing_format))
     {
+        mxmlDelete(document);
         return NULL;
     }
 
