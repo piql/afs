@@ -444,6 +444,7 @@ DBOOL afs_toc_metadata_save_file(afs_toc_metadata * toc_metadata, const char * f
 
     if (fp_save == NULL)
     {
+        mxmlDelete(tree);
         return DFALSE;
     }
 
