@@ -375,6 +375,7 @@ DBOOL afs_toc_data_reels_save_file(afs_toc_data_reels * toc_data_reels, const ch
 
     if (fp_save == NULL)
     {
+        mxmlDelete(tree);
         return DFALSE;
     }
 
