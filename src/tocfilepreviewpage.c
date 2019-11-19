@@ -487,6 +487,7 @@ char * afs_toc_file_preview_page_save_string(afs_toc_file_preview_page * toc_fil
     if (!afs_toc_file_preview_page_save_xml(toc_file_preview_page, document))
     {
         DLOG_INFO("Load XML failed!\n");
+        mxmlDelete(document);
         return NULL;
     }
 
