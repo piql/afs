@@ -554,14 +554,7 @@ DBOOL afs_toc_preview_layout_definition_save_xml(const afs_toc_preview_layout_de
     afs_xmlutils_add_new_text_node(preview_node, "id", toc_preview_layout_definition->id);
     afs_xmlutils_add_new_text_node(preview_node, "name", toc_preview_layout_definition->name);
 
-    DBOOL result = afs_toc_preview_sections_save_xml(toc_preview_layout_definition->sections, preview_node);
-
-    if (result == DFALSE)
-    {
-        return DFALSE;
-    }
-    
-    return DTRUE;
+    return afs_toc_preview_sections_save_xml(toc_preview_layout_definition->sections, preview_node);
 }
 
 
