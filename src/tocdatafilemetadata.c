@@ -435,6 +435,7 @@ DBOOL afs_toc_data_file_metadata_save_file(afs_toc_data_file_metadata * toc_data
 
     if (fp_save == NULL)
     {
+        mxmlDelete(tree);
         return DFALSE;
     }
 
