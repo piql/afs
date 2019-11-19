@@ -128,7 +128,6 @@ void afs_toc_data_reels_free(afs_toc_data_reels * toc_data_reels)
 
 afs_toc_data_reels * afs_toc_data_reels_clone(afs_toc_data_reels * toc_data_reels)
 {
-    // If TOC data reels pointer is NULL return NULL.
     if (toc_data_reels == NULL)
     {
         return NULL;
@@ -411,7 +410,6 @@ DBOOL afs_toc_data_reels_save_file(afs_toc_data_reels * toc_data_reels, const ch
 
 char * afs_toc_data_reels_save_string(afs_toc_data_reels * toc_data_reels, DBOOL compact)
 {
-    // If TOC data reels pointer is NULL return DFALSE
     if (toc_data_reels == NULL)
     {
         return NULL;
@@ -457,7 +455,6 @@ char * afs_toc_data_reels_save_string(afs_toc_data_reels * toc_data_reels, DBOOL
 
 DBOOL afs_toc_data_reels_save_xml(afs_toc_data_reels * toc_data_reels, mxml_node_t * out)
 {
-    // If output node pointer is NULL or TOC data reels pointer is NULL return DFALSE
     if (out == NULL || toc_data_reels == NULL)
     {
         return DFALSE;
@@ -498,7 +495,6 @@ DBOOL afs_toc_data_reels_save_xml(afs_toc_data_reels * toc_data_reels, mxml_node
 
 DBOOL afs_toc_data_reels_load_file(afs_toc_data_reels * toc_data_reels, const char * file_name)
 {
-    // If input file name string pointer is NULL or TOC data reels pointer is NULL return DFALSE
     if (file_name == NULL || toc_data_reels == NULL)
     {
         return DFALSE;
@@ -548,7 +544,6 @@ DBOOL afs_toc_data_reels_load_file(afs_toc_data_reels * toc_data_reels, const ch
 
 DBOOL afs_toc_data_reels_load_string(afs_toc_data_reels * toc_data_reels, const char * in)
 {
-    // If input string pointer is NULL or TOC data reels pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || toc_data_reels == NULL)
     {
         return DFALSE;
@@ -581,7 +576,6 @@ DBOOL afs_toc_data_reels_load_string(afs_toc_data_reels * toc_data_reels, const 
 
 DBOOL afs_toc_data_reels_load_xml(afs_toc_data_reels * toc_data_reels, mxml_node_t * node)
 {
-    // If input node pointer is NULL or TOC data reels pointer is NULL return DFALSE
     if (node == NULL || toc_data_reels == NULL)
     {
         return DFALSE;

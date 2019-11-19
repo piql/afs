@@ -96,17 +96,13 @@ char* afs_sha1_sum2(const char* file_name, boxing_int64 start, boxing_int64 size
     FILE *file;
     char *check_sum = NULL;
 
-    // If there is no file name, then exit with an error
     if (file_name == NULL)
     {
         return check_sum;
     }
 
-
-    // Open the file for reading
     file = fopen(file_name, "rb");
-    
-    // If the file does not open, then exit with an error
+
     if (file == NULL)
     {
         return check_sum;

@@ -203,7 +203,6 @@ void afs_toc_data_free(afs_toc_data * toc_data)
 
 afs_toc_data * afs_toc_data_clone(afs_toc_data * toc_data)
 {
-    // If TOC data pointer is NULL return NULL.
     if (toc_data == NULL)
     {
         return NULL;
@@ -452,7 +451,6 @@ afs_toc_preview_layout_definition * afs_toc_data_get_preview_layout_definition(c
 
 void afs_toc_data_set_version(afs_toc_data * toc_data, const char * version)
 {
-    // If TOC data pointer is NULL return
     if (toc_data == NULL)
     {
         return;
@@ -479,7 +477,6 @@ void afs_toc_data_set_version(afs_toc_data * toc_data, const char * version)
 
 void afs_toc_data_set_index_type(afs_toc_data * toc_data, const char * index_type)
 {
-    // If TOC data pointer is NULL return
     if (toc_data == NULL)
     {
         return;
@@ -506,7 +503,6 @@ void afs_toc_data_set_index_type(afs_toc_data * toc_data, const char * index_typ
 
 void afs_toc_data_set_job_id(afs_toc_data * toc_data, const char * job_id)
 {
-    // If TOC data pointer is NULL return
     if (toc_data == NULL)
     {
         return;
@@ -533,7 +529,6 @@ void afs_toc_data_set_job_id(afs_toc_data * toc_data, const char * job_id)
 
 void afs_toc_data_set_reel_id(afs_toc_data * toc_data, const char * reel_id)
 {
-    // If TOC data pointer is NULL return
     if (toc_data == NULL)
     {
         return;
@@ -906,7 +901,6 @@ int afs_toc_data_last_frame(const afs_toc_data * toc_data)
 
 DBOOL afs_toc_data_is_valid(const afs_toc_data * toc_data)
 {
-    // If TOC data pointer is NULL return DFALSE
     if (toc_data == NULL)
     {
         return DFALSE;
@@ -1067,7 +1061,6 @@ DBOOL afs_toc_data_save_file(afs_toc_data * toc_data, const char * file_name, DB
 
 char * afs_toc_data_save_string(afs_toc_data * toc_data, DBOOL compact)
 {
-    // If TOC data reel pointer is NULL return DFALSE
     if (toc_data == NULL)
     {
         return NULL;
@@ -1113,7 +1106,6 @@ char * afs_toc_data_save_string(afs_toc_data * toc_data, DBOOL compact)
 
 DBOOL afs_toc_data_save_xml(afs_toc_data * toc_data, mxml_node_t* out)
 {
-    // If output node pointer is NULL or TOC data reel pointer is NULL return DFALSE
     if (out == NULL || toc_data == NULL)
     {
         return DFALSE;
@@ -1177,7 +1169,6 @@ DBOOL afs_toc_data_save_xml(afs_toc_data * toc_data, mxml_node_t* out)
 
 DBOOL afs_toc_data_load_file(afs_toc_data * toc_data, const char * file_name)
 {
-    // If input file name string pointer is NULL or TOC data pointer is NULL return DFALSE
     if (file_name == NULL || toc_data == NULL)
     {
         return DFALSE;
@@ -1227,7 +1218,6 @@ DBOOL afs_toc_data_load_file(afs_toc_data * toc_data, const char * file_name)
 
 DBOOL afs_toc_data_load_string(afs_toc_data * toc_data, const char * in)
 {
-    // If input string pointer is NULL or TOC data pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || toc_data == NULL)
     {
         return DFALSE;
@@ -1260,7 +1250,6 @@ DBOOL afs_toc_data_load_string(afs_toc_data * toc_data, const char * in)
 
 DBOOL afs_toc_data_load_xml(afs_toc_data * toc_data, mxml_node_t * node)
 {
-    // If input node pointer is NULL or TOC data pointer is NULL return DFALSE
     if (node == NULL || toc_data == NULL)
     {
         return DFALSE;

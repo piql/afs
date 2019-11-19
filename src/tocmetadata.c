@@ -189,7 +189,6 @@ void afs_toc_metadata_free(afs_toc_metadata * toc_metadata)
 
 afs_toc_metadata * afs_toc_metadata_clone(afs_toc_metadata * toc_metadata)
 {
-    // If TOC metadata pointer is NULL return NULL.
     if (toc_metadata == NULL)
     {
         return NULL;
@@ -480,7 +479,6 @@ DBOOL afs_toc_metadata_save_file(afs_toc_metadata * toc_metadata, const char * f
 
 char * afs_toc_metadata_save_string(afs_toc_metadata * toc_metadata, DBOOL compact)
 {
-    // If TOC metadata pointer is NULL return DFALSE
     if (toc_metadata == NULL)
     {
         return DFALSE;
@@ -529,7 +527,6 @@ char * afs_toc_metadata_save_string(afs_toc_metadata * toc_metadata, DBOOL compa
 
 DBOOL afs_toc_metadata_save_xml(afs_toc_metadata * toc_metadata, mxml_node_t* out)
 {
-    // If output node pointer is NULL or TOC metadata pointer is NULL return DFALSE
     if (out == NULL || toc_metadata == NULL)
     {
         return DFALSE;
@@ -570,7 +567,6 @@ DBOOL afs_toc_metadata_save_xml(afs_toc_metadata * toc_metadata, mxml_node_t* ou
 
 DBOOL afs_toc_metadata_load_file(afs_toc_metadata * toc_metadata, const char * file_name)
 {
-    // If input file name string pointer is NULL or TOC metadata pointer is NULL return DFALSE
     if (file_name == NULL || toc_metadata == NULL)
     {
         return DFALSE;
@@ -620,7 +616,6 @@ DBOOL afs_toc_metadata_load_file(afs_toc_metadata * toc_metadata, const char * f
 
 DBOOL afs_toc_metadata_load_string(afs_toc_metadata * toc_metadata, const char * in)
 {
-    // If input string pointer is NULL or TOC metadata pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || toc_metadata == NULL)
     {
         return DFALSE;
@@ -653,7 +648,6 @@ DBOOL afs_toc_metadata_load_string(afs_toc_metadata * toc_metadata, const char *
 
 DBOOL afs_toc_metadata_load_xml(afs_toc_metadata * toc_metadata, mxml_node_t* node)
 {
-    // If input node pointer is NULL or TOC metadata pointer is NULL return DFALSE
     if (node == NULL || toc_metadata == NULL)
     {
         return DFALSE;

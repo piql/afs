@@ -179,7 +179,6 @@ void afs_toc_file_preview_free(afs_toc_file_preview * toc_file_preview)
 
 afs_toc_file_preview* afs_toc_file_preview_clone(const afs_toc_file_preview * toc_file_preview)
 {
-    // If TOC file preview pointer is NULL return NULL.
     if (toc_file_preview == NULL)
     {
         return NULL;
@@ -598,7 +597,6 @@ DBOOL afs_toc_file_preview_save_file(afs_toc_file_preview * toc_file_preview, co
 
 char * afs_toc_file_preview_save_string(afs_toc_file_preview * toc_file_preview, DBOOL compact)
 {
-    // If TOC file preview page pointer is NULL return DFALSE
     if (toc_file_preview == NULL)
     {
         return DFALSE;
@@ -644,7 +642,6 @@ char * afs_toc_file_preview_save_string(afs_toc_file_preview * toc_file_preview,
 
 DBOOL afs_toc_file_preview_save_xml(afs_toc_file_preview * toc_file_preview, mxml_node_t* out)
 {
-    // If output node pointer is NULL or TOC file preview pointer is NULL return DFALSE
     if (out == NULL || toc_file_preview == NULL)
     {
         return DFALSE;
@@ -691,7 +688,6 @@ DBOOL afs_toc_file_preview_save_xml(afs_toc_file_preview * toc_file_preview, mxm
 
 DBOOL afs_toc_file_preview_load_file(afs_toc_file_preview * toc_file_preview, const char * file_name)
 {
-    // If input file name string pointer is NULL or TOC file preview pointer is NULL return DFALSE
     if (file_name == NULL || toc_file_preview == NULL)
     {
         return DFALSE;
@@ -741,7 +737,6 @@ DBOOL afs_toc_file_preview_load_file(afs_toc_file_preview * toc_file_preview, co
 
 DBOOL afs_toc_file_preview_load_string(afs_toc_file_preview * toc_file_preview, const char * in)
 {
-    // If input string pointer is NULL or TOC file preview pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") == DTRUE || toc_file_preview == NULL)
     {
         return DFALSE;
@@ -774,7 +769,6 @@ DBOOL afs_toc_file_preview_load_string(afs_toc_file_preview * toc_file_preview, 
 
 DBOOL afs_toc_file_preview_load_xml(afs_toc_file_preview * toc_file_preview, mxml_node_t* node)
 {
-    // If input node pointer is NULL or TOC file preview pointer is NULL return DFALSE
     if (node == NULL || toc_file_preview == NULL)
     {
         return DFALSE;

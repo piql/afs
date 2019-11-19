@@ -141,7 +141,6 @@ void afs_control_data_free(afs_control_data * control_data)
 
 afs_control_data * afs_control_data_clone(const afs_control_data * control_data)
 {
-    // If control data pointer is NULL return NULL.
     if (control_data == NULL)
     {
         return NULL;
@@ -265,7 +264,6 @@ DBOOL afs_control_data_save_file(afs_control_data * control_data, const char * f
 
 char * afs_control_data_save_string(afs_control_data * control_data, DBOOL compact)
 {
-    // If control data pointer is NULL return DFALSE
     if (control_data == NULL)
     {
         return NULL;
@@ -346,7 +344,6 @@ DBOOL afs_control_data_save_xml(afs_control_data * control_data, mxml_node_t * o
 
 DBOOL afs_control_data_load_file(afs_control_data * control_data, const char * file_name)
 {
-    // If input file name string pointer is NULL or control data pointer is NULL return DFALSE
     if (file_name == NULL || control_data == NULL)
     {
         return DFALSE;
@@ -396,7 +393,6 @@ DBOOL afs_control_data_load_file(afs_control_data * control_data, const char * f
 
 DBOOL afs_control_data_load_string(afs_control_data * control_data, const char * in)
 {
-    // If input string pointer is NULL or control data pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || control_data == NULL)
     {
         return DFALSE;

@@ -115,7 +115,6 @@ void afs_frame_ranges_free(afs_frame_ranges * frame_ranges)
 
 afs_frame_ranges * afs_frame_ranges_clone(const afs_frame_ranges * frame_ranges)
 {
-    // If frame ranges pointer is NULL return NULL.
     if (frame_ranges == NULL)
     {
         return NULL;
