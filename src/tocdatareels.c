@@ -600,6 +600,7 @@ DBOOL afs_toc_data_reels_load_xml(afs_toc_data_reels * toc_data_reels, mxml_node
             if (load_reel_result == DFALSE)
             {
                 DLOG_INFO("Has no REEL.\n");
+                afs_toc_data_reel_free(toc_data_reel);
                 return DFALSE;
             }
 
