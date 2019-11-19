@@ -663,14 +663,11 @@ DBOOL afs_toc_data_file_metadata_load_string(afs_toc_data_file_metadata * toc_da
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    if (!afs_toc_data_file_metadata_load_xml(toc_data_file_metadata, document))
-    {
-        return DFALSE;
-    }
+    DBOOL return_value = afs_toc_data_file_metadata_load_xml(toc_data_file_metadata, document);
 
     mxmlDelete(document);
 
-    return DTRUE;
+    return return_value;
 }
 
 
