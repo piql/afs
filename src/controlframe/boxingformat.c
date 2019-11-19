@@ -338,8 +338,6 @@ DBOOL afs_boxing_format_save_config_file(const char * file_name, afs_boxing_form
         return DFALSE;
     }
 
-    mxml_node_t *tree = mxmlNewXML("1.0");
-
 #ifndef WIN32
     FILE * fp_save = fopen(file_name, "w+");
 #else
@@ -350,6 +348,8 @@ DBOOL afs_boxing_format_save_config_file(const char * file_name, afs_boxing_form
     {
         return DFALSE;
     }
+
+    mxml_node_t *tree = mxmlNewXML("1.0");
 
     if (boxing_format->config != NULL)
     {
