@@ -310,15 +310,11 @@ DBOOL afs_boxing_format_load_string(afs_boxing_format* boxing_format, const char
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    if (!afs_boxing_format_load_xml(boxing_format, document))
-    {
-        mxmlDelete(document);
-        return DFALSE;
-    }
+    DBOOL return_value = afs_boxing_format_load_xml(boxing_format, document);
 
     mxmlDelete(document);
 
-    return DTRUE;
+    return return_value;
 }
 
 
