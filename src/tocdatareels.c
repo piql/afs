@@ -557,14 +557,11 @@ DBOOL afs_toc_data_reels_load_string(afs_toc_data_reels * toc_data_reels, const 
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    if (!afs_toc_data_reels_load_xml(toc_data_reels, document))
-    {
-        return DFALSE;
-    }
+    DBOOL return_value = afs_toc_data_reels_load_xml(toc_data_reels, document);
 
     mxmlDelete(document);
 
-    return DTRUE;
+    return return_value;
 }
 
 
