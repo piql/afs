@@ -213,8 +213,6 @@ DBOOL afs_technical_metadata_save_file(afs_technical_metadata * technical_metada
         return DFALSE;
     }
 
-    mxml_node_t *tree = mxmlNewXML("1.0");
-
 #ifndef WIN32
     FILE * fp_save = fopen(file_name, "w+");
 #else
@@ -225,6 +223,8 @@ DBOOL afs_technical_metadata_save_file(afs_technical_metadata * technical_metada
     {
         return DFALSE;
     }
+
+    mxml_node_t *tree = mxmlNewXML("1.0");
 
     if (!afs_technical_metadata_save_xml(technical_metadata, tree))
     {
