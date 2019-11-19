@@ -1195,17 +1195,9 @@ DBOOL afs_toc_data_load_file(afs_toc_data * toc_data, const char * file_name)
     }
 
     mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
-    
-    if (document == NULL)
-    {
-        fclose(fp_load);
-        mxmlDelete(document);
 
-        return DFALSE;
-    }
-    
     DBOOL return_value = afs_toc_data_load_xml(toc_data, document);
-    
+
     fclose(fp_load);
     mxmlDelete(document);
 

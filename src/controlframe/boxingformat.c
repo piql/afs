@@ -419,14 +419,6 @@ DBOOL afs_boxing_format_load_config_file(afs_boxing_format* boxing_format, const
 
     mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
 
-    if (document == NULL)
-    {
-        fclose(fp_load);
-        mxmlDelete(document);
-
-        return DFALSE;
-    }
-
     DBOOL return_value = afs_boxing_format_load_xml(boxing_format, document);
 
     fclose(fp_load);

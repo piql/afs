@@ -483,14 +483,6 @@ DBOOL afs_toc_preview_section_load_file(afs_toc_preview_section * toc_preview_se
 
     mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
 
-    if (document == NULL)
-    {
-        fclose(fp_load);
-        mxmlDelete(document);
-
-        return DFALSE;
-    }
-
     DBOOL return_value = afs_toc_preview_section_load_xml(toc_preview_section, document);
 
     fclose(fp_load);
