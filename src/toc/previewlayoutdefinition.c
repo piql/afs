@@ -456,6 +456,7 @@ DBOOL afs_toc_preview_layout_definition_save_file(const afs_toc_preview_layout_d
 
     if (fp_save == NULL)
     {
+        mxmlDelete(tree);
         return DFALSE;
     }
 
