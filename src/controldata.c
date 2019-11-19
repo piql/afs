@@ -229,6 +229,7 @@ DBOOL afs_control_data_save_file(afs_control_data * control_data, const char * f
 
     if (fp_save == NULL)
     {
+        mxmlDelete(tree);
         return DFALSE;
     }
 
