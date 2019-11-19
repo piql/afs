@@ -879,10 +879,7 @@ DBOOL afs_toc_metadata_source_load_string(afs_toc_metadata_source * toc_metadata
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    if (!afs_toc_metadata_source_load_xml(toc_metadata_source, document))
-    {
-        return DFALSE;
-    }
+    DBOOL return_value = afs_toc_metadata_source_load_xml(toc_metadata_source, document);
 
     mxmlDelete(document);
 
