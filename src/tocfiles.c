@@ -649,6 +649,7 @@ DBOOL afs_toc_files_save_file(afs_toc_files * toc_files, const char * file_name,
 
     if (fp_save == NULL)
     {
+        mxmlDelete(tree);
         return DFALSE;
     }
 
