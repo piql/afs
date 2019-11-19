@@ -413,14 +413,11 @@ DBOOL afs_technical_metadata_load_string(afs_technical_metadata * technical_meta
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    if (!afs_technical_metadata_load_xml(technical_metadata, document))
-    {
-        return DFALSE;
-    }
+    DBOOL return_value = afs_technical_metadata_load_xml(technical_metadata, document);
 
     mxmlDelete(document);
 
-    return DTRUE;
+    return return_value;
 }
 
 
