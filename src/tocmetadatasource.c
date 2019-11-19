@@ -883,7 +883,7 @@ DBOOL afs_toc_metadata_source_load_string(afs_toc_metadata_source * toc_metadata
 
     mxmlDelete(document);
 
-    return DTRUE;
+    return return_value;
 }
 
 
