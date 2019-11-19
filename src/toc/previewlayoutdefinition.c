@@ -638,14 +638,11 @@ DBOOL afs_toc_preview_layout_definition_load_string(afs_toc_preview_layout_defin
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    if (!afs_toc_preview_layout_definition_load_xml(toc_preview_layout_definition, document))
-    {
-        return DFALSE;
-    }
+    DBOOL return_value = afs_toc_preview_layout_definition_load_xml(toc_preview_layout_definition, document);
 
     mxmlDelete(document);
 
-    return DTRUE;
+    return return_value;
 }
 
 
