@@ -562,6 +562,7 @@ DBOOL afs_toc_file_preview_save_file(afs_toc_file_preview * toc_file_preview, co
 
     if (fp_save == NULL)
     {
+        mxmlDelete(tree);
         return DFALSE;
     }
 
