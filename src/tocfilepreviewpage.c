@@ -719,7 +719,7 @@ static DBOOL extract_xy_from_string(unsigned int* x, unsigned int* y, const char
 
 static const char * whitespace_cb(mxml_node_t *node, int where)
 {
-    const char *name, *parent_name;
+    const char *name;
 
     /*
     * We can conditionally break to a new line
@@ -728,10 +728,6 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
     */
 
     name = mxmlGetElement(node);
-    parent_name = mxmlGetElement(node->parent);
-
-    /// \todo warning: variable ‘parent_name’ set but not used [-Wunused-but-set-variable]
-    (void) parent_name;
 
     if (boxing_string_equal("pages", name))
     {
