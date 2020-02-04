@@ -370,17 +370,9 @@ DBOOL afs_technical_metadata_load_file(afs_technical_metadata * technical_metada
     }
 
     mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
-    
-    if (document == NULL)
-    {
-        fclose(fp_load);
-        mxmlDelete(document);
 
-        return DFALSE;
-    }
-    
     DBOOL return_value = afs_technical_metadata_load_xml(technical_metadata, document);
-    
+
     fclose(fp_load);
     mxmlDelete(document);
 
