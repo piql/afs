@@ -374,6 +374,7 @@ DBOOL afs_toc_data_reels_save_file(afs_toc_data_reels * toc_data_reels, const ch
 
     if (fp_save == NULL)
     {
+        mxmlDelete(tree);
         return DFALSE;
     }
 
@@ -543,14 +544,11 @@ DBOOL afs_toc_data_reels_load_string(afs_toc_data_reels * toc_data_reels, const 
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    if (!afs_toc_data_reels_load_xml(toc_data_reels, document))
-    {
-        return DFALSE;
-    }
+    DBOOL return_value = afs_toc_data_reels_load_xml(toc_data_reels, document);
 
     mxmlDelete(document);
 
-    return DTRUE;
+    return return_value;
 }
 
 
@@ -588,6 +586,7 @@ DBOOL afs_toc_data_reels_load_xml(afs_toc_data_reels * toc_data_reels, mxml_node
             if (load_reel_result == DFALSE)
             {
                 DLOG_INFO("Has no REEL.\n");
+                afs_toc_data_reel_free(toc_data_reel);
                 return DFALSE;
             }
 

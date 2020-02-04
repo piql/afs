@@ -211,6 +211,7 @@ char * afs_boxing_format_save_string(afs_boxing_format* boxing_format, DBOOL com
 
     if (!afs_boxing_format_save_xml(document, boxing_format))
     {
+        mxmlDelete(document);
         return NULL;
     }
 
@@ -306,15 +307,11 @@ DBOOL afs_boxing_format_load_string(afs_boxing_format* boxing_format, const char
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    if (!afs_boxing_format_load_xml(boxing_format, document))
-    {
-        mxmlDelete(document);
-        return DFALSE;
-    }
+    DBOOL return_value = afs_boxing_format_load_xml(boxing_format, document);
 
     mxmlDelete(document);
 
-    return DTRUE;
+    return return_value;
 }
 
 
@@ -338,8 +335,6 @@ DBOOL afs_boxing_format_save_config_file(const char * file_name, afs_boxing_form
         return DFALSE;
     }
 
-    mxml_node_t *tree = mxmlNewXML("1.0");
-
 #ifndef WIN32
     FILE * fp_save = fopen(file_name, "w+");
 #else
@@ -350,6 +345,8 @@ DBOOL afs_boxing_format_save_config_file(const char * file_name, afs_boxing_form
     {
         return DFALSE;
     }
+
+    mxml_node_t *tree = mxmlNewXML("1.0");
 
     if (boxing_format->config != NULL)
     {

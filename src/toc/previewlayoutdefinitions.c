@@ -500,8 +500,6 @@ DBOOL afs_toc_preview_layout_definitions_save_file(const afs_toc_preview_layout_
         return DFALSE;
     }
 
-    mxml_node_t *tree = mxmlNewXML("1.0");
-
 #ifndef WIN32
     FILE * fp_save = fopen(file_name, "w+");
 #else
@@ -512,6 +510,8 @@ DBOOL afs_toc_preview_layout_definitions_save_file(const afs_toc_preview_layout_
     {
         return DFALSE;
     }
+
+    mxml_node_t *tree = mxmlNewXML("1.0");
 
     if (!afs_toc_preview_layout_definitions_save_xml(toc_preview_layout_definitions, tree))
     {
@@ -752,14 +752,11 @@ DBOOL afs_toc_preview_layout_definitions_load_string(afs_toc_preview_layout_defi
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    if (!afs_toc_preview_layout_definitions_load_xml(toc_preview_layout_definitions, document))
-    {
-        return DFALSE;
-    }
+    DBOOL return_value = afs_toc_preview_layout_definitions_load_xml(toc_preview_layout_definitions, document);
 
     mxmlDelete(document);
 
-    return DTRUE;
+    return return_value;
 }
 
 

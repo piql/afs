@@ -212,8 +212,6 @@ DBOOL afs_technical_metadata_save_file(afs_technical_metadata * technical_metada
         return DFALSE;
     }
 
-    mxml_node_t *tree = mxmlNewXML("1.0");
-
 #ifndef WIN32
     FILE * fp_save = fopen(file_name, "w+");
 #else
@@ -224,6 +222,8 @@ DBOOL afs_technical_metadata_save_file(afs_technical_metadata * technical_metada
     {
         return DFALSE;
     }
+
+    mxml_node_t *tree = mxmlNewXML("1.0");
 
     if (!afs_technical_metadata_save_xml(technical_metadata, tree))
     {
@@ -401,14 +401,11 @@ DBOOL afs_technical_metadata_load_string(afs_technical_metadata * technical_meta
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    if (!afs_technical_metadata_load_xml(technical_metadata, document))
-    {
-        return DFALSE;
-    }
+    DBOOL return_value = afs_technical_metadata_load_xml(technical_metadata, document);
 
     mxmlDelete(document);
 
-    return DTRUE;
+    return return_value;
 }
 
 

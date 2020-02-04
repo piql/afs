@@ -422,8 +422,6 @@ DBOOL afs_toc_file_preview_page_save_file(afs_toc_file_preview_page * toc_file_p
         return DFALSE;
     }
 
-    mxml_node_t *tree = mxmlNewXML("1.0");
-
 #ifndef WIN32
     FILE * fp_save = fopen(file_name, "w+");
 #else
@@ -434,6 +432,8 @@ DBOOL afs_toc_file_preview_page_save_file(afs_toc_file_preview_page * toc_file_p
     {
         return DFALSE;
     }
+
+    mxml_node_t *tree = mxmlNewXML("1.0");
 
     if (!afs_toc_file_preview_page_save_xml(toc_file_preview_page, tree))
     {
@@ -485,6 +485,7 @@ char * afs_toc_file_preview_page_save_string(afs_toc_file_preview_page * toc_fil
     if (!afs_toc_file_preview_page_save_xml(toc_file_preview_page, document))
     {
         DLOG_INFO("Load XML failed!\n");
+        mxmlDelete(document);
         return NULL;
     }
 
@@ -613,14 +614,11 @@ DBOOL afs_toc_file_preview_page_load_string(afs_toc_file_preview_page * toc_file
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    if (!afs_toc_file_preview_page_load_xml(toc_file_preview_page, document))
-    {
-        return DFALSE;
-    }
+    DBOOL return_value = afs_toc_file_preview_page_load_xml(toc_file_preview_page, document);
 
     mxmlDelete(document);
 
-    return DTRUE;
+    return return_value;
 }
 
 
