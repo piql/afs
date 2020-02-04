@@ -221,7 +221,6 @@ void afs_toc_files_free(afs_toc_files * toc_files)
 
 afs_toc_files* afs_toc_files_clone(afs_toc_files * toc_files)
 {
-    // If TOC files pointer is NULL return NULL.
     if (toc_files == NULL)
     {
         return NULL;
@@ -685,7 +684,6 @@ DBOOL afs_toc_files_save_file(afs_toc_files * toc_files, const char * file_name,
 
 char * afs_toc_files_save_string(afs_toc_files * toc_files, DBOOL compact)
 {
-    // If TOC files pointer is NULL return DFALSE
     if (toc_files == NULL)
     {
         return NULL;
@@ -731,7 +729,6 @@ char * afs_toc_files_save_string(afs_toc_files * toc_files, DBOOL compact)
 
 DBOOL afs_toc_files_save_xml(afs_toc_files * toc_files, mxml_node_t* out)
 {
-    // If output node pointer is NULL or TOC files pointer is NULL return DFALSE
     if (out == NULL || toc_files == NULL)
     {
         return DFALSE;
@@ -772,7 +769,6 @@ DBOOL afs_toc_files_save_xml(afs_toc_files * toc_files, mxml_node_t* out)
 
 DBOOL afs_toc_files_load_file(afs_toc_files * toc_files, const char * file_name)
 {
-    // If input file name string pointer is NULL or TOC files pointer is NULL return DFALSE
     if (file_name == NULL || toc_files == NULL)
     {
         return DFALSE;
@@ -822,7 +818,6 @@ DBOOL afs_toc_files_load_file(afs_toc_files * toc_files, const char * file_name)
 
 DBOOL afs_toc_files_load_string(afs_toc_files * toc_files, const char * in)
 {
-    // If input string pointer is NULL or TOC files pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || toc_files == NULL)
     {
         return DFALSE;
@@ -855,7 +850,6 @@ DBOOL afs_toc_files_load_string(afs_toc_files * toc_files, const char * in)
 
 DBOOL afs_toc_files_load_xml(afs_toc_files * toc_files, mxml_node_t* node)
 {
-    // If input node pointer is NULL or TOC file preview pointer is NULL return DFALSE
     if (node == NULL || toc_files == NULL)
     {
         return DFALSE;
@@ -977,7 +971,6 @@ char * afs_toc_files_save_as_table(afs_toc_files * toc_files)
 
 char * afs_toc_files_save_as_location_table(afs_toc_files * toc_files)
 {
-    // If TOC files pointer is NULL return NULL
     if (toc_files == NULL)
     {
         return NULL;
@@ -1128,7 +1121,6 @@ char * afs_toc_files_save_as_location_table(afs_toc_files * toc_files)
 
 char * afs_toc_files_save_as_metadata_table(afs_toc_files * toc_files)
 {
-    // If TOC files pointer is NULL return NULL
     if (toc_files == NULL)
     {
         return NULL;

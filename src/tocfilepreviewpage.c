@@ -222,7 +222,6 @@ void afs_toc_file_preview_page_free(afs_toc_file_preview_page * toc_file_preview
 
 afs_toc_file_preview_page* afs_toc_file_preview_page_clone(afs_toc_file_preview_page * toc_file_preview_page)
 {
-    // If TOC file preview page pointer is NULL return NULL.
     if (toc_file_preview_page == NULL)
     {
         return NULL;
@@ -476,7 +475,6 @@ DBOOL afs_toc_file_preview_page_save_file(afs_toc_file_preview_page * toc_file_p
 
 char * afs_toc_file_preview_page_save_string(afs_toc_file_preview_page * toc_file_preview_page, DBOOL compact)
 {
-    // If TOC file preview page pointer is NULL return DFALSE
     if (toc_file_preview_page == NULL)
     {
         return DFALSE;
@@ -522,7 +520,6 @@ char * afs_toc_file_preview_page_save_string(afs_toc_file_preview_page * toc_fil
 
 DBOOL afs_toc_file_preview_page_save_xml(afs_toc_file_preview_page * toc_file_preview_page, mxml_node_t* out)
 {
-    // If output node pointer is NULL or TOC file preview page pointer is NULL return DFALSE
     if (out == NULL || toc_file_preview_page == NULL)
     {
         return DFALSE;
@@ -568,7 +565,6 @@ DBOOL afs_toc_file_preview_page_save_xml(afs_toc_file_preview_page * toc_file_pr
 
 DBOOL afs_toc_file_preview_page_load_file(afs_toc_file_preview_page * toc_file_preview_page, const char * file_name)
 {
-    // If input file name string pointer is NULL or TOC file preview page pointer is NULL return DFALSE
     if (file_name == NULL || toc_file_preview_page == NULL)
     {
         return DFALSE;
@@ -618,7 +614,6 @@ DBOOL afs_toc_file_preview_page_load_file(afs_toc_file_preview_page * toc_file_p
 
 DBOOL afs_toc_file_preview_page_load_string(afs_toc_file_preview_page * toc_file_preview_page, const char * in)
 {
-    // If input string pointer is NULL or TOC file preview page pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || toc_file_preview_page == NULL)
     {
         return DFALSE;
@@ -651,7 +646,6 @@ DBOOL afs_toc_file_preview_page_load_string(afs_toc_file_preview_page * toc_file
 
 DBOOL afs_toc_file_preview_page_load_xml(afs_toc_file_preview_page * toc_file_preview_page, mxml_node_t* node)
 {
-    // If input node pointer is NULL or TOC file preview page pointer is NULL return DFALSE
     if (node == NULL || toc_file_preview_page == NULL)
     {
         return DFALSE;

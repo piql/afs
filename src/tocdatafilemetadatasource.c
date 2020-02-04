@@ -165,7 +165,6 @@ void afs_toc_data_file_metadata_source_free(afs_toc_data_file_metadata_source * 
 
 afs_toc_data_file_metadata_source * afs_toc_data_file_metadata_source_clone(afs_toc_data_file_metadata_source * toc_data_file_metadata_source)
 {
-    // If TOC data file metadata source pointer is NULL return NULL.
     if (toc_data_file_metadata_source == NULL)
     {
         return NULL;
@@ -230,7 +229,6 @@ DBOOL afs_toc_data_file_metadata_source_equal(afs_toc_data_file_metadata_source 
 
 DBOOL afs_toc_data_file_metadata_source_is_valid(afs_toc_data_file_metadata_source * toc_data_file_metadata_source)
 {
-    // If TOC data file metadata source pointer is NULL return DFALSE
     if (toc_data_file_metadata_source == NULL)
     {
         return DFALSE;
@@ -374,7 +372,6 @@ DBOOL afs_toc_data_file_metadata_source_save_file(afs_toc_data_file_metadata_sou
 
 char * afs_toc_data_file_metadata_source_save_string(afs_toc_data_file_metadata_source * toc_data_file_metadata_source, DBOOL compact)
 {
-    // If TOC data file metadata source pointer is NULL return DFALSE
     if (toc_data_file_metadata_source == NULL)
     {
         return DFALSE;
@@ -420,7 +417,6 @@ char * afs_toc_data_file_metadata_source_save_string(afs_toc_data_file_metadata_
 
 DBOOL afs_toc_data_file_metadata_source_save_xml(afs_toc_data_file_metadata_source * toc_data_file_metadata_source, mxml_node_t* out)
 {
-    // If output node pointer is NULL or TOC data file metadata source pointer is NULL return DFALSE
     if (out == NULL || toc_data_file_metadata_source == NULL || afs_toc_data_file_metadata_source_is_valid(toc_data_file_metadata_source) == DFALSE)
     {
         return DFALSE;
@@ -460,7 +456,6 @@ DBOOL afs_toc_data_file_metadata_source_save_xml(afs_toc_data_file_metadata_sour
 
 DBOOL afs_toc_data_file_metadata_source_load_file(afs_toc_data_file_metadata_source * toc_data_file_metadata_source, const char * file_name)
 {
-    // If input file name string pointer is NULL or TOC data file metadata source pointer is NULL return DFALSE
     if (file_name == NULL || toc_data_file_metadata_source == NULL)
     {
         return DFALSE;
@@ -510,7 +505,6 @@ DBOOL afs_toc_data_file_metadata_source_load_file(afs_toc_data_file_metadata_sou
 
 DBOOL afs_toc_data_file_metadata_source_load_string(afs_toc_data_file_metadata_source * toc_data_file_metadata_source, const char * in)
 {
-    // If input string pointer is NULL or TOC data file metadata source pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || toc_data_file_metadata_source == NULL)
     {
         return DFALSE;
@@ -543,7 +537,6 @@ DBOOL afs_toc_data_file_metadata_source_load_string(afs_toc_data_file_metadata_s
 
 DBOOL afs_toc_data_file_metadata_source_load_xml(afs_toc_data_file_metadata_source * toc_data_file_metadata_source, mxml_node_t* input_node)
 {
-    // If input node pointer is NULL or TOC data file metadata source pointer is NULL return DFALSE
     if (input_node == NULL || toc_data_file_metadata_source == NULL)
     {
         DLOG_ERROR("Setup error.\n");

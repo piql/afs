@@ -219,7 +219,6 @@ void afs_toc_preview_layout_definition_free(afs_toc_preview_layout_definition * 
 
 afs_toc_preview_layout_definition * afs_toc_preview_layout_definition_clone(const afs_toc_preview_layout_definition * toc_preview_layout_definition)
 {
-    // If TOC preview layout definition pointer is NULL return NULL.
     if (toc_preview_layout_definition == NULL)
     {
         return NULL;
@@ -282,7 +281,6 @@ DBOOL afs_toc_preview_layout_definition_equal(const afs_toc_preview_layout_defin
 
 DBOOL afs_toc_preview_layout_definition_is_valid(const afs_toc_preview_layout_definition * toc_preview_layout_definition)
 {
-    // If TOC preview layout definition pointer is NULL return DFALSE
     if (toc_preview_layout_definition == NULL)
     {
         return DFALSE;
@@ -492,7 +490,6 @@ DBOOL afs_toc_preview_layout_definition_save_file(const afs_toc_preview_layout_d
 
 char * afs_toc_preview_layout_definition_save_string(const afs_toc_preview_layout_definition * toc_preview_layout_definition, DBOOL compact)
 {
-    // If TOC preview layout definition pointer is NULL return DFALSE
     if (toc_preview_layout_definition == NULL)
     {
         return DFALSE;
@@ -539,7 +536,6 @@ char * afs_toc_preview_layout_definition_save_string(const afs_toc_preview_layou
 
 DBOOL afs_toc_preview_layout_definition_save_xml(const afs_toc_preview_layout_definition * toc_preview_layout_definition, mxml_node_t* out)
 {
-    // If output node pointer is NULL or TOC preview layout definition pointer is NULL return DFALSE
     if (out == NULL || toc_preview_layout_definition == NULL)
     {
         return DFALSE;
@@ -579,7 +575,6 @@ DBOOL afs_toc_preview_layout_definition_save_xml(const afs_toc_preview_layout_de
 
 DBOOL afs_toc_preview_layout_definition_load_file(afs_toc_preview_layout_definition * toc_preview_layout_definition, const char * file_name)
 {
-    // If input file name string pointer is NULL or TOC preview layout definition pointer is NULL return DFALSE
     if (file_name == NULL || toc_preview_layout_definition == NULL)
     {
         return DFALSE;
@@ -629,7 +624,6 @@ DBOOL afs_toc_preview_layout_definition_load_file(afs_toc_preview_layout_definit
 
 DBOOL afs_toc_preview_layout_definition_load_string(afs_toc_preview_layout_definition * toc_preview_layout_definition, const char * in)
 {
-    // If input string pointer is NULL or TOC preview layout definition pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || toc_preview_layout_definition == NULL)
     {
         return DFALSE;
@@ -662,7 +656,6 @@ DBOOL afs_toc_preview_layout_definition_load_string(afs_toc_preview_layout_defin
 
 DBOOL afs_toc_preview_layout_definition_load_xml(afs_toc_preview_layout_definition * toc_preview_layout_definition, mxml_node_t* node)
 {
-    // If input node pointer is NULL or TOC preview layout definition pointer is NULL return DFALSE
     if (node == NULL || toc_preview_layout_definition == NULL)
     {
         return DFALSE;

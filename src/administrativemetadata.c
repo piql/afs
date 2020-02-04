@@ -162,7 +162,6 @@ void afs_administrative_metadata_free(afs_administrative_metadata * administrati
 
 afs_administrative_metadata * afs_administrative_metadata_clone(const afs_administrative_metadata * administrative_metadata)
 {
-    // If administrative metadata pointer is NULL return NULL.
     if (administrative_metadata == NULL)
     {
         return NULL;
@@ -229,7 +228,6 @@ DBOOL afs_administrative_metadata_equal(const afs_administrative_metadata * admi
 
 void afs_administrative_metadata_set_reel_id(afs_administrative_metadata * administrative_metadata, const char * reel_id)
 {
-    // If administrative metadata pointer is NULL return
     if (administrative_metadata == NULL)
     {
         return;
@@ -256,7 +254,6 @@ void afs_administrative_metadata_set_reel_id(afs_administrative_metadata * admin
 
 void afs_administrative_metadata_set_print_reel_id(afs_administrative_metadata * administrative_metadata, const char * print_reel_id)
 {
-    // If administrative metadata pointer is NULL return
     if (administrative_metadata == NULL)
     {
         return;
@@ -283,7 +280,6 @@ void afs_administrative_metadata_set_print_reel_id(afs_administrative_metadata *
 
 void afs_administrative_metadata_set_title(afs_administrative_metadata * administrative_metadata, const char * title)
 {
-    // If administrative metadata pointer is NULL return
     if (administrative_metadata == NULL)
     {
         return;
@@ -310,7 +306,6 @@ void afs_administrative_metadata_set_title(afs_administrative_metadata * adminis
 
 void afs_administrative_metadata_set_description(afs_administrative_metadata * administrative_metadata, const char * description)
 {
-    // If administrative metadata pointer is NULL return
     if (administrative_metadata == NULL)
     {
         return;
@@ -337,7 +332,6 @@ void afs_administrative_metadata_set_description(afs_administrative_metadata * a
 
 void afs_administrative_metadata_set_creator(afs_administrative_metadata * administrative_metadata, const char * creator)
 {
-    // If administrative metadata pointer is NULL return
     if (administrative_metadata == NULL)
     {
         return;
@@ -364,7 +358,6 @@ void afs_administrative_metadata_set_creator(afs_administrative_metadata * admin
 
 void afs_administrative_metadata_set_creation_date(afs_administrative_metadata * administrative_metadata, const char * creation_date)
 {
-    // If administrative metadata pointer is NULL return
     if (administrative_metadata == NULL)
     {
         return;
@@ -452,7 +445,6 @@ DBOOL afs_administrative_metadata_save_file(afs_administrative_metadata * admini
 
 char * afs_administrative_metadata_save_string(afs_administrative_metadata * administrative_metadata, DBOOL compact)
 {
-    // If TOC data reel pointer is NULL return DFALSE
     if (administrative_metadata == NULL)
     {
         return NULL;
@@ -498,7 +490,6 @@ char * afs_administrative_metadata_save_string(afs_administrative_metadata * adm
 
 DBOOL afs_administrative_metadata_save_xml(afs_administrative_metadata * administrative_metadata, mxml_node_t * out)
 {
-    // If output node pointer is NULL or administrative metadata pointer is NULL return DFALSE
     if (out == NULL || administrative_metadata == NULL)
     {
         return DFALSE;
@@ -534,7 +525,6 @@ DBOOL afs_administrative_metadata_save_xml(afs_administrative_metadata * adminis
 
 DBOOL afs_administrative_metadata_load_file(afs_administrative_metadata * administrative_metadata, const char * file_name)
 {
-    // If input file name string pointer is NULL or administrative metadata pointer is NULL return DFALSE
     if (file_name == NULL || administrative_metadata == NULL)
     {
         return DFALSE;
@@ -584,7 +574,6 @@ DBOOL afs_administrative_metadata_load_file(afs_administrative_metadata * admini
 
 DBOOL afs_administrative_metadata_load_string(afs_administrative_metadata * administrative_metadata, const char * in)
 {
-    // If input string pointer is NULL or TOC data reel pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || administrative_metadata == NULL)
     {
         return DFALSE;
@@ -617,7 +606,6 @@ DBOOL afs_administrative_metadata_load_string(afs_administrative_metadata * admi
 
 DBOOL afs_administrative_metadata_load_xml(afs_administrative_metadata* administrative_metadata, mxml_node_t * in)
 {
-    // If input data pointer is NULL or administrative metadata pointer is NULL return DFALSE
     if (in == NULL || administrative_metadata == NULL)
     {
         return DFALSE;

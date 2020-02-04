@@ -156,7 +156,6 @@ void afs_toc_preview_section_free(afs_toc_preview_section * toc_preview_section)
 
 afs_toc_preview_section * afs_toc_preview_section_clone(const afs_toc_preview_section * toc_preview_section)
 {
-    // If TOC preview section pointer is NULL return NULL.
     if (toc_preview_section == NULL)
     {
         return NULL;
@@ -219,7 +218,6 @@ DBOOL afs_toc_preview_section_equal(const afs_toc_preview_section * toc_preview_
 
 DBOOL afs_toc_preview_section_is_valid(const afs_toc_preview_section * toc_preview_section)
 {
-    // If TOC preview section pointer is NULL return DFALSE
     if (toc_preview_section == NULL)
     {
         return DFALSE;
@@ -255,7 +253,6 @@ DBOOL afs_toc_preview_section_is_valid(const afs_toc_preview_section * toc_previ
 
 unsigned int afs_toc_preview_section_content_width(const afs_toc_preview_section * toc_preview_section)
 {
-    // If TOC preview section pointer is NULL return zero or rotation value is not valid
     if (toc_preview_section == NULL || toc_preview_section->rotation % 90 != 0)
     {
         return 0;
@@ -278,7 +275,6 @@ unsigned int afs_toc_preview_section_content_width(const afs_toc_preview_section
 
 unsigned int afs_toc_preview_section_content_height(const afs_toc_preview_section * toc_preview_section)
 {
-    // If TOC preview section pointer is NULL return zero or rotation value is not valid
     if (toc_preview_section == NULL || toc_preview_section->rotation % 90 != 0)
     {
         return 0;
@@ -385,7 +381,6 @@ DBOOL afs_toc_preview_section_save_file(const afs_toc_preview_section * toc_prev
 
 char * afs_toc_preview_section_save_string(const afs_toc_preview_section * toc_preview_section, DBOOL compact)
 {
-    // If TOC preview section pointer is NULL return DFALSE
     if (toc_preview_section == NULL)
     {
         return DFALSE;
@@ -431,7 +426,6 @@ char * afs_toc_preview_section_save_string(const afs_toc_preview_section * toc_p
 
 DBOOL afs_toc_preview_section_save_xml(const afs_toc_preview_section * toc_preview_section, mxml_node_t* out)
 {
-    // If output node pointer is NULL or TOC preview section pointer is NULL return DFALSE
     if (out == NULL || toc_preview_section == NULL || afs_toc_preview_section_is_valid(toc_preview_section) == DFALSE)
     {
         return DFALSE;
@@ -464,7 +458,6 @@ DBOOL afs_toc_preview_section_save_xml(const afs_toc_preview_section * toc_previ
 
 DBOOL afs_toc_preview_section_load_file(afs_toc_preview_section * toc_preview_section, const char * file_name)
 {
-    // If input file name string pointer is NULL or TOC preview section pointer is NULL return DFALSE
     if (file_name == NULL || toc_preview_section == NULL)
     {
         return DFALSE;
@@ -514,7 +507,6 @@ DBOOL afs_toc_preview_section_load_file(afs_toc_preview_section * toc_preview_se
 
 DBOOL afs_toc_preview_section_load_string(afs_toc_preview_section * toc_preview_section, const char * in)
 {
-    // If input string pointer is NULL or TOC preview section pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || toc_preview_section == NULL)
     {
         return DFALSE;
@@ -547,7 +539,6 @@ DBOOL afs_toc_preview_section_load_string(afs_toc_preview_section * toc_preview_
 
 DBOOL afs_toc_preview_section_load_xml(afs_toc_preview_section * toc_preview_section, mxml_node_t* input_node)
 {
-    // If input node pointer is NULL or TOC preview section pointer is NULL return DFALSE
     if (input_node == NULL || toc_preview_section == NULL)
     {
         return DFALSE;

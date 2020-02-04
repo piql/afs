@@ -127,7 +127,6 @@ void afs_frame_range_free(afs_frame_range * frame_range)
 
 afs_frame_range * afs_frame_range_clone(afs_frame_range * frame_range)
 {
-    // If frma range pointer is NULL return NULL.
     if (frame_range == NULL)
     {
         return NULL;

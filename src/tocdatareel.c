@@ -140,7 +140,6 @@ void afs_toc_data_reel_free(afs_toc_data_reel * toc_data_reel)
 
 afs_toc_data_reel * afs_toc_data_reel_clone(const afs_toc_data_reel * toc_data_reel)
 {
-    // If TOC data reel pointer is NULL return NULL.
     if (toc_data_reel == NULL)
     {
         return NULL;
@@ -199,7 +198,6 @@ DBOOL afs_toc_data_reel_equal(const afs_toc_data_reel * toc_data_reel1, const af
 
 void afs_toc_data_reel_set_id(afs_toc_data_reel * toc_data_reel, const char * id)
 {
-    // If TOC data reel pointer is NULL return
     if (toc_data_reel == NULL)
     {
         return;
@@ -988,7 +986,6 @@ DBOOL afs_toc_data_reel_save_file(afs_toc_data_reel * toc_data_reel, const char 
 
 char * afs_toc_data_reel_save_string(afs_toc_data_reel * toc_data_reel, DBOOL compact)
 {
-    // If TOC data reel pointer is NULL return DFALSE
     if (toc_data_reel == NULL)
     {
         return NULL;
@@ -1034,7 +1031,6 @@ char * afs_toc_data_reel_save_string(afs_toc_data_reel * toc_data_reel, DBOOL co
 
 DBOOL afs_toc_data_reel_save_xml(afs_toc_data_reel * toc_data_reel, mxml_node_t* out)
 {
-    // If output node pointer is NULL or TOC data reel pointer is NULL return DFALSE
     if (out == NULL || toc_data_reel == NULL)
     {
         return DFALSE;
@@ -1071,7 +1067,6 @@ DBOOL afs_toc_data_reel_save_xml(afs_toc_data_reel * toc_data_reel, mxml_node_t*
 
 DBOOL afs_toc_data_reel_load_file(afs_toc_data_reel * toc_data_reel, const char * file_name)
 {
-    // If input file name string pointer is NULL or TOC data reel pointer is NULL return DFALSE
     if (file_name == NULL || toc_data_reel == NULL)
     {
         return DFALSE;
@@ -1121,7 +1116,6 @@ DBOOL afs_toc_data_reel_load_file(afs_toc_data_reel * toc_data_reel, const char 
 
 DBOOL afs_toc_data_reel_load_string(afs_toc_data_reel * toc_data_reel, const char * in)
 {
-    // If input string pointer is NULL or TOC data reel pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || toc_data_reel == NULL)
     {
         return DFALSE;
@@ -1154,7 +1148,6 @@ DBOOL afs_toc_data_reel_load_string(afs_toc_data_reel * toc_data_reel, const cha
 
 DBOOL afs_toc_data_reel_load_xml(afs_toc_data_reel * toc_data_reel, mxml_node_t* node)
 {
-    // If input node pointer is NULL or TOC data reel pointer is NULL return DFALSE
     if (node == NULL || toc_data_reel == NULL)
     {
         return DFALSE;

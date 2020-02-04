@@ -173,7 +173,6 @@ void afs_boxing_format_free(afs_boxing_format* boxing_format)
 
 DBOOL afs_boxing_format_save_xml(mxml_node_t * out, afs_boxing_format* boxing_format)
 {
-    // If output node pointer is NULL or boxing format pointer is NULL return DFALSE
     if (out == NULL || boxing_format == NULL)
     {
         return DFALSE;
@@ -247,7 +246,6 @@ char * afs_boxing_format_save_string(afs_boxing_format* boxing_format, DBOOL com
 
 DBOOL afs_boxing_format_load_xml(afs_boxing_format* boxing_format, mxml_node_t * in)
 {
-    // If input XML node pointer pointer is NULL or boxing format pointer is NULL return DFALSE
     if (in == NULL || boxing_format == NULL)
     {
         return DFALSE;
@@ -301,7 +299,6 @@ DBOOL afs_boxing_format_load_xml(afs_boxing_format* boxing_format, mxml_node_t *
 
 DBOOL afs_boxing_format_load_string(afs_boxing_format* boxing_format, const char * in)
 {
-    // If input string pointer is NULL or boxing format pointer is NULL return DFALSE
     if (in == NULL || boxing_format == NULL)
     {
         return DFALSE;
@@ -831,7 +828,6 @@ static void set_version(struct mxml_node_s* node, GHashTable * class_hash)
 
 static DBOOL save_config_xml(mxml_node_t * out, boxing_config * config)
 {
-    // If output XML node pointer is NULL or boxing format pointer is NULL return DFALSE
     if (out == NULL || config == NULL)
     {
         return DFALSE;

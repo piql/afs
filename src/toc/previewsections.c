@@ -136,7 +136,6 @@ void afs_toc_preview_sections_free(afs_toc_preview_sections * toc_preview_sectio
 
 afs_toc_preview_sections * afs_toc_preview_sections_clone(const afs_toc_preview_sections * toc_preview_sections)
 {
-    // If TOC preview sections pointer is NULL return NULL.
     if (toc_preview_sections == NULL)
     {
         return NULL;
@@ -459,7 +458,6 @@ DBOOL afs_toc_preview_sections_save_file(const afs_toc_preview_sections * toc_pr
 
 char * afs_toc_preview_sections_save_string(const afs_toc_preview_sections * toc_preview_sections, DBOOL compact)
 {
-    // If TOC preview sections pointer is NULL return DFALSE
     if (toc_preview_sections == NULL)
     {
         return DFALSE;
@@ -505,7 +503,6 @@ char * afs_toc_preview_sections_save_string(const afs_toc_preview_sections * toc
 
 DBOOL afs_toc_preview_sections_save_xml(const afs_toc_preview_sections * toc_preview_sections, mxml_node_t* out)
 {
-    // If output node pointer is NULL or TOC preview sections pointer is NULL return DFALSE
     if (out == NULL || toc_preview_sections == NULL || afs_toc_preview_sections_is_valid(toc_preview_sections) == DFALSE)
     {
         return DFALSE;
@@ -541,7 +538,6 @@ DBOOL afs_toc_preview_sections_save_xml(const afs_toc_preview_sections * toc_pre
 
 DBOOL afs_toc_preview_sections_load_file(afs_toc_preview_sections * toc_preview_sections, const char * file_name)
 {
-    // If input file name string pointer is NULL or TOC preview sections pointer is NULL return DFALSE
     if (file_name == NULL || toc_preview_sections == NULL)
     {
         return DFALSE;
@@ -591,7 +587,6 @@ DBOOL afs_toc_preview_sections_load_file(afs_toc_preview_sections * toc_preview_
 
 DBOOL afs_toc_preview_sections_load_string(afs_toc_preview_sections * toc_preview_sections, const char * in)
 {
-    // If input string pointer is NULL or TOC preview sections pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || toc_preview_sections == NULL)
     {
         return DFALSE;
@@ -624,7 +619,6 @@ DBOOL afs_toc_preview_sections_load_string(afs_toc_preview_sections * toc_previe
 
 DBOOL afs_toc_preview_sections_load_xml(afs_toc_preview_sections * toc_preview_sections, mxml_node_t * input_node)
 {
-    // If input node pointer is NULL or TOC preview sections pointer is NULL return DFALSE
     if (input_node == NULL || toc_preview_sections == NULL)
     {
         return DFALSE;
