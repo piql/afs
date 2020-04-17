@@ -68,4 +68,5 @@ nobase_include_HEADERS = \
     ../inc/toc/previewsection.h \
     ../inc/toc/previewsections.h \
     ../inc/xmlutils.h \
-    ../inc/zeroreferenceframe.h 
+    ../inc/zeroreferenceframe.h \
+    ../thirdparty/minixml/inc/mxml.h

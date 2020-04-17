@@ -1384,6 +1384,27 @@ int afs_toc_file_get_duration_frames(afs_toc_file * toc_file)
 
 //----------------------------------------------------------------------------
 /*!
+ *  \brief Digital file size
+ *
+ *  Return size of file in bytes.
+ *
+ *  \param[in]   toc_file  Pointer to the instance of the afs_toc_file structure.
+ *  \return size in bytes.
+ */
+
+boxing_int64 afs_toc_file_size(afs_toc_file * toc_file)
+{
+    if (toc_file == NULL)
+    {
+        return 0;
+    }
+
+    return toc_file->size;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
   * \} end of file group
   */
 

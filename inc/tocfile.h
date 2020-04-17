@@ -130,6 +130,7 @@ DBOOL               afs_toc_file_is_preview(const afs_toc_file *);
 DBOOL               afs_toc_file_has_metadata(const afs_toc_file *);
 DBOOL               afs_toc_file_is_valid(const afs_toc_file *);
 int                 afs_toc_file_get_duration_frames(afs_toc_file *);
+boxing_int64        afs_toc_file_size(afs_toc_file *);
 
 DBOOL               afs_toc_file_load_file(afs_toc_file * toc_data_file, const char * file_name);
 DBOOL               afs_toc_file_load_string(afs_toc_file * toc_data_file, const char * in);
