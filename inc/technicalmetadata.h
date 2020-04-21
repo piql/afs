@@ -29,6 +29,7 @@ typedef struct afs_technical_metadata_s
 {
     afs_toc_files *     afs_tocs;
     afs_boxing_format * afs_content_boxing_format;
+    afs_toc_files *     afs_applications;
 } afs_technical_metadata;
 
 afs_technical_metadata * afs_technical_metadata_create();

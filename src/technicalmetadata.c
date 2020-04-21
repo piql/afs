@@ -38,10 +38,24 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
  *  \struct     afs_technical_metadata_s  technicalmetadata.h
  *  \brief      Technical metadata storage.
  *
- *  \param afs_tocs                   Pointer to the afs_toc_files structure.
- *  \param afs_content_boxing_format  Pointer to the afs_boxing_format structure.
+ *  \param afs_tocs                   List of TOC locations on reel.
+ *  \param afs_content_boxing_format  Boxing format used to unbox TOC and data files.
+ *  \param afs_applications           List of application locations on reel.
  *
- *  Structure for storing technical metadata.
+ *  The technical metadata part of the control data contains information that 
+ *  can be used to unbox the rest of the reel. Most importantly, is points to the 
+ *  location of the table-of-content frames on the reel. It also has a boxing frame 
+ *  structure that should be used when unboxing the TOC and the digital data files 
+ *  the TOC points to. 
+ *
+ *  The technical metadata also contains an optional list of locations that points 
+ *  to an application that can be used to unbox the TOC and the content. The
+ *  purpose for this is to provide a bootstrap mechanism that could be used to
+ *  to restore the reel content. An example of this is the iVM virtual machine 
+ *  implementation that is a virtual machine execution environment designed to 
+ *  embedded on the reel. 
+ *
+ *  The afs_data_file.format should be used to identify the application format.
  */
 
 
@@ -62,6 +76,7 @@ afs_technical_metadata * afs_technical_metadata_create()
 
     technical_metadata->afs_content_boxing_format = NULL;
     technical_metadata->afs_tocs = NULL;
+    technical_metadata->afs_applications = NULL;
 
     return technical_metadata;
 }
@@ -86,6 +101,36 @@ afs_technical_metadata * afs_technical_metadata_create2(afs_toc_files * tocs, af
 
     technical_metadata->afs_tocs = tocs;
     technical_metadata->afs_content_boxing_format = content_boxing_format;
+    technical_metadata->afs_applications = NULL;
+
+    return technical_metadata;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Create a technical metadata instance.
+ *
+ *  Allocate memory for the afs_technical_metadata type
+ *  and initialize tocs and boxing format with specified input value.
+ *  Return instance of allocated structure.
+ *
+ *  \param[in]  tocs                   Pointer to the afs_toc_files structure.
+ *  \param[in]  content_boxing_format  Pointer to the content_boxing_format structure.
+ *  \param[in]  applications           List of application locations.
+ *  \return instance of allocated afs_technical_metadata structure.
+ */
+
+afs_technical_metadata * afs_technical_metadata_create3(
+    afs_toc_files * tocs,
+    afs_boxing_format * content_boxing_format,
+    afs_toc_file * applications )
+{
+    afs_technical_metadata * technical_metadata = BOXING_MEMORY_ALLOCATE_TYPE(afs_technical_metadata);
+
+    technical_metadata->afs_tocs = tocs;
+    technical_metadata->afs_content_boxing_format = content_boxing_format;
+    technical_metadata->afs_applications = applications;
 
     return technical_metadata;
 }
@@ -109,6 +154,7 @@ void afs_technical_metadata_free(afs_technical_metadata* technical_metadata)
 
     afs_boxing_format_free(technical_metadata->afs_content_boxing_format);
     afs_toc_files_free(technical_metadata->afs_tocs);
+    afs_toc_files_free(technical_metadata->afs_applications);
 
     boxing_memory_free(technical_metadata);
 }
@@ -132,19 +178,20 @@ afs_technical_metadata * afs_technical_metadata_clone(const afs_technical_metada
         return NULL;
     }
 
-    afs_technical_metadata * return_technical_metadata = afs_technical_metadata_create();
-    return_technical_metadata->afs_tocs = afs_toc_files_clone(technical_metadata->afs_tocs);
-    return_technical_metadata->afs_content_boxing_format = technical_metadata->afs_content_boxing_format == NULL ? NULL : afs_boxing_format_create2(technical_metadata->afs_content_boxing_format->config);
+    afs_technical_metadata * clone = afs_technical_metadata_create();
+    clone->afs_tocs = afs_toc_files_clone(technical_metadata->afs_tocs);
+    clone->afs_content_boxing_format = technical_metadata->afs_content_boxing_format == NULL ? NULL : afs_boxing_format_create2(technical_metadata->afs_content_boxing_format->config);
+    clone->afs_applications = afs_toc_files_clone(technical_metadata->afs_applications);
 
-    return return_technical_metadata;
+    return clone;
 }
 
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function checks two instances of the afs_technical_metadata structures on the identity.
+ *  \brief Compare technical metadata
  *
- *  Function checks two instances of the afs_technical_metadata structures on the identity.
+ *  Returns DTRUE if content is equal.
  *
  *  \param[in]   technical_metadata1  Pointer to the first instance of the afs_technical_metadata structure.
  *  \param[in]   technical_metadata2  Pointer to the second instance of the afs_technical_metadata structure.
@@ -178,7 +225,8 @@ DBOOL afs_technical_metadata_equal(const afs_technical_metadata * technical_meta
     }
 
     if (boxing_format_is_equal == DTRUE &&
-        afs_toc_files_equal(technical_metadata1->afs_tocs, technical_metadata2->afs_tocs))
+        afs_toc_files_equal(technical_metadata1->afs_tocs, technical_metadata2->afs_tocs) &&
+        afs_toc_files_equal(technical_metadata1->afs_applications, technical_metadata2->afs_applications) )
     {
         return DTRUE;
     }
@@ -189,7 +237,7 @@ DBOOL afs_technical_metadata_equal(const afs_technical_metadata * technical_meta
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function translates the input afs_technical_metadata structure to the XML file.
+ *  \brief Save as XML file
  *
  *  Function translates the input afs_technical_metadata structure to the XML file.
  *  If translates is successful, then function return DTRUE, else function return DFALSE.
@@ -253,7 +301,7 @@ DBOOL afs_technical_metadata_save_file(afs_technical_metadata * technical_metada
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function translates the input afs_technical_metadata structure to the XML string.
+ *  \brief Save as XML string
  *
  *  Function translates the input afs_technical_metadata structure to the XML string.
  *  If translates is successful, then function return resulting string, else function return NULL.
@@ -303,7 +351,7 @@ char * afs_technical_metadata_save_string(afs_technical_metadata * technical_met
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function translates the input afs_technical_metadata structure to the XML nodes.
+ *  \brief Save as XML nodes
  *
  *  Function translates the input afs_technical_metadata structure to the XML nodes.
  *  If translates is successful, then function return DTRUE, else function return DFALSE.
@@ -333,7 +381,16 @@ DBOOL afs_technical_metadata_save_xml(afs_technical_metadata * technical_metadat
     if ( technical_metadata->afs_tocs )
     {
         mxml_node_t * tocs_node = mxmlNewElement(technical_metadata_node, "Tocs");
-        return afs_toc_files_save_xml(technical_metadata->afs_tocs, tocs_node);
+        if (!afs_toc_files_save_xml(technical_metadata->afs_tocs, tocs_node))
+        {
+            return DFALSE;
+        }
+    }
+
+    if ( technical_metadata->afs_applications )
+    {
+        mxml_node_t * tocs_node = mxmlNewElement(technical_metadata_node, "Applications");
+        return afs_toc_files_save_xml(technical_metadata->afs_applications, tocs_node);
     }
     return DTRUE;
 }
@@ -341,7 +398,7 @@ DBOOL afs_technical_metadata_save_xml(afs_technical_metadata * technical_metadat
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function translates the input XML file to the afs_technical_metadata structure.
+ *  \brief Load from file
  *
  *  Function translates the input XML file to the afs_technical_metadata structure.
  *  If translates is successful, then function return DTRUE, else function return DFALSE.
@@ -382,7 +439,7 @@ DBOOL afs_technical_metadata_load_file(afs_technical_metadata * technical_metada
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function translates the input XML string to the afs_technical_metadata structure.
+ *  \brief Load from string
  *
  *  Function translates the input XML string to the afs_technical_metadata structure.
  *  If translates is successful, then function return DTRUE, else function return DFALSE.
@@ -411,7 +468,7 @@ DBOOL afs_technical_metadata_load_string(afs_technical_metadata * technical_meta
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Function translates the input XML nodes to the afs_technical_metadata structure.
+ *  \brief Load from XML node tree
  *
  *  Function translates the input XML nodes to the afs_technical_metadata structure.
  *  If translates is successful, then function return DTRUE, else function return DFALSE.
@@ -454,23 +511,39 @@ DBOOL afs_technical_metadata_load_xml(afs_technical_metadata* technical_metadata
 
     mxml_node_t * tocs_node = mxmlFindElement(technical_metadata_node, technical_metadata_node, "Tocs", NULL, NULL, MXML_DESCEND);
     
-    if (tocs_node == NULL)
+    if (tocs_node != NULL)
+    {
+        technical_metadata->afs_tocs = afs_toc_files_create();
+
+        DBOOL load_tocs_result = afs_toc_files_load_xml(technical_metadata->afs_tocs, tocs_node);
+
+        if (load_tocs_result == DFALSE)
+        {
+            afs_boxing_format_free(technical_metadata->afs_content_boxing_format);
+            technical_metadata->afs_content_boxing_format = NULL;
+            afs_toc_files_free(technical_metadata->afs_tocs);
+            technical_metadata->afs_tocs = NULL;
+            return DFALSE;
+        }
+    }
+
+    mxml_node_t * applications_node = mxmlFindElement(technical_metadata_node, technical_metadata_node, "Applications", NULL, NULL, MXML_DESCEND);
+    
+    if (applications_node == NULL)
     {
         return DTRUE;
     }
 
-    technical_metadata->afs_tocs = afs_toc_files_create();
+    technical_metadata->afs_applications = afs_toc_files_create();
 
-    DBOOL load_tocs_result = afs_toc_files_load_xml(technical_metadata->afs_tocs, tocs_node);
+    DBOOL load_applications_result = afs_toc_files_load_xml(technical_metadata->afs_applications, applications_node);
 
-    if (load_tocs_result == DFALSE)
+    if (load_applications_result == DFALSE)
     {
-        afs_boxing_format_free(technical_metadata->afs_content_boxing_format);
-        technical_metadata->afs_content_boxing_format = NULL;
-        afs_toc_files_free(technical_metadata->afs_tocs);
-        technical_metadata->afs_tocs = NULL;
+        afs_toc_files_free(technical_metadata->afs_applications);
+        technical_metadata->afs_applications = NULL;
     }
-
+    
     return DTRUE;
 }
 
@@ -526,7 +599,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("BoxerFormat", name) || boxing_string_equal("Tocs", name))
+    if (boxing_string_equal("BoxerFormat", name) || boxing_string_equal("Tocs", name) || boxing_string_equal("Applications", name))
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
