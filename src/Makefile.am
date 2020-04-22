@@ -36,7 +36,17 @@ libafs_a_SOURCES = \
     tocdata.c \
     controlframeboxingformat.c \
     tocdatareel.c \
-    sha256hash.c
+    sha256hash.c \
+    ../thirdparty/minixml/src/mxml-entity.c \
+    ../thirdparty/minixml/src/mxml-get.c \
+    ../thirdparty/minixml/src/mxml-node.c \
+    ../thirdparty/minixml/src/mxml-set.c \
+    ../thirdparty/minixml/src/mxml-attr.c \
+    ../thirdparty/minixml/src/mxml-file.c \
+    ../thirdparty/minixml/src/mxml-index.c \
+    ../thirdparty/minixml/src/mxml-private.c \
+    ../thirdparty/minixml/src/mxml-search.c \
+    ../thirdparty/minixml/src/mxml-string.c
 
 nobase_include_HEADERS = \
     ../inc/administrativemetadata.h \
