@@ -19,6 +19,7 @@
 #include "platform/io.h"
 #include "boxing/string.h"
 #include "boxing/log.h"
+#include "mxml.h"
 
 //  DEFINES
 //

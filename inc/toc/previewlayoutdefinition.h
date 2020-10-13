@@ -15,7 +15,7 @@
 **
 *****************************************************************************/
 
-#include "toc/previewsections.h" 
+#include "previewsections.h" 
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,7 +31,7 @@ typedef struct afs_toc_preview_layout_definition_s
 afs_toc_preview_layout_definition * afs_toc_preview_layout_definition_create();
 afs_toc_preview_layout_definition * afs_toc_preview_layout_definition_create2(const char * id, const char * name);
 afs_toc_preview_layout_definition * afs_toc_preview_layout_definition_create3(const char * id, const char * name, afs_toc_preview_sections * sections);
-afs_toc_preview_layout_definition * afs_toc_preview_layout_definition_create4(mxml_node_t* definition_node);
+afs_toc_preview_layout_definition * afs_toc_preview_layout_definition_create4(struct mxml_node_s* definition_node);
 void                                afs_toc_preview_layout_definition_init(afs_toc_preview_layout_definition * toc_preview_layout_definition, const char * id, const char * name);
 void                                afs_toc_preview_layout_definition_init2(afs_toc_preview_layout_definition * toc_preview_layout_definition, const char * id, const char * name, afs_toc_preview_sections * sections);
 void                                afs_toc_preview_layout_definition_free(afs_toc_preview_layout_definition * toc_preview_layout_definition);
@@ -47,11 +47,11 @@ DBOOL                               afs_toc_preview_layout_definition_is_section
 
 DBOOL                               afs_toc_preview_layout_definition_save_file(const afs_toc_preview_layout_definition * toc_preview_layout_definition, const char * file_name, DBOOL compact);
 char *                              afs_toc_preview_layout_definition_save_string(const afs_toc_preview_layout_definition * toc_preview_layout_definition, DBOOL compact);
-DBOOL                               afs_toc_preview_layout_definition_save_xml(const afs_toc_preview_layout_definition * toc_preview_layout_definition, mxml_node_t* out);
+DBOOL                               afs_toc_preview_layout_definition_save_xml(const afs_toc_preview_layout_definition * toc_preview_layout_definition, struct mxml_node_s* out);
 
 DBOOL                               afs_toc_preview_layout_definition_load_file(afs_toc_preview_layout_definition * toc_preview_layout_definition, const char * file_name);
 DBOOL                               afs_toc_preview_layout_definition_load_string(afs_toc_preview_layout_definition * toc_preview_layout_definition, const char * in);
-DBOOL                               afs_toc_preview_layout_definition_load_xml(afs_toc_preview_layout_definition * toc_preview_layout_definition, mxml_node_t* input_node);
+DBOOL                               afs_toc_preview_layout_definition_load_xml(afs_toc_preview_layout_definition * toc_preview_layout_definition, struct mxml_node_s* input_node);
 
 #ifdef __cplusplus
 } /* extern "C" */

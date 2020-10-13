@@ -18,11 +18,12 @@
 *****************************************************************************/
 
 #include "boxing/bool.h"
-#include "mxml.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+    
+struct mxml_node_s;
 
 // Definition structure afs_toc_preview_section
 typedef struct afs_toc_preview_section_s
@@ -49,11 +50,11 @@ DBOOL                      afs_toc_preview_section_is_overlap(const afs_toc_prev
 
 DBOOL                      afs_toc_preview_section_save_file(const afs_toc_preview_section * toc_preview_section, const char * file_name, DBOOL compact);
 char *                     afs_toc_preview_section_save_string(const afs_toc_preview_section * toc_preview_section, DBOOL compact);
-DBOOL                      afs_toc_preview_section_save_xml(const afs_toc_preview_section * toc_preview_section, mxml_node_t* out);
+DBOOL                      afs_toc_preview_section_save_xml(const afs_toc_preview_section * toc_preview_section, struct mxml_node_s* out);
 
 DBOOL                      afs_toc_preview_section_load_file(afs_toc_preview_section * toc_preview_section, const char * file_name);
 DBOOL                      afs_toc_preview_section_load_string(afs_toc_preview_section * toc_preview_section, const char * in);
-DBOOL                      afs_toc_preview_section_load_xml(afs_toc_preview_section * toc_preview_section, mxml_node_t* input_node);
+DBOOL                      afs_toc_preview_section_load_xml(afs_toc_preview_section * toc_preview_section, struct mxml_node_s* input_node);
 
 #ifdef __cplusplus
 } /* extern "C" */

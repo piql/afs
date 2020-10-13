@@ -18,11 +18,11 @@
 #include "boxing/string.h"
 #include "boxing/platform/memory.h"
 #include "boxing/log.h"
-
+#include "mxml.h"
 
 // PRIVATE INTERFACE
 //
-static const char * whitespace_cb(mxml_node_t *node, int where);
+static const char * whitespace_cb(struct mxml_node_s *node, int where);
 
 
 /*! 
@@ -83,7 +83,7 @@ afs_toc_preview_sections * afs_toc_preview_sections_create()
  *  \return instance of allocated afs_toc_preview_sections vector.
  */
 
-afs_toc_preview_sections * afs_toc_preview_sections_create2(mxml_node_t* sections_node)
+afs_toc_preview_sections * afs_toc_preview_sections_create2(struct mxml_node_s* sections_node)
 {
     afs_toc_preview_sections * toc_preview_sections = afs_toc_preview_sections_create();
     afs_toc_preview_sections_load_xml(toc_preview_sections, sections_node);
@@ -417,7 +417,7 @@ DBOOL afs_toc_preview_sections_save_file(const afs_toc_preview_sections * toc_pr
         return DFALSE;
     }
 
-    mxml_node_t *tree = mxmlNewXML("1.0");
+    struct mxml_node_s *tree = mxmlNewXML("1.0");
 
     if (!afs_toc_preview_sections_save_xml(toc_preview_sections, tree))
     {
@@ -501,14 +501,14 @@ char * afs_toc_preview_sections_save_string(const afs_toc_preview_sections * toc
  *  \return DTRUE on success.
  */
 
-DBOOL afs_toc_preview_sections_save_xml(const afs_toc_preview_sections * toc_preview_sections, mxml_node_t* out)
+DBOOL afs_toc_preview_sections_save_xml(const afs_toc_preview_sections * toc_preview_sections, struct mxml_node_s* out)
 {
     if (out == NULL || toc_preview_sections == NULL || afs_toc_preview_sections_is_valid(toc_preview_sections) == DFALSE)
     {
         return DFALSE;
     }
 
-    mxml_node_t * sections_node = mxmlNewElement(out, "sections");
+    struct mxml_node_s * sections_node = mxmlNewElement(out, "sections");
 
     for (unsigned int i = 0; i < toc_preview_sections->sections->size; i++)
     {
@@ -554,7 +554,7 @@ DBOOL afs_toc_preview_sections_load_file(afs_toc_preview_sections * toc_preview_
         return DFALSE;
     }
 
-    mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
+    struct mxml_node_s * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
 
     DBOOL return_value = afs_toc_preview_sections_load_xml(toc_preview_sections, document);
 
@@ -584,7 +584,7 @@ DBOOL afs_toc_preview_sections_load_string(afs_toc_preview_sections * toc_previe
         return DFALSE;
     }
 
-    mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
+    struct mxml_node_s * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
     DBOOL return_value = afs_toc_preview_sections_load_xml(toc_preview_sections, document);
 
@@ -606,21 +606,21 @@ DBOOL afs_toc_preview_sections_load_string(afs_toc_preview_sections * toc_previe
  *  \return DTRUE on success.
  */
 
-DBOOL afs_toc_preview_sections_load_xml(afs_toc_preview_sections * toc_preview_sections, mxml_node_t * input_node)
+DBOOL afs_toc_preview_sections_load_xml(afs_toc_preview_sections * toc_preview_sections, struct mxml_node_s * input_node)
 {
     if (input_node == NULL || toc_preview_sections == NULL)
     {
         return DFALSE;
     }
 
-    mxml_node_t * sections_node = boxing_string_equal(mxmlGetElement(input_node), "sections") == DTRUE ? input_node : mxmlFindElement(input_node, input_node, "sections", NULL, NULL, MXML_DESCEND);
+    struct mxml_node_s * sections_node = boxing_string_equal(mxmlGetElement(input_node), "sections") == DTRUE ? input_node : mxmlFindElement(input_node, input_node, "sections", NULL, NULL, MXML_DESCEND);
 
     if (sections_node == NULL)
     {
         return DFALSE;
     }
 
-    mxml_node_t * section_node = mxmlFindElement(sections_node, sections_node, "section", NULL, NULL, MXML_DESCEND);
+    struct mxml_node_s * section_node = mxmlFindElement(sections_node, sections_node, "section", NULL, NULL, MXML_DESCEND);
 
     while (section_node != NULL)
     {
@@ -661,7 +661,7 @@ DBOOL afs_toc_preview_sections_load_xml(afs_toc_preview_sections * toc_preview_s
 // PRIVATE AFS TOC PREVIEW SECTIONS FUNCTIONS
 //
 
-static const char * whitespace_cb(mxml_node_t *node, int where)
+static const char * whitespace_cb(struct mxml_node_s *node, int where)
 {
     const char *name;
 

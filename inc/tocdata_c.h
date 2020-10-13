@@ -17,7 +17,6 @@
 
 #include "tocdatareels.h"
 #include "tocmetadata_c.h"
-#include "mxml.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,11 +69,11 @@ void         afs_toc_data_add_frame_offset(afs_toc_data * toc_data, unsigned int
 
 DBOOL  afs_toc_data_save_file(afs_toc_data * toc_data, const char * file_name, DBOOL compact);
 char * afs_toc_data_save_string(afs_toc_data * toc_data, DBOOL compact);
-DBOOL  afs_toc_data_save_xml(afs_toc_data * toc_data, mxml_node_t* out);
+DBOOL  afs_toc_data_save_xml(afs_toc_data * toc_data, struct mxml_node_s* out);
 
 DBOOL  afs_toc_data_load_file(afs_toc_data * toc_data, const char * file_name);
 DBOOL  afs_toc_data_load_string(afs_toc_data * toc_data, const char * in);
-DBOOL  afs_toc_data_load_xml(afs_toc_data * toc_data, mxml_node_t* node);
+DBOOL  afs_toc_data_load_xml(afs_toc_data * toc_data, struct mxml_node_s* node);
 
 #ifdef __cplusplus
 } /* extern "C" */

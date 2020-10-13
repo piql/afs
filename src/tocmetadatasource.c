@@ -18,6 +18,7 @@
 #include "xmlutils.h"
 #include "platform/io.h"
 #include "boxing/string.h"
+#include "mxml.h"
 
 //  DEFINES
 //

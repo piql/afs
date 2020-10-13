@@ -17,6 +17,7 @@
 #include "controldata.h"
 #include "boxing/string.h"
 #include "boxing/platform/memory.h"
+#include "mxml.h"
 
 // PRIVATE INTERFACE
 //
