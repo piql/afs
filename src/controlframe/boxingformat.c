@@ -97,7 +97,7 @@ afs_boxing_format* afs_boxing_format_create2(const boxing_config * config)
 
 //----------------------------------------------------------------------------
 /*!
- *  \brief Initialize .
+ *  \brief Initialize.
  *
  *  Initialize input structure pointer with NULL values.
  *  If input pointer is NULL, then return without initialization.
@@ -155,6 +155,7 @@ void afs_boxing_format_free(afs_boxing_format* boxing_format)
     }
 
     boxing_config_free(boxing_format->config);
+    boxing_format->config = NULL;
     boxing_memory_free(boxing_format);
 }
 

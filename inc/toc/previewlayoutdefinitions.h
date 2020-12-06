@@ -15,7 +15,7 @@
 **
 *****************************************************************************/
 
-#include "toc/previewlayoutdefinition.h" 
+#include "previewlayoutdefinition.h" 
 
 #ifdef __cplusplus
 extern "C" {

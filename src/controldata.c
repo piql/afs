@@ -123,7 +123,9 @@ void afs_control_data_free(afs_control_data * control_data)
     }
 
     afs_administrative_metadata_free(control_data->administrative_metadata);
+    control_data->administrative_metadata = NULL;
     afs_technical_metadata_free(control_data->technical_metadata);
+    control_data->technical_metadata = NULL;
     boxing_memory_free(control_data);
 }
 

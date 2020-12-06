@@ -15,7 +15,7 @@
 **
 *****************************************************************************/
 
-#include "toc/previewsections.h" 
+#include "previewsections.h" 
 
 #ifdef __cplusplus
 extern "C" {

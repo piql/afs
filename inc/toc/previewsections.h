@@ -15,7 +15,7 @@
 **
 *****************************************************************************/
 
-#include "toc/previewsection.h"
+#include "previewsection.h"
 #include "gvector.h"
 #include "boxing/bool.h"
 #include "mxml.h"

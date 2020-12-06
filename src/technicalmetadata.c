@@ -153,8 +153,11 @@ void afs_technical_metadata_free(afs_technical_metadata* technical_metadata)
     }
 
     afs_boxing_format_free(technical_metadata->afs_content_boxing_format);
+    technical_metadata->afs_content_boxing_format = NULL;
     afs_toc_files_free(technical_metadata->afs_tocs);
+    technical_metadata->afs_tocs = NULL;
     afs_toc_files_free(technical_metadata->afs_applications);
+    technical_metadata->afs_applications = NULL;
 
     boxing_memory_free(technical_metadata);
 }
