@@ -21,6 +21,7 @@
 #include "boxing/graphics/genericframefactory.h"
 #include "boxing/codecs/codecdispatcher.h"
 #include "boxing/math/math.h"
+#include "mxml.h"
 
 static void         set_class_from_xml(boxing_config * config, struct mxml_node_s * dom_node);
 static DBOOL        save_config_xml(mxml_node_t * out, boxing_config * config);

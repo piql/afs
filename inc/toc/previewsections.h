@@ -18,7 +18,6 @@
 #include "previewsection.h"
 #include "gvector.h"
 #include "boxing/bool.h"
-#include "mxml.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,7 +32,7 @@ typedef struct afs_toc_preview_sections_s
 } afs_toc_preview_sections;
 
 afs_toc_preview_sections * afs_toc_preview_sections_create();
-afs_toc_preview_sections * afs_toc_preview_sections_create2(mxml_node_t* sections_node);
+afs_toc_preview_sections * afs_toc_preview_sections_create2(struct mxml_node_s* sections_node);
 
 void                       afs_toc_preview_sections_free(afs_toc_preview_sections * toc_preview_sections);
 
@@ -47,11 +46,11 @@ afs_toc_preview_section *  afs_toc_preview_sections_get(const afs_toc_preview_se
 
 DBOOL                      afs_toc_preview_sections_save_file(const afs_toc_preview_sections * toc_preview_sections, const char * file_name, DBOOL compact);
 char *                     afs_toc_preview_sections_save_string(const afs_toc_preview_sections * toc_preview_sections, DBOOL compact);
-DBOOL                      afs_toc_preview_sections_save_xml(const afs_toc_preview_sections * toc_preview_sections, mxml_node_t* out);
+DBOOL                      afs_toc_preview_sections_save_xml(const afs_toc_preview_sections * toc_preview_sections, struct mxml_node_s* out);
 
 DBOOL                      afs_toc_preview_sections_load_file(afs_toc_preview_sections * toc_preview_sections, const char * file_name);
 DBOOL                      afs_toc_preview_sections_load_string(afs_toc_preview_sections * toc_preview_sections, const char * in);
-DBOOL                      afs_toc_preview_sections_load_xml(afs_toc_preview_sections * toc_preview_sections, mxml_node_t* input_node);
+DBOOL                      afs_toc_preview_sections_load_xml(afs_toc_preview_sections * toc_preview_sections, struct mxml_node_s* input_node);
 
 
 #ifdef __cplusplus

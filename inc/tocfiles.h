@@ -18,7 +18,6 @@
 #include "tocfile.h"
 #include "toc/previewlayoutdefinitions.h"
 #include "gvector.h"
-#include "mxml.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,11 +54,11 @@ DBOOL           afs_toc_files_is_valid(afs_toc_files * toc_files);
 
 DBOOL           afs_toc_files_save_file(afs_toc_files * toc_files, const char * file_name, DBOOL compact);
 char *          afs_toc_files_save_string(afs_toc_files * toc_files, DBOOL compact);
-DBOOL           afs_toc_files_save_xml(afs_toc_files * toc_files, mxml_node_t* out);
+DBOOL           afs_toc_files_save_xml(afs_toc_files * toc_files, struct mxml_node_s* out);
 
 DBOOL           afs_toc_files_load_file(afs_toc_files * toc_files, const char * file_name);
 DBOOL           afs_toc_files_load_string(afs_toc_files * toc_files, const char * in);
-DBOOL           afs_toc_files_load_xml(afs_toc_files * toc_files, mxml_node_t* node);
+DBOOL           afs_toc_files_load_xml(afs_toc_files * toc_files, struct mxml_node_s* node);
 
 char *          afs_toc_files_save_as_table(afs_toc_files * toc_files);
 char *          afs_toc_files_save_as_location_table(afs_toc_files * toc_files);

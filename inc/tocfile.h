@@ -19,7 +19,6 @@
 #include "tocdatafilemetadata_c.h"
 #include "boxing/config.h"
 #include "gvector.h"
-#include "mxml.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -134,13 +133,13 @@ boxing_int64        afs_toc_file_size(afs_toc_file *);
 
 DBOOL               afs_toc_file_load_file(afs_toc_file * toc_data_file, const char * file_name);
 DBOOL               afs_toc_file_load_string(afs_toc_file * toc_data_file, const char * in);
-DBOOL               afs_toc_file_load_xml(afs_toc_file * toc_data_file, mxml_node_t* node);
-DBOOL               afs_toc_file_load_data_v1(afs_toc_file * toc_data_file, mxml_node_t* node);
-DBOOL               afs_toc_file_load_data_v2(afs_toc_file * toc_data_file, mxml_node_t* node);
+DBOOL               afs_toc_file_load_xml(afs_toc_file * toc_data_file, struct mxml_node_s* node);
+DBOOL               afs_toc_file_load_data_v1(afs_toc_file * toc_data_file, struct mxml_node_s* node);
+DBOOL               afs_toc_file_load_data_v2(afs_toc_file * toc_data_file, struct mxml_node_s* node);
 
 DBOOL               afs_toc_file_save_file(afs_toc_file * toc_data_file, const char * file_name, DBOOL compact, DBOOL data_v1);
 char *              afs_toc_file_save_string(afs_toc_file * toc_data_file, DBOOL compact, DBOOL data_v1);
-DBOOL               afs_toc_file_save_xml(afs_toc_file * toc_data_file, mxml_node_t* out, DBOOL data_v1);
+DBOOL               afs_toc_file_save_xml(afs_toc_file * toc_data_file, struct mxml_node_s* out, DBOOL data_v1);
 
 
 #ifdef __cplusplus

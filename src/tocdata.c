@@ -18,6 +18,7 @@
 #include "tocdata_c.h"
 #include "xmlutils.h"
 #include "platform/io.h"
+#include "mxml.h"
 #include <stdlib.h>
 
 //  DEFINES

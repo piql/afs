@@ -21,6 +21,7 @@
 #include "boxing/platform/memory.h"
 #include "boxing/string.h"
 #include "boxing/log.h"
+#include "mxml.h"
 
 //  DEFINES
 //

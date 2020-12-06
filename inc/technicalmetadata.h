@@ -18,7 +18,6 @@
 #include    "controlframe/boxingformat.h"
 #include    "tocfiles.h"
 #include    "boxing/bool.h"
-#include    "mxml.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,11 +40,11 @@ DBOOL                    afs_technical_metadata_equal(const afs_technical_metada
 
 DBOOL                    afs_technical_metadata_save_file(afs_technical_metadata * technical_metadata, const char * file_name, DBOOL compact);
 char *                   afs_technical_metadata_save_string(afs_technical_metadata * technical_metadata, DBOOL compact);
-DBOOL                    afs_technical_metadata_save_xml(afs_technical_metadata * technical_metadata, mxml_node_t * out);
+DBOOL                    afs_technical_metadata_save_xml(afs_technical_metadata * technical_metadata, struct mxml_node_s * out);
 
 DBOOL                    afs_technical_metadata_load_file(afs_technical_metadata * technical_metadata, const char * file_name);
 DBOOL                    afs_technical_metadata_load_string(afs_technical_metadata * technical_metadata, const char * in);
-DBOOL                    afs_technical_metadata_load_xml(afs_technical_metadata* technical_metadata, mxml_node_t * in);
+DBOOL                    afs_technical_metadata_load_xml(afs_technical_metadata* technical_metadata, struct mxml_node_s * in);
 
 #ifdef __cplusplus
 } /* extern "C" */

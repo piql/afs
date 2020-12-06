@@ -15,7 +15,6 @@
 **
 *****************************************************************************/
 
-#include "mxml.h"
 #include "gvector.h"
 #include "tocfilepreviewpage.h"
 
@@ -55,11 +54,11 @@ DBOOL                        afs_toc_file_preview_get_frames_count(afs_toc_file_
 
 DBOOL         afs_toc_file_preview_save_file(afs_toc_file_preview * toc_file_preview, const char * file_name, DBOOL compact);
 char *        afs_toc_file_preview_save_string(afs_toc_file_preview * toc_file_preview, DBOOL compact);
-DBOOL         afs_toc_file_preview_save_xml(afs_toc_file_preview * toc_file_preview, mxml_node_t* out);
+DBOOL         afs_toc_file_preview_save_xml(afs_toc_file_preview * toc_file_preview, struct mxml_node_s* out);
 
 DBOOL         afs_toc_file_preview_load_file(afs_toc_file_preview * toc_file_preview, const char * file_name);
 DBOOL         afs_toc_file_preview_load_string(afs_toc_file_preview * toc_file_preview, const char * in);
-DBOOL         afs_toc_file_preview_load_xml(afs_toc_file_preview * toc_file_preview, mxml_node_t* node);
+DBOOL         afs_toc_file_preview_load_xml(afs_toc_file_preview * toc_file_preview, struct mxml_node_s* node);
 
 #ifdef __cplusplus
 } /* extern "C" */

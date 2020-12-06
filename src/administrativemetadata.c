@@ -18,6 +18,7 @@
 #include "boxing/platform/memory.h"
 #include "boxing/string.h"
 #include "xmlutils.h"
+#include "mxml.h"
 
 //  DEFINES
 //

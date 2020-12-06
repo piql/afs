@@ -46,11 +46,11 @@ DBOOL                        afs_toc_data_file_metadata_is_valid(const afs_toc_d
 DBOOL                        afs_toc_data_file_metadata_save_file(afs_toc_data_file_metadata * toc_data_file_metadata, const char * file_name, DBOOL compact);
 char *                       afs_toc_data_file_metadata_save_string(afs_toc_data_file_metadata * toc_data_file_metadata, DBOOL compact);
 char *                       afs_toc_data_file_metadata_save_as_table(const afs_toc_data_file_metadata * toc_data_file_metadata);
-DBOOL                        afs_toc_data_file_metadata_save_xml(afs_toc_data_file_metadata * toc_data_file_metadata, mxml_node_t* out);
+DBOOL                        afs_toc_data_file_metadata_save_xml(afs_toc_data_file_metadata * toc_data_file_metadata, struct mxml_node_s* out);
 
 DBOOL                        afs_toc_data_file_metadata_load_file(afs_toc_data_file_metadata * toc_data_file_metadata, const char * file_name);
 DBOOL                        afs_toc_data_file_metadata_load_string(afs_toc_data_file_metadata * toc_data_file_metadata, const char * in);
-DBOOL                        afs_toc_data_file_metadata_load_xml(afs_toc_data_file_metadata * toc_data_file_metadata, mxml_node_t* node);
+DBOOL                        afs_toc_data_file_metadata_load_xml(afs_toc_data_file_metadata * toc_data_file_metadata, struct mxml_node_s* node);
 
 #ifdef __cplusplus
 } /* extern "C" */

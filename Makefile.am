@@ -28,6 +28,7 @@ afsinclude_HEADERS = \
     inc/xmlutils.h \
     inc/zeroreferenceframe.h
 
+
 afscontrolframeincludedir = $(includedir)/afs/controlframe
 afscontrolframeinclude_HEADERS = \
     inc/controlframe/boxingformat.h
@@ -35,6 +36,10 @@ afscontrolframeinclude_HEADERS = \
 afsplatformincludedir = $(includedir)/afs/platform
 afsplatforminclude_HEADERS = \
     inc/platform/io.h
+
+afscfincludedir = $(includedir)/afs/controlframe
+afscfinclude_HEADERS = \
+    inc/controlframe/boxingformat.h
 
 afstocincludedir = $(includedir)/afs/toc
 afstocinclude_HEADERS = \

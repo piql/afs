@@ -16,6 +16,7 @@
 //
 #include "technicalmetadata.h"
 #include "boxing/platform/memory.h"
+#include "mxml.h"
 
 // PRIVATE INTERFACE
 //
