@@ -45,9 +45,9 @@ libafs_a_SOURCES = \
     ../thirdparty/minixml/src/mxml-file.c \
     ../thirdparty/minixml/src/mxml-index.c \
     ../thirdparty/minixml/src/mxml-private.c \
-    ../thirdparty/minixml/src/mxml-search.c
+    ../thirdparty/minixml/src/mxml-search.c \
+    ../thirdparty/minixml/src/mxml-string.c
 
 nobase_include_HEADERS = \
-    ../thirdparty/minixml/src/mxml-string.c \
     ../thirdparty/minixml/inc/mxml.h
 
