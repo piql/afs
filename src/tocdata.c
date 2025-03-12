@@ -30,6 +30,7 @@ static const char * AFS_TOC_INDEX_TYPE_REEL = "reel";
 //
 
 static const char * whitespace_cb(mxml_node_t *node, int where);
+static void sort_preview_layout_definitions_by_id(afs_toc_preview_layout_definitions * layoutDefinitions);
 
 //----------------------------------------------------------------------------
 /*! \defgroup  toc  Table of Content.
@@ -118,7 +119,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
 
 afs_toc_data * afs_toc_data_create()
 {
-    afs_toc_data * toc_data = BOXING_MEMORY_ALLOCATE_TYPE(afs_toc_data);
+    afs_toc_data * toc_data = malloc(sizeof(afs_toc_data));
 
     toc_data->version = NULL;
     toc_data->index_type = NULL;
@@ -127,6 +128,8 @@ afs_toc_data * afs_toc_data_create()
     toc_data->reels = NULL;
     toc_data->metadata = NULL;
     toc_data->preview_layout_definitions = NULL;
+
+    toc_data->reference_count = 1;
 
     return toc_data;
 }
@@ -159,6 +162,8 @@ afs_toc_data * afs_toc_data_create2(const char * version, const char * index_typ
     toc_data->metadata = NULL;
     toc_data->preview_layout_definitions = NULL;
 
+    toc_data->reference_count = 1;
+
     return toc_data;
 }
 
@@ -179,14 +184,19 @@ void afs_toc_data_free(afs_toc_data * toc_data)
         return;
     }
 
-    boxing_string_free(toc_data->version);
-    boxing_string_free(toc_data->index_type);
-    boxing_string_free(toc_data->job_id);
-    boxing_string_free(toc_data->reel_id);
-    afs_toc_data_reels_free(toc_data->reels);
-    afs_toc_metadata_free(toc_data->metadata);
-    afs_toc_preview_layout_definitions_free(toc_data->preview_layout_definitions);
-    boxing_memory_free(toc_data);
+    toc_data->reference_count--;
+
+    if (toc_data->reference_count <= 0)
+    {
+        boxing_string_free(toc_data->version);
+        boxing_string_free(toc_data->index_type);
+        boxing_string_free(toc_data->job_id);
+        boxing_string_free(toc_data->reel_id);
+        afs_toc_data_reels_free(toc_data->reels);
+        afs_toc_metadata_free(toc_data->metadata);
+        afs_toc_preview_layout_definitions_free(toc_data->preview_layout_definitions);
+        free(toc_data);
+    }
 }
 
 
@@ -203,6 +213,7 @@ void afs_toc_data_free(afs_toc_data * toc_data)
 
 afs_toc_data * afs_toc_data_clone(afs_toc_data * toc_data)
 {
+    // If TOC data pointer is NULL return NULL.
     if (toc_data == NULL)
     {
         return NULL;
@@ -214,6 +225,31 @@ afs_toc_data * afs_toc_data_clone(afs_toc_data * toc_data)
     return_toc_data->preview_layout_definitions = afs_toc_preview_layout_definitions_clone(toc_data->preview_layout_definitions);
 
     return return_toc_data;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function returns a new reference to the input afs_toc_data structure.
+ *
+ *  Function returns a new reference to the input afs_toc_data structure.
+ *  The reference count is incremented by 1.
+ *  If TOC data pointer is NULL function return NULL.
+ *
+ *  \param[in]  toc_data  Pointer to the afs_toc_data structure.
+ *  \return new reference of afs_toc_data structure or NULL.
+ */
+
+afs_toc_data * afs_toc_data_get_new_reference(afs_toc_data * toc_data)
+{
+    // If TOC data pointer is NULL return NULL.
+    if (toc_data == NULL)
+    {
+        return NULL;
+    }
+
+    toc_data->reference_count++;
+    return toc_data;
 }
 
 
@@ -441,6 +477,124 @@ afs_toc_preview_layout_definition * afs_toc_data_get_preview_layout_definition(c
 
 //----------------------------------------------------------------------------
 /*!
+ *  \brief The function returns an instance of afs_toc_preview_layout_definitions structure with used instances.
+ *
+ *  The function returns an instance of afs_toc_preview_layout_definitions structure.
+ *  This instance contains only those instances of structure afs_toc_preview_layout_definition that are used 
+ *  when rendering visual frames of files.
+ *
+ *  \param[in]   toc_data  Pointer to the instance of the afs_toc_data structure.
+ *  \return an instance of afs_toc_preview_layout_definitions structure or NULL.
+ */
+
+afs_toc_preview_layout_definitions * afs_toc_data_get_used_preview_layout_definitions(const afs_toc_data * toc_data)
+{
+	// Checking the validity of input data.
+	if (toc_data == NULL || toc_data->preview_layout_definitions == NULL)
+	{
+		return NULL;
+	}
+
+	// Determine the number of definitions.
+	unsigned int definitions_count = afs_toc_preview_layout_definitions_get_count(toc_data->preview_layout_definitions);
+
+	if (definitions_count == 0)
+	{
+		return NULL;
+	}
+
+	// Determine the number of reels
+	unsigned int reel_count = afs_toc_data_reel_count(toc_data);
+
+	if (reel_count == 0)
+	{
+		return NULL;
+	}
+
+	// Create an empty instance of structure afs_toc_preview_layout_definitions
+	afs_toc_preview_layout_definitions * used_preview_layout_definitions = afs_toc_preview_layout_definitions_create();
+
+	// We process all reels in turn to check all files on all reels
+	for (unsigned int r = 0; r < reel_count; r++)
+	{
+		// Get an instance of the current afs_toc_data_reel structure
+		afs_toc_data_reel * current_reel = afs_toc_data_reels_get_reel(toc_data->reels, r);
+
+        unsigned int files_count = afs_toc_data_reel_file_count(current_reel);
+
+		// We process in turn all the files on the reel
+		for (size_t i = 0; i < files_count; i++)
+		{
+			// Get an instance of the current afs_toc_file structure
+			afs_toc_file * current_toc_file = GVECTORN(current_reel->files->tocs, afs_toc_file *, i);
+
+			if (current_toc_file == NULL)
+			{
+				continue;
+			}
+
+			// Checking that the file has a preview frame and that the file is not a parent
+			if (afs_toc_file_is_preview(current_toc_file) == DTRUE && afs_toc_file_is_parent(current_toc_file) == DFALSE)
+			{
+				// Get an instance of the current afs_toc_file_preview structure
+				afs_toc_file_preview * current_toc_file_preview = current_toc_file->preview;
+
+				// Check if the file has preview pages
+				if (current_toc_file_preview == NULL || current_toc_file_preview->pages == NULL || current_toc_file_preview->pages->size == 0)
+				{
+					continue;
+				}
+
+				// We get the first page from the preview pages and from this page we get the value of preview layout definition.
+				// Here we do not check all pages, meaning that for all preview pages of the current file, the value of
+				// preview layout definition is always the same. If this is not the case, it needs to be corrected.
+				afs_toc_file_preview_page * first_toc_file_preview_page = afs_toc_file_preview_get_page(current_toc_file_preview, 0);
+				char * file_layout_definition_id = first_toc_file_preview_page->layout_id;
+
+				// If current layout definition is already contained in layout definitions, then there is no need to add it there.
+				if (afs_toc_preview_layout_definitions_has_layout_definition(used_preview_layout_definitions, file_layout_definition_id) == DTRUE)
+				{
+					continue;
+				}
+
+				// Based on current layout id, we get the corresponding pointer to afs_toc_preview_layout_definition contained in TOC.
+				afs_toc_preview_layout_definition * toc_preview_layout_definition = afs_toc_preview_layout_definitions_get_layout_definition_by_id(toc_data->preview_layout_definitions, file_layout_definition_id);
+
+				if (toc_preview_layout_definition == NULL)
+				{
+					continue;
+				}
+
+				// Make a copy of afs_toc_preview_layout_definition structure.
+				afs_toc_preview_layout_definition * toc_preview_layout_definition_cloned = afs_toc_preview_layout_definition_clone(toc_preview_layout_definition);
+
+				// We add a new instance of layout definition to the used layout definitions.
+				if (afs_toc_preview_layout_definitions_add_layout_definition(used_preview_layout_definitions, toc_preview_layout_definition_cloned) == DFALSE)
+				{
+					afs_toc_preview_layout_definition_free(toc_preview_layout_definition_cloned);
+					afs_toc_preview_layout_definitions_free(used_preview_layout_definitions);
+					return NULL;
+				}
+			}
+		}
+	}
+
+	// Sort layout definitions based on layout definition value.
+	// We loop through all the files and for each file check if there is a preview frame for each file. 
+	// If there is, then we check if there is current layout definition in used layout definitions, 
+	// and if not, then we add it. Since the value of layout definition id for files can be different in different order, 
+	// we get an unsorted array of layout definitions.
+	// Of course, it would be possible to iterate over all layout definitions and sorting would then be unnecessary, 
+	// but in order to check whether it is used or not, we will, in the worst case, need to iterate over the reels 
+	// and all the files on each reel each time. Which will take longer.
+	sort_preview_layout_definitions_by_id(used_preview_layout_definitions);
+
+	return used_preview_layout_definitions;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
  *  \brief Function sets a new version in the TOC data structure.
  *
  *  Function sets a new version in the TOC data structure.
@@ -451,6 +605,7 @@ afs_toc_preview_layout_definition * afs_toc_data_get_preview_layout_definition(c
 
 void afs_toc_data_set_version(afs_toc_data * toc_data, const char * version)
 {
+    // If TOC data pointer is NULL return
     if (toc_data == NULL)
     {
         return;
@@ -477,6 +632,7 @@ void afs_toc_data_set_version(afs_toc_data * toc_data, const char * version)
 
 void afs_toc_data_set_index_type(afs_toc_data * toc_data, const char * index_type)
 {
+    // If TOC data pointer is NULL return
     if (toc_data == NULL)
     {
         return;
@@ -503,6 +659,7 @@ void afs_toc_data_set_index_type(afs_toc_data * toc_data, const char * index_typ
 
 void afs_toc_data_set_job_id(afs_toc_data * toc_data, const char * job_id)
 {
+    // If TOC data pointer is NULL return
     if (toc_data == NULL)
     {
         return;
@@ -529,6 +686,7 @@ void afs_toc_data_set_job_id(afs_toc_data * toc_data, const char * job_id)
 
 void afs_toc_data_set_reel_id(afs_toc_data * toc_data, const char * reel_id)
 {
+    // If TOC data pointer is NULL return
     if (toc_data == NULL)
     {
         return;
@@ -901,6 +1059,7 @@ int afs_toc_data_last_frame(const afs_toc_data * toc_data)
 
 DBOOL afs_toc_data_is_valid(const afs_toc_data * toc_data)
 {
+    // If TOC data pointer is NULL return DFALSE
     if (toc_data == NULL)
     {
         return DFALSE;
@@ -1008,6 +1167,8 @@ DBOOL afs_toc_data_save_file(afs_toc_data * toc_data, const char * file_name, DB
         return DFALSE;
     }
 
+    mxml_node_t *tree = mxmlNewXML("1.0");
+
 #ifndef WIN32
     FILE * fp_save = fopen(file_name, "w+");
 #else
@@ -1018,8 +1179,6 @@ DBOOL afs_toc_data_save_file(afs_toc_data * toc_data, const char * file_name, DB
     {
         return DFALSE;
     }
-
-    mxml_node_t *tree = mxmlNewXML("1.0");
 
     if (!afs_toc_data_save_xml(toc_data, tree))
     {
@@ -1061,6 +1220,7 @@ DBOOL afs_toc_data_save_file(afs_toc_data * toc_data, const char * file_name, DB
 
 char * afs_toc_data_save_string(afs_toc_data * toc_data, DBOOL compact)
 {
+    // If TOC data reel pointer is NULL return DFALSE
     if (toc_data == NULL)
     {
         return NULL;
@@ -1106,6 +1266,7 @@ char * afs_toc_data_save_string(afs_toc_data * toc_data, DBOOL compact)
 
 DBOOL afs_toc_data_save_xml(afs_toc_data * toc_data, mxml_node_t* out)
 {
+    // If output node pointer is NULL or TOC data reel pointer is NULL return DFALSE
     if (out == NULL || toc_data == NULL)
     {
         return DFALSE;
@@ -1169,6 +1330,7 @@ DBOOL afs_toc_data_save_xml(afs_toc_data * toc_data, mxml_node_t* out)
 
 DBOOL afs_toc_data_load_file(afs_toc_data * toc_data, const char * file_name)
 {
+    // If input file name string pointer is NULL or TOC data pointer is NULL return DFALSE
     if (file_name == NULL || toc_data == NULL)
     {
         return DFALSE;
@@ -1186,9 +1348,17 @@ DBOOL afs_toc_data_load_file(afs_toc_data * toc_data, const char * file_name)
     }
 
     mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
+    
+    if (document == NULL)
+    {
+        fclose(fp_load);
+        mxmlDelete(document);
 
+        return DFALSE;
+    }
+    
     DBOOL return_value = afs_toc_data_load_xml(toc_data, document);
-
+    
     fclose(fp_load);
     mxmlDelete(document);
 
@@ -1210,6 +1380,7 @@ DBOOL afs_toc_data_load_file(afs_toc_data * toc_data, const char * file_name)
 
 DBOOL afs_toc_data_load_string(afs_toc_data * toc_data, const char * in)
 {
+    // If input string pointer is NULL or TOC data pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || toc_data == NULL)
     {
         return DFALSE;
@@ -1217,11 +1388,14 @@ DBOOL afs_toc_data_load_string(afs_toc_data * toc_data, const char * in)
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    DBOOL return_value = afs_toc_data_load_xml(toc_data, document);
+    if (!afs_toc_data_load_xml(toc_data, document))
+    {
+        return DFALSE;
+    }
 
     mxmlDelete(document);
 
-    return return_value;
+    return DTRUE;
 }
 
 
@@ -1239,6 +1413,7 @@ DBOOL afs_toc_data_load_string(afs_toc_data * toc_data, const char * in)
 
 DBOOL afs_toc_data_load_xml(afs_toc_data * toc_data, mxml_node_t * node)
 {
+    // If input node pointer is NULL or TOC data pointer is NULL return DFALSE
     if (node == NULL || toc_data == NULL)
     {
         return DFALSE;
@@ -1613,4 +1788,34 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
     }
 
     return (NULL);
+}
+
+
+static void sort_preview_layout_definitions_by_id(afs_toc_preview_layout_definitions * layoutDefinitions)
+{
+	// Insertion sorting
+	// Temporary variable for storing the value of the element of the vector being sorted
+	afs_toc_preview_layout_definition * tempLayoutDefinition;
+	// Previous item index
+	int item;
+
+	// We determine the number of layout definitions
+	unsigned int definitions_count = afs_toc_preview_layout_definitions_get_count(layoutDefinitions);
+
+	for (unsigned int counter = 1; counter < definitions_count; counter++)
+	{
+		// Initialize the temporary variable with the current value of the vector element
+		tempLayoutDefinition = GVECTORN(layoutDefinitions->layout_definitions, afs_toc_preview_layout_definition *, counter);
+		// Remember the index of the previous element of the vector
+		item = counter - 1;
+
+		// While the index is not 0 and the previous element of the vector is larger than the current one
+		while (item >= 0 && strcmp(GVECTORN(layoutDefinitions->layout_definitions, afs_toc_preview_layout_definition *, item)->id, tempLayoutDefinition->id) > 0)
+		{
+			// Permutation of array elements
+			GVECTORN(layoutDefinitions->layout_definitions, afs_toc_preview_layout_definition *, item + 1) = GVECTORN(layoutDefinitions->layout_definitions, afs_toc_preview_layout_definition *, item);
+			GVECTORN(layoutDefinitions->layout_definitions, afs_toc_preview_layout_definition *, item) = tempLayoutDefinition;
+			item--;
+		}
+	}
 }

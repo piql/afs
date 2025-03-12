@@ -37,6 +37,8 @@ typedef struct afs_toc_data_reel_s
 {
     char *          id;
     afs_toc_files * files;
+
+    int reference_count;
 } afs_toc_data_reel;
 
 
@@ -45,6 +47,7 @@ afs_toc_data_reel * afs_toc_data_reel_create2(const char * id);
 void                afs_toc_data_reel_free(afs_toc_data_reel * toc_data_reel);
 
 afs_toc_data_reel * afs_toc_data_reel_clone(const afs_toc_data_reel * toc_data_reel);
+afs_toc_data_reel * afs_toc_data_reel_get_new_reference(afs_toc_data_reel * toc_data_reel);
 DBOOL               afs_toc_data_reel_equal(const afs_toc_data_reel * toc_data_reel1, const afs_toc_data_reel * toc_data_reel2);
 
 void                afs_toc_data_reel_set_id(afs_toc_data_reel * toc_data_reel, const char * id);

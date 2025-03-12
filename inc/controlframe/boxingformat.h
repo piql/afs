@@ -27,13 +27,32 @@ extern "C" {
 typedef struct afs_boxing_format_s
 {
     boxing_config * config;
+
+    const char * name;
+    unsigned int bytes_per_frame;
+    unsigned int data_bytes_per_frame;
+    unsigned int data_stripe_size;
+    unsigned int scaling_factor;
+    unsigned int width;
+    unsigned int height;
+    unsigned int data_frame_width;
+    unsigned int data_frame_height;
+    unsigned int bits_per_pixel;
+    unsigned int symbol_per_pixel;
+
+    int reference_count;
 } afs_boxing_format;
 
 afs_boxing_format * afs_boxing_format_create();
 afs_boxing_format * afs_boxing_format_create2(const boxing_config *);
-void                afs_boxing_format_init(afs_boxing_format *);
-void                afs_boxing_format_init2(afs_boxing_format *, const boxing_config *);
 void                afs_boxing_format_free(afs_boxing_format *);
+
+afs_boxing_format * afs_boxing_format_clone(const afs_boxing_format * boxing_format);
+afs_boxing_format * afs_boxing_format_get_new_reference(afs_boxing_format * boxing_format);
+DBOOL               afs_boxing_format_equal(const afs_boxing_format * boxing_format1, const afs_boxing_format * boxing_format2);
+
+unsigned int        afs_boxing_format_get_data_frames(const afs_boxing_format * boxing_format, const size_t file_size);
+void                afs_boxing_format_set_config(afs_boxing_format * boxing_format, const boxing_config * config);
 
 DBOOL               afs_boxing_format_save_xml(mxml_node_t * out, afs_boxing_format * boxing_format);
 char *              afs_boxing_format_save_string(afs_boxing_format * boxing_format, DBOOL compact);
@@ -42,18 +61,8 @@ DBOOL               afs_boxing_format_load_string(afs_boxing_format * boxing_for
 
 #if !defined( AFS_DISABLE_FILE_IO )
 DBOOL               afs_boxing_format_save_config_file(const char * file_name, afs_boxing_format* boxing_format, DBOOL compact);
-DBOOL               afs_boxing_format_load_config_file(afs_boxing_format* boxing_format, const char * file_name);
+DBOOL               afs_boxing_format_load_config_file(afs_boxing_format * boxing_format, const char * file_name);
 #endif
-
-const char *        afs_boxing_format_get_name(afs_boxing_format * format);
-unsigned int        afs_boxing_format_get_scaling_factor(afs_boxing_format * format);
-unsigned int        afs_boxing_format_get_width(afs_boxing_format * format);
-unsigned int        afs_boxing_format_get_height(afs_boxing_format * format);
-unsigned int        afs_boxing_format_get_data_frame_width(afs_boxing_format * format);
-unsigned int        afs_boxing_format_get_data_frame_height(afs_boxing_format * format);
-unsigned int        afs_boxing_format_get_bits_per_pixel(afs_boxing_format * format);
-unsigned int        afs_boxing_format_get_symbols_per_pixel(afs_boxing_format * format);
-
 
 #ifdef __cplusplus
 } /* extern "C" */

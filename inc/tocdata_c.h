@@ -32,6 +32,8 @@ typedef struct afs_toc_data_s
     afs_toc_data_reels *                 reels;
     afs_toc_metadata *                   metadata;
     afs_toc_preview_layout_definitions * preview_layout_definitions;
+
+    int reference_count;
 } afs_toc_data;
 
 afs_toc_data * afs_toc_data_create();
@@ -39,14 +41,16 @@ afs_toc_data * afs_toc_data_create2(const char * version, const char * index_typ
 void           afs_toc_data_free(afs_toc_data * toc_data);
 
 afs_toc_data * afs_toc_data_clone(afs_toc_data * toc_data);
+afs_toc_data * afs_toc_data_get_new_reference(afs_toc_data * toc_data);
 DBOOL          afs_toc_data_equal(afs_toc_data * toc_data1, afs_toc_data * toc_data2);
 
-afs_toc_data_reel  *                afs_toc_data_get_reel_by_index(const afs_toc_data * toc_data, const unsigned int index);
-afs_toc_data_reel  *                afs_toc_data_get_reel_by_id(const afs_toc_data * toc_data, const char * id);
-afs_toc_metadata_source  *          afs_toc_data_get_metadata_source(const afs_toc_data * toc_data, const unsigned int index);
-afs_toc_file  *                     afs_toc_data_get_file_by_id(const afs_toc_data * toc_data, const int id);
-afs_toc_file  *                     afs_toc_data_get_file_by_unique_id(const afs_toc_data * toc_data, const char * unique_id);
-afs_toc_preview_layout_definition * afs_toc_data_get_preview_layout_definition(const afs_toc_data * toc_data, const unsigned int index);
+afs_toc_data_reel  *                 afs_toc_data_get_reel_by_index(const afs_toc_data * toc_data, const unsigned int index);
+afs_toc_data_reel  *                 afs_toc_data_get_reel_by_id(const afs_toc_data * toc_data, const char * id);
+afs_toc_metadata_source  *           afs_toc_data_get_metadata_source(const afs_toc_data * toc_data, const unsigned int index);
+afs_toc_file  *                      afs_toc_data_get_file_by_id(const afs_toc_data * toc_data, const int id);
+afs_toc_file  *                      afs_toc_data_get_file_by_unique_id(const afs_toc_data * toc_data, const char * unique_id);
+afs_toc_preview_layout_definition *  afs_toc_data_get_preview_layout_definition(const afs_toc_data * toc_data, const unsigned int index);
+afs_toc_preview_layout_definitions * afs_toc_data_get_used_preview_layout_definitions(const afs_toc_data * toc_data);
 
 void afs_toc_data_set_version(afs_toc_data * toc_data, const char * version);
 void afs_toc_data_set_index_type(afs_toc_data * toc_data, const char * index_type);

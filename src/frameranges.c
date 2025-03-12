@@ -15,7 +15,6 @@
 //  PROJECT INCLUDES
 //
 #include "frameranges.h"
-#include "boxing/platform/memory.h"
 #include "boxing/log.h"
 
 
@@ -64,8 +63,9 @@
 
 afs_frame_ranges * afs_frame_ranges_create()
 {
-    afs_frame_ranges * frame_ranges = boxing_memory_allocate(sizeof(afs_frame_ranges));
+    afs_frame_ranges * frame_ranges = malloc(sizeof(afs_frame_ranges));
     frame_ranges->frame_ranges = NULL;
+    frame_ranges->reference_count = 1;
     return frame_ranges;
 }
 
@@ -86,19 +86,24 @@ void afs_frame_ranges_free(afs_frame_ranges * frame_ranges)
         return;
     }
 
-    if (frame_ranges->frame_ranges != NULL)
+    frame_ranges->reference_count--;
+
+    if (frame_ranges->reference_count <= 0)
     {
-        for (unsigned int i = 0; i < frame_ranges->frame_ranges->size; i++)
+        if (frame_ranges->frame_ranges != NULL)
         {
-            afs_frame_range_free(GVECTORN(frame_ranges->frame_ranges, afs_frame_range *, i));
-            GVECTORN(frame_ranges->frame_ranges, afs_frame_range *, i) = NULL;
+            for (unsigned int i = 0; i < frame_ranges->frame_ranges->size; i++)
+            {
+                afs_frame_range_free(GVECTORN(frame_ranges->frame_ranges, afs_frame_range *, i));
+                GVECTORN(frame_ranges->frame_ranges, afs_frame_range *, i) = NULL;
+            }
+
+            gvector_free(frame_ranges->frame_ranges);
+            frame_ranges->frame_ranges = NULL;
         }
 
-        gvector_free(frame_ranges->frame_ranges);
-        frame_ranges->frame_ranges = NULL;
+        free(frame_ranges);
     }
-
-    boxing_memory_free(frame_ranges);
 }
 
 
@@ -115,6 +120,7 @@ void afs_frame_ranges_free(afs_frame_ranges * frame_ranges)
 
 afs_frame_ranges * afs_frame_ranges_clone(const afs_frame_ranges * frame_ranges)
 {
+    // If frame ranges pointer is NULL return NULL.
     if (frame_ranges == NULL)
     {
         return NULL;
@@ -135,6 +141,31 @@ afs_frame_ranges * afs_frame_ranges_clone(const afs_frame_ranges * frame_ranges)
     }
 
     return return_frame_ranges;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function returns a new reference to the input afs_frame_ranges structure.
+ *
+ *  Function returns a new reference to the input afs_frame_ranges structure.
+ *  The reference count is incremented by 1.
+ *  If frame ranges pointer is NULL function return NULL.
+ *
+ *  \param[in]  frame_ranges  Pointer to the afs_frame_ranges structure.
+ *  \return new reference of afs_frame_ranges structure or NULL.
+ */
+
+afs_frame_ranges * afs_frame_ranges_get_new_reference(afs_frame_ranges * frame_ranges)
+{
+    // If frame ranges pointer is NULL return NULL.
+    if (frame_ranges == NULL)
+    {
+        return NULL;
+    }
+
+    frame_ranges->reference_count++;
+    return frame_ranges;
 }
 
 

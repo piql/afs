@@ -16,7 +16,6 @@
 //
 
 #include "tocmetadata_c.h"
-#include "boxing/platform/memory.h"
 #include "boxing/log.h"
 
 // PRIVATE INTERFACE
@@ -57,7 +56,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
 
 afs_toc_metadata* afs_toc_metadata_create()
 {
-    afs_toc_metadata* toc_metadata = BOXING_MEMORY_ALLOCATE_TYPE(afs_toc_metadata);
+    afs_toc_metadata* toc_metadata = malloc(sizeof(afs_toc_metadata));
     afs_toc_metadata_init(toc_metadata);
     return toc_metadata;
 }
@@ -77,7 +76,7 @@ afs_toc_metadata* afs_toc_metadata_create()
 
 afs_toc_metadata * afs_toc_metadata_create2(afs_toc_metadata_sources * sources)
 {
-    afs_toc_metadata* toc_metadata = BOXING_MEMORY_ALLOCATE_TYPE(afs_toc_metadata);
+    afs_toc_metadata* toc_metadata = malloc(sizeof(afs_toc_metadata));
     afs_toc_metadata_init2(toc_metadata, sources);
     return toc_metadata;
 }
@@ -121,6 +120,7 @@ void afs_toc_metadata_init(afs_toc_metadata * toc_metadata)
     }
 
     toc_metadata->sources = NULL;
+    toc_metadata->reference_count = 1;
 }
 
 
@@ -143,6 +143,7 @@ void afs_toc_metadata_init2(afs_toc_metadata * toc_metadata, afs_toc_metadata_so
     }
 
     toc_metadata->sources = sources;
+    toc_metadata->reference_count = 1;
 }
 
 
@@ -162,17 +163,22 @@ void afs_toc_metadata_free(afs_toc_metadata * toc_metadata)
         return;
     }
 
-    if (toc_metadata->sources != NULL)
-    {
-        for (unsigned int i = 0; i < toc_metadata->sources->size; i++)
-        {
-            afs_toc_metadata_source_free(GVECTORN(toc_metadata->sources, afs_toc_metadata_source *, i));
-            GVECTORN(toc_metadata->sources, afs_toc_metadata_source *, i) = NULL;
-        }
-    }
+    toc_metadata->reference_count--;
 
-    gvector_free(toc_metadata->sources);
-    boxing_memory_free(toc_metadata);
+    if (toc_metadata->reference_count <= 0)
+    {
+        if (toc_metadata->sources != NULL)
+        {
+            for (unsigned int i = 0; i < toc_metadata->sources->size; i++)
+            {
+                afs_toc_metadata_source_free(GVECTORN(toc_metadata->sources, afs_toc_metadata_source *, i));
+                GVECTORN(toc_metadata->sources, afs_toc_metadata_source *, i) = NULL;
+            }
+        }
+
+        gvector_free(toc_metadata->sources);
+        free(toc_metadata);
+    }
 }
 
 
@@ -189,6 +195,7 @@ void afs_toc_metadata_free(afs_toc_metadata * toc_metadata)
 
 afs_toc_metadata * afs_toc_metadata_clone(afs_toc_metadata * toc_metadata)
 {
+    // If TOC metadata pointer is NULL return NULL.
     if (toc_metadata == NULL)
     {
         return NULL;
@@ -208,6 +215,31 @@ afs_toc_metadata * afs_toc_metadata_clone(afs_toc_metadata * toc_metadata)
     }
 
     return return_toc_metadata;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function returns a new reference to the input afs_toc_metadata structure.
+ *
+ *  Function returns a new reference to the input afs_toc_metadata structure.
+ *  The reference count is incremented by 1.
+ *  If TOC metadata pointer is NULL function return NULL.
+ *
+ *  \param[in]  toc_metadata  Pointer to the afs_toc_metadata structure.
+ *  \return new reference of afs_toc_metadata structure or NULL.
+ */
+
+afs_toc_metadata * afs_toc_metadata_get_new_reference(afs_toc_metadata * toc_metadata)
+{
+    // If TOC metadata pointer is NULL return NULL.
+    if (toc_metadata == NULL)
+    {
+        return NULL;
+    }
+
+    toc_metadata->reference_count++;
+    return toc_metadata;
 }
 
 
@@ -443,7 +475,6 @@ DBOOL afs_toc_metadata_save_file(afs_toc_metadata * toc_metadata, const char * f
 
     if (fp_save == NULL)
     {
-        mxmlDelete(tree);
         return DFALSE;
     }
 
@@ -480,6 +511,7 @@ DBOOL afs_toc_metadata_save_file(afs_toc_metadata * toc_metadata, const char * f
 
 char * afs_toc_metadata_save_string(afs_toc_metadata * toc_metadata, DBOOL compact)
 {
+    // If TOC metadata pointer is NULL return DFALSE
     if (toc_metadata == NULL)
     {
         return DFALSE;
@@ -528,6 +560,7 @@ char * afs_toc_metadata_save_string(afs_toc_metadata * toc_metadata, DBOOL compa
 
 DBOOL afs_toc_metadata_save_xml(afs_toc_metadata * toc_metadata, mxml_node_t* out)
 {
+    // If output node pointer is NULL or TOC metadata pointer is NULL return DFALSE
     if (out == NULL || toc_metadata == NULL)
     {
         return DFALSE;
@@ -568,6 +601,7 @@ DBOOL afs_toc_metadata_save_xml(afs_toc_metadata * toc_metadata, mxml_node_t* ou
 
 DBOOL afs_toc_metadata_load_file(afs_toc_metadata * toc_metadata, const char * file_name)
 {
+    // If input file name string pointer is NULL or TOC metadata pointer is NULL return DFALSE
     if (file_name == NULL || toc_metadata == NULL)
     {
         return DFALSE;
@@ -585,9 +619,17 @@ DBOOL afs_toc_metadata_load_file(afs_toc_metadata * toc_metadata, const char * f
     }
 
     mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
+    
+    if (document == NULL)
+    {
+        fclose(fp_load);
+        mxmlDelete(document);
 
+        return DFALSE;
+    }
+    
     DBOOL return_value = afs_toc_metadata_load_xml(toc_metadata, document);
-
+    
     fclose(fp_load);
     mxmlDelete(document);
 
@@ -609,6 +651,7 @@ DBOOL afs_toc_metadata_load_file(afs_toc_metadata * toc_metadata, const char * f
 
 DBOOL afs_toc_metadata_load_string(afs_toc_metadata * toc_metadata, const char * in)
 {
+    // If input string pointer is NULL or TOC metadata pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || toc_metadata == NULL)
     {
         return DFALSE;
@@ -616,11 +659,14 @@ DBOOL afs_toc_metadata_load_string(afs_toc_metadata * toc_metadata, const char *
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    DBOOL return_value = afs_toc_metadata_load_xml(toc_metadata, document);
+    if (!afs_toc_metadata_load_xml(toc_metadata, document))
+    {
+        return DFALSE;
+    }
 
     mxmlDelete(document);
 
-    return return_value;
+    return DTRUE;
 }
 
 
@@ -638,6 +684,7 @@ DBOOL afs_toc_metadata_load_string(afs_toc_metadata * toc_metadata, const char *
 
 DBOOL afs_toc_metadata_load_xml(afs_toc_metadata * toc_metadata, mxml_node_t* node)
 {
+    // If input node pointer is NULL or TOC metadata pointer is NULL return DFALSE
     if (node == NULL || toc_metadata == NULL)
     {
         return DFALSE;

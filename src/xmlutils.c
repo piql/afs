@@ -57,11 +57,7 @@ void afs_xmlutils_set_node_text(const char* text, mxml_node_t* node)
         return;
     }
 
-    if (boxing_string_length(text) == 0 && text != NULL)
-    {
-        mxmlNewOpaque(node, "/0");
-    }
-    else
+    if (boxing_string_length(text) != 0)
     {
         mxmlNewOpaque(node, text);
     }
@@ -101,7 +97,7 @@ char* afs_xmlutils_get_node_text(mxml_node_t* node)
 
     boxing_string_trim(&text);
 
-    if (boxing_string_equal("/0", text) == DFALSE)
+    if (boxing_string_length(text) != 0)
     {
         return text;
     }
@@ -112,6 +108,27 @@ char* afs_xmlutils_get_node_text(mxml_node_t* node)
     }
 }
 
+//----------------------------------------------------------------------------
+/*!
+*  \brief The function extracts text from the XML node.
+*
+*  The function extracts text from the XML node.
+*  If XML node pointer is NULL or the text cannot be extracted, the function returns a default string.
+*
+*  \param[in]   node   XML node pointer.
+*  \param[in]   default_text   A default text to return if extracting text fails.
+*  \return text from the XML node (safe version).
+*/
+
+char* afs_xmlutils_get_node_text_safe( mxml_node_t* node, const char* default_text )
+{
+    char* return_string = afs_xmlutils_get_node_text( node );
+    if ( return_string == NULL )
+    {
+        return_string = boxing_string_clone( default_text );
+    }
+    return return_string;
+}
 
 //----------------------------------------------------------------------------
 /*!

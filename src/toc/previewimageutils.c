@@ -64,10 +64,6 @@ int toc_preview_image_util_extract( boxing_image8*** images, const afs_toc_previ
     if (previews_number > 0)
     {
         *images = (boxing_image8 **)malloc(sizeof(boxing_image8 *) * previews_number);
-        if (*images == NULL)
-        {
-            return TOC_PREVIEW_IMAGE_UTIL_EXTRACT_ERROR;
-        }
     }
 
     unsigned int extracted_images = 0;

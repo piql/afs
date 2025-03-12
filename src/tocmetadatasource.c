@@ -117,7 +117,7 @@ static char *       get_substring(const char* input_string, size_t start_index, 
 
 afs_toc_metadata_source * afs_toc_metadata_source_create()
 {
-    afs_toc_metadata_source * toc_metadata_source = BOXING_MEMORY_ALLOCATE_TYPE(afs_toc_metadata_source);
+    afs_toc_metadata_source * toc_metadata_source = malloc(sizeof(afs_toc_metadata_source));
     afs_toc_metadata_source_init(toc_metadata_source);
     return toc_metadata_source;
 }
@@ -325,6 +325,8 @@ void afs_toc_metadata_source_init(afs_toc_metadata_source * toc_metadata_source)
     toc_metadata_source->file_id = FILE_ID_UNDEFINED;
     toc_metadata_source->data = NULL;
     toc_metadata_source->tags = NULL;
+
+    toc_metadata_source->reference_count = 1;
 }
 
 
@@ -355,6 +357,8 @@ void afs_toc_metadata_source_init2(afs_toc_metadata_source * toc_metadata_source
     toc_metadata_source->file_id = file_id;
     toc_metadata_source->data = boxing_string_clone(data);
     toc_metadata_source->tags = boxing_string_split(tags, ";");
+
+    toc_metadata_source->reference_count = 1;
 }
 
 
@@ -384,6 +388,8 @@ void afs_toc_metadata_source_init3(afs_toc_metadata_source * toc_metadata_source
     toc_metadata_source->file_id = file_id;
     toc_metadata_source->data = NULL;
     toc_metadata_source->tags = tags;
+
+    toc_metadata_source->reference_count = 1;
 }
 
 
@@ -403,19 +409,24 @@ void afs_toc_metadata_source_free(afs_toc_metadata_source * toc_metadata_source)
         return;
     }
 
-    if (toc_metadata_source->tags != NULL)
-    {
-        for (unsigned int i = 0; i < toc_metadata_source->tags->size; i++)
-        {
-            boxing_string_free(GVECTORN(toc_metadata_source->tags, char *, i));
-            GVECTORN(toc_metadata_source->tags, char *, i) = NULL;
-        }
-    }
+    toc_metadata_source->reference_count--;
 
-    boxing_string_free(toc_metadata_source->format);
-    boxing_string_free(toc_metadata_source->data);
-    gvector_free(toc_metadata_source->tags);
-    boxing_memory_free(toc_metadata_source);
+    if (toc_metadata_source->reference_count <= 0)
+    {
+        if (toc_metadata_source->tags != NULL)
+        {
+            for (unsigned int i = 0; i < toc_metadata_source->tags->size; i++)
+            {
+                boxing_string_free(GVECTORN(toc_metadata_source->tags, char *, i));
+                GVECTORN(toc_metadata_source->tags, char *, i) = NULL;
+            }
+        }
+
+        boxing_string_free(toc_metadata_source->format);
+        boxing_string_free(toc_metadata_source->data);
+        gvector_free(toc_metadata_source->tags);
+        free(toc_metadata_source);
+    }
 }
 
 
@@ -432,6 +443,7 @@ void afs_toc_metadata_source_free(afs_toc_metadata_source * toc_metadata_source)
 
 afs_toc_metadata_source * afs_toc_metadata_source_clone(afs_toc_metadata_source * toc_metadata_source)
 {
+    // If TOC metadata source pointer is NULL return NULL.
     if (toc_metadata_source == NULL)
     {
         return NULL;
@@ -458,6 +470,31 @@ afs_toc_metadata_source * afs_toc_metadata_source_clone(afs_toc_metadata_source 
     }
 
     return return_copy;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function returns a new reference to the input afs_toc_metadata_source structure.
+ *
+ *  Function returns a new reference to the input afs_toc_metadata_source structure.
+ *  The reference count is incremented by 1.
+ *  If TOC metadata source pointer is NULL function return NULL.
+ *
+ *  \param[in]  toc_metadata_source  Pointer to the afs_toc_metadata_source structure.
+ *  \return new reference of afs_toc_metadata_source structure or NULL.
+ */
+
+afs_toc_metadata_source * afs_toc_metadata_source_get_new_reference(afs_toc_metadata_source * toc_metadata_source)
+{
+    // If TOC metadata source pointer is NULL return NULL.
+    if (toc_metadata_source == NULL)
+    {
+        return NULL;
+    }
+
+    toc_metadata_source->reference_count++;
+    return toc_metadata_source;
 }
 
 
@@ -512,6 +549,7 @@ DBOOL afs_toc_metadata_source_equal(afs_toc_metadata_source * toc_metadata_sourc
 
 DBOOL afs_toc_metadata_source_is_valid(afs_toc_metadata_source * toc_metadata_source)
 {
+    // If TOC metadata source pointer is NULL return DFALSE
     if (toc_metadata_source == NULL)
     {
         return DFALSE;
@@ -576,11 +614,13 @@ void afs_toc_metadata_source_set_tags(afs_toc_metadata_source * toc_metadata_sou
 
 char * afs_toc_metadata_source_get_tags(afs_toc_metadata_source * toc_metadata_source)
 {
+    // If input afs_toc_metadata_source pointer is NULL return NULL
     if (toc_metadata_source == NULL)
     {
         return NULL;
     }
 
+    // If tags pointer is NULL return NULL
     if (toc_metadata_source->tags == NULL)
     {
         return NULL;
@@ -626,6 +666,7 @@ char * afs_toc_metadata_source_get_tags(afs_toc_metadata_source * toc_metadata_s
 
 DBOOL afs_toc_metadata_source_save_xml(afs_toc_metadata_source * toc_metadata_source, mxml_node_t* out)
 {
+    // If output node pointer is NULL or TOC metadata source pointer is NULL return DFALSE
     if (out == NULL || toc_metadata_source == NULL || afs_toc_metadata_source_is_valid(toc_metadata_source) == DFALSE)
     {
         return DFALSE;
@@ -668,6 +709,7 @@ DBOOL afs_toc_metadata_source_save_xml(afs_toc_metadata_source * toc_metadata_so
 
 char * afs_toc_metadata_source_save_string(afs_toc_metadata_source * toc_metadata_source, DBOOL compact)
 {
+    // If TOC metadata source pointer is NULL return DFALSE
     if (toc_metadata_source == NULL)
     {
         return DFALSE;
@@ -719,6 +761,8 @@ DBOOL afs_toc_metadata_source_save_file(afs_toc_metadata_source * toc_metadata_s
         return DFALSE;
     }
 
+    mxml_node_t *tree = mxmlNewXML("1.0");
+
 #ifndef WIN32
     FILE * fp_save = fopen(file_name, "w+");
 #else
@@ -729,8 +773,6 @@ DBOOL afs_toc_metadata_source_save_file(afs_toc_metadata_source * toc_metadata_s
     {
         return DFALSE;
     }
-
-    mxml_node_t *tree = mxmlNewXML("1.0");
 
     if (!afs_toc_metadata_source_save_xml(toc_metadata_source, tree))
     {
@@ -772,6 +814,7 @@ DBOOL afs_toc_metadata_source_save_file(afs_toc_metadata_source * toc_metadata_s
 
 DBOOL afs_toc_metadata_source_load_xml(afs_toc_metadata_source * toc_metadata_source, mxml_node_t* input_node)
 {
+    // If input node pointer is NULL or TOC metadata source pointer is NULL return DFALSE
     if (input_node == NULL || toc_metadata_source == NULL)
     {
         return DFALSE;
@@ -864,6 +907,7 @@ DBOOL afs_toc_metadata_source_load_xml(afs_toc_metadata_source * toc_metadata_so
 
 DBOOL afs_toc_metadata_source_load_string(afs_toc_metadata_source * toc_metadata_source, const char * in)
 {
+    // If input string pointer is NULL or TOC metadata source pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || toc_metadata_source == NULL)
     {
         return DFALSE;
@@ -871,11 +915,14 @@ DBOOL afs_toc_metadata_source_load_string(afs_toc_metadata_source * toc_metadata
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    DBOOL return_value = afs_toc_metadata_source_load_xml(toc_metadata_source, document);
+    if (!afs_toc_metadata_source_load_xml(toc_metadata_source, document))
+    {
+        return DFALSE;
+    }
 
     mxmlDelete(document);
 
-    return return_value;
+    return DTRUE;
 }
 
 
@@ -893,6 +940,7 @@ DBOOL afs_toc_metadata_source_load_string(afs_toc_metadata_source * toc_metadata
 
 DBOOL afs_toc_metadata_source_load_file(afs_toc_metadata_source * toc_metadata_source, const char * file_name)
 {
+    // If input file name string pointer is NULL or TOC metadata source pointer is NULL return DFALSE
     if (file_name == NULL || toc_metadata_source == NULL)
     {
         return DFALSE;
@@ -910,6 +958,14 @@ DBOOL afs_toc_metadata_source_load_file(afs_toc_metadata_source * toc_metadata_s
     }
 
     mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
+
+    if (document == NULL)
+    {
+        fclose(fp_load);
+        mxmlDelete(document);
+
+        return DFALSE;
+    }
 
     DBOOL return_value = afs_toc_metadata_source_load_xml(toc_metadata_source, document);
 

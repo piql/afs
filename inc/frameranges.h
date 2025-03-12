@@ -27,12 +27,15 @@ typedef gvector afs_frame_ranges_vector;
 typedef struct afs_frame_ranges_s
 {
     afs_frame_ranges_vector *  frame_ranges;
+
+    int reference_count;
 } afs_frame_ranges;
 
 afs_frame_ranges * afs_frame_ranges_create();
 void               afs_frame_ranges_free(afs_frame_ranges * frame_ranges);
 
 afs_frame_ranges * afs_frame_ranges_clone(const afs_frame_ranges * frame_ranges);
+afs_frame_ranges * afs_frame_ranges_get_new_reference(afs_frame_ranges * frame_ranges);
 DBOOL              afs_frame_ranges_equal(const afs_frame_ranges * frame_ranges1, const afs_frame_ranges * frame_ranges2);
 
 unsigned int       afs_frame_ranges_get_count(const afs_frame_ranges * frame_ranges);

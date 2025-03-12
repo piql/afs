@@ -400,7 +400,7 @@ mxmlSaveString(mxml_node_t    *node,	/* I - Node to write */
   * Return the number of characters...
   */
 
-  return (unsigned int)ptr[2];
+  return (int)(size_t)(ptr[2]);
 }
 
 

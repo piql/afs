@@ -16,9 +16,7 @@
 //
 #include "toc/previewsections.h"
 #include "boxing/string.h"
-#include "boxing/platform/memory.h"
 #include "boxing/log.h"
-
 
 // PRIVATE INTERFACE
 //
@@ -66,8 +64,9 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
 
 afs_toc_preview_sections * afs_toc_preview_sections_create()
 {
-    afs_toc_preview_sections * toc_preview_sections = boxing_memory_allocate(sizeof(afs_toc_preview_sections));
+    afs_toc_preview_sections * toc_preview_sections = malloc(sizeof(afs_toc_preview_sections));
     toc_preview_sections->sections = NULL;
+    toc_preview_sections->reference_count = 1;
     return toc_preview_sections;
 }
 
@@ -83,7 +82,7 @@ afs_toc_preview_sections * afs_toc_preview_sections_create()
  *  \return instance of allocated afs_toc_preview_sections vector.
  */
 
-afs_toc_preview_sections * afs_toc_preview_sections_create2(mxml_node_t* sections_node)
+afs_toc_preview_sections * afs_toc_preview_sections_create2(mxml_node_t * sections_node)
 {
     afs_toc_preview_sections * toc_preview_sections = afs_toc_preview_sections_create();
     afs_toc_preview_sections_load_xml(toc_preview_sections, sections_node);
@@ -107,19 +106,24 @@ void afs_toc_preview_sections_free(afs_toc_preview_sections * toc_preview_sectio
         return;
     }
 
-    if (toc_preview_sections->sections != NULL)
+    toc_preview_sections->reference_count--;
+
+    if (toc_preview_sections->reference_count == 0)
     {
-        for (unsigned int i = 0; i < toc_preview_sections->sections->size; i++)
+        if (toc_preview_sections->sections != NULL)
         {
-            afs_toc_preview_section_free(GVECTORN(toc_preview_sections->sections, afs_toc_preview_section *, i));
-            GVECTORN(toc_preview_sections->sections, afs_toc_preview_section *, i) = NULL;
+            for (unsigned int i = 0; i < toc_preview_sections->sections->size; i++)
+            {
+                afs_toc_preview_section_free(GVECTORN(toc_preview_sections->sections, afs_toc_preview_section *, i));
+                GVECTORN(toc_preview_sections->sections, afs_toc_preview_section *, i) = NULL;
+            }
+
+            gvector_free(toc_preview_sections->sections);
+            toc_preview_sections->sections = NULL;
         }
 
-        gvector_free(toc_preview_sections->sections);
-        toc_preview_sections->sections = NULL;
+        free(toc_preview_sections);
     }
-
-    boxing_memory_free(toc_preview_sections);
 }
 
 
@@ -136,6 +140,7 @@ void afs_toc_preview_sections_free(afs_toc_preview_sections * toc_preview_sectio
 
 afs_toc_preview_sections * afs_toc_preview_sections_clone(const afs_toc_preview_sections * toc_preview_sections)
 {
+    // If TOC preview sections pointer is NULL return NULL.
     if (toc_preview_sections == NULL)
     {
         return NULL;
@@ -156,6 +161,31 @@ afs_toc_preview_sections * afs_toc_preview_sections_clone(const afs_toc_preview_
     }
 
     return return_toc_preview_sections;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function returns a new reference to the input afs_toc_preview_sections structure.
+ *
+ *  Function returns a new reference to the input afs_toc_preview_sections structure.
+ *  The reference count is incremented by 1.
+ *  If TOC preview sections pointer is NULL function return NULL.
+ *
+ *  \param[in]  toc_preview_sections  Pointer to the afs_toc_preview_sections structure.
+ *  \return new reference of afs_toc_preview_sections structure or NULL.
+ */
+
+afs_toc_preview_sections * afs_toc_preview_sections_get_new_reference(afs_toc_preview_sections * toc_preview_sections)
+{
+    // If TOC preview sections pointer is NULL return NULL.
+    if (toc_preview_sections == NULL)
+    {
+        return NULL;
+    }
+
+    toc_preview_sections->reference_count++;
+    return toc_preview_sections;
 }
 
 
@@ -406,6 +436,8 @@ DBOOL afs_toc_preview_sections_save_file(const afs_toc_preview_sections * toc_pr
         return DFALSE;
     }
 
+    mxml_node_t *tree = mxmlNewXML("1.0");
+
 #ifndef WIN32
     FILE * fp_save = fopen(file_name, "w+");
 #else
@@ -416,8 +448,6 @@ DBOOL afs_toc_preview_sections_save_file(const afs_toc_preview_sections * toc_pr
     {
         return DFALSE;
     }
-
-    mxml_node_t *tree = mxmlNewXML("1.0");
 
     if (!afs_toc_preview_sections_save_xml(toc_preview_sections, tree))
     {
@@ -458,6 +488,7 @@ DBOOL afs_toc_preview_sections_save_file(const afs_toc_preview_sections * toc_pr
 
 char * afs_toc_preview_sections_save_string(const afs_toc_preview_sections * toc_preview_sections, DBOOL compact)
 {
+    // If TOC preview sections pointer is NULL return DFALSE
     if (toc_preview_sections == NULL)
     {
         return DFALSE;
@@ -503,6 +534,7 @@ char * afs_toc_preview_sections_save_string(const afs_toc_preview_sections * toc
 
 DBOOL afs_toc_preview_sections_save_xml(const afs_toc_preview_sections * toc_preview_sections, mxml_node_t* out)
 {
+    // If output node pointer is NULL or TOC preview sections pointer is NULL return DFALSE
     if (out == NULL || toc_preview_sections == NULL || afs_toc_preview_sections_is_valid(toc_preview_sections) == DFALSE)
     {
         return DFALSE;
@@ -538,6 +570,7 @@ DBOOL afs_toc_preview_sections_save_xml(const afs_toc_preview_sections * toc_pre
 
 DBOOL afs_toc_preview_sections_load_file(afs_toc_preview_sections * toc_preview_sections, const char * file_name)
 {
+    // If input file name string pointer is NULL or TOC preview sections pointer is NULL return DFALSE
     if (file_name == NULL || toc_preview_sections == NULL)
     {
         return DFALSE;
@@ -555,6 +588,14 @@ DBOOL afs_toc_preview_sections_load_file(afs_toc_preview_sections * toc_preview_
     }
 
     mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
+
+    if (document == NULL)
+    {
+        fclose(fp_load);
+        mxmlDelete(document);
+
+        return DFALSE;
+    }
 
     DBOOL return_value = afs_toc_preview_sections_load_xml(toc_preview_sections, document);
 
@@ -579,6 +620,7 @@ DBOOL afs_toc_preview_sections_load_file(afs_toc_preview_sections * toc_preview_
 
 DBOOL afs_toc_preview_sections_load_string(afs_toc_preview_sections * toc_preview_sections, const char * in)
 {
+    // If input string pointer is NULL or TOC preview sections pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || toc_preview_sections == NULL)
     {
         return DFALSE;
@@ -586,11 +628,14 @@ DBOOL afs_toc_preview_sections_load_string(afs_toc_preview_sections * toc_previe
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    DBOOL return_value = afs_toc_preview_sections_load_xml(toc_preview_sections, document);
+    if (!afs_toc_preview_sections_load_xml(toc_preview_sections, document))
+    {
+        return DFALSE;
+    }
 
     mxmlDelete(document);
 
-    return return_value;
+    return DTRUE;
 }
 
 
@@ -608,6 +653,7 @@ DBOOL afs_toc_preview_sections_load_string(afs_toc_preview_sections * toc_previe
 
 DBOOL afs_toc_preview_sections_load_xml(afs_toc_preview_sections * toc_preview_sections, mxml_node_t * input_node)
 {
+    // If input node pointer is NULL or TOC preview sections pointer is NULL return DFALSE
     if (input_node == NULL || toc_preview_sections == NULL)
     {
         return DFALSE;

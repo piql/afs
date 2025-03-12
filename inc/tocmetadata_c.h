@@ -28,6 +28,8 @@ extern "C" {
 typedef struct afs_toc_metadata_s
 {
     afs_toc_metadata_sources * sources;
+
+    int reference_count;
 } afs_toc_metadata;
 
 afs_toc_metadata * afs_toc_metadata_create();
@@ -40,6 +42,7 @@ void               afs_toc_metadata_init2(afs_toc_metadata * toc_metadata, afs_t
 void               afs_toc_metadata_free(afs_toc_metadata * toc_metadata);
 
 afs_toc_metadata * afs_toc_metadata_clone(afs_toc_metadata * toc_metadata);
+afs_toc_metadata * afs_toc_metadata_get_new_reference(afs_toc_metadata * toc_metadata);
 DBOOL              afs_toc_metadata_equal(afs_toc_metadata * toc_metadata1, afs_toc_metadata * toc_metadata2);
 
 DBOOL                     afs_toc_metadata_add_source(afs_toc_metadata * toc_metadata, afs_toc_metadata_source * toc_metadata_source);

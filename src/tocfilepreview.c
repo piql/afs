@@ -16,11 +16,15 @@
 //
 
 #include "tocfilepreview.h"
-#include "boxing/platform/memory.h"
+#include "boxing/math/math.h"
 #include "boxing/string.h"
 #include "xmlutils.h"
 #include "boxing/log.h"
 #include "mxml.h"
+
+//  SYSTEM INCLUDES
+//
+#include <limits.h>
 
 //  DEFINES
 //
@@ -65,7 +69,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
 
 afs_toc_file_preview* afs_toc_file_preview_create()
 {
-    afs_toc_file_preview* toc_file_preview = BOXING_MEMORY_ALLOCATE_TYPE(afs_toc_file_preview);
+    afs_toc_file_preview * toc_file_preview = malloc(sizeof(afs_toc_file_preview));
     afs_toc_file_preview_init(toc_file_preview);
     return toc_file_preview;
 }
@@ -85,7 +89,7 @@ afs_toc_file_preview* afs_toc_file_preview_create()
 
 afs_toc_file_preview* afs_toc_file_preview_create2(afs_toc_file_preview_pages* pages)
 {
-    afs_toc_file_preview* toc_file_preview = BOXING_MEMORY_ALLOCATE_TYPE(afs_toc_file_preview);
+    afs_toc_file_preview* toc_file_preview = malloc(sizeof(afs_toc_file_preview));
     afs_toc_file_preview_init2(toc_file_preview, pages);
     return toc_file_preview;
 }
@@ -110,6 +114,8 @@ void afs_toc_file_preview_init(afs_toc_file_preview * toc_file_preview)
 
     toc_file_preview->pages = NULL;
     toc_file_preview->dpi = -1;
+
+    toc_file_preview->reference_count = 1;
 }
 
 
@@ -124,7 +130,7 @@ void afs_toc_file_preview_init(afs_toc_file_preview * toc_file_preview)
  *  \param[in]  pages             Pointer to the vector with afs_toc_file_preview_page structure pointers.
  */
 
-void afs_toc_file_preview_init2(afs_toc_file_preview * toc_file_preview, afs_toc_file_preview_pages* pages)
+void afs_toc_file_preview_init2(afs_toc_file_preview * toc_file_preview, afs_toc_file_preview_pages * pages)
 {
     if (toc_file_preview == NULL)
     {
@@ -133,6 +139,8 @@ void afs_toc_file_preview_init2(afs_toc_file_preview * toc_file_preview, afs_toc
 
     toc_file_preview->pages = pages;
     toc_file_preview->dpi = -1;
+
+    toc_file_preview->reference_count = 1;
 }
 
 
@@ -152,17 +160,22 @@ void afs_toc_file_preview_free(afs_toc_file_preview * toc_file_preview)
         return;
     }
 
-    if (toc_file_preview->pages != NULL)
-    {
-        for (unsigned int i = 0; i < toc_file_preview->pages->size; i++)
-        {
-            afs_toc_file_preview_page_free(GVECTORN(toc_file_preview->pages, afs_toc_file_preview_page *, i));
-            GVECTORN(toc_file_preview->pages, afs_toc_file_preview_page *, i) = NULL;
-        }
-    }
+    toc_file_preview->reference_count--;
 
-    gvector_free(toc_file_preview->pages);
-    boxing_memory_free(toc_file_preview);
+    if (toc_file_preview->reference_count <= 0)
+    {
+        if (toc_file_preview->pages != NULL)
+        {
+            for (unsigned int i = 0; i < toc_file_preview->pages->size; i++)
+            {
+                afs_toc_file_preview_page_free(GVECTORN(toc_file_preview->pages, afs_toc_file_preview_page *, i));
+                GVECTORN(toc_file_preview->pages, afs_toc_file_preview_page *, i) = NULL;
+            }
+        }
+
+        gvector_free(toc_file_preview->pages);
+        free(toc_file_preview);
+    }
 }
 
 
@@ -177,8 +190,9 @@ void afs_toc_file_preview_free(afs_toc_file_preview * toc_file_preview)
  *  \return new copy of afs_toc_file_preview structure or NULL.
  */
 
-afs_toc_file_preview* afs_toc_file_preview_clone(const afs_toc_file_preview * toc_file_preview)
+afs_toc_file_preview * afs_toc_file_preview_clone(const afs_toc_file_preview * toc_file_preview)
 {
+    // If TOC file preview pointer is NULL return NULL.
     if (toc_file_preview == NULL)
     {
         return NULL;
@@ -202,6 +216,31 @@ afs_toc_file_preview* afs_toc_file_preview_clone(const afs_toc_file_preview * to
     return_toc_file_preview->dpi = toc_file_preview->dpi;
 
     return return_toc_file_preview;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function returns a new reference to the input afs_toc_file_preview structure.
+ *
+ *  Function returns a new reference to the input afs_toc_file_preview structure.
+ *  The reference count is incremented by 1.
+ *  If TOC file preview pointer is NULL function return NULL.
+ *
+ *  \param[in]  toc_file_preview  Pointer to the afs_toc_file_preview structure.
+ *  \return new reference of afs_toc_file_preview structure or NULL.
+ */
+
+afs_toc_file_preview * afs_toc_file_preview_get_new_reference(afs_toc_file_preview * toc_file_preview)
+{
+    // If TOC file preview pointer is NULL return NULL.
+    if (toc_file_preview == NULL)
+    {
+        return NULL;
+    }
+
+    toc_file_preview->reference_count++;
+    return toc_file_preview;
 }
 
 
@@ -503,6 +542,9 @@ DBOOL afs_toc_file_preview_get_frames_count(afs_toc_file_preview * toc_file_prev
     }
 
     *frames_count = 0;
+    unsigned int firstFrame = INT_MAX;
+    unsigned int lastFrame = 0;
+
     unsigned int preview_page_count = afs_toc_file_preview_get_page_count(toc_file_preview);
     for (unsigned int p = 0; p < preview_page_count; p++)
     {
@@ -518,7 +560,17 @@ DBOOL afs_toc_file_preview_get_frames_count(afs_toc_file_preview * toc_file_prev
         {
             return DFALSE;
         }
-        *frames_count += f;
+
+        if ( f > 0 )
+        {
+            firstFrame = BOXING_MATH_MIN( firstFrame, toc_file_preview_page->start_frame );
+            lastFrame = BOXING_MATH_MAX( lastFrame, toc_file_preview_page->start_frame + f - 1 );
+        }
+    }
+
+    if ( firstFrame != INT_MAX )
+    {
+        *frames_count = (lastFrame - firstFrame + 1);
     }
 
     return DTRUE;
@@ -561,7 +613,6 @@ DBOOL afs_toc_file_preview_save_file(afs_toc_file_preview * toc_file_preview, co
 
     if (fp_save == NULL)
     {
-        mxmlDelete(tree);
         return DFALSE;
     }
 
@@ -598,6 +649,7 @@ DBOOL afs_toc_file_preview_save_file(afs_toc_file_preview * toc_file_preview, co
 
 char * afs_toc_file_preview_save_string(afs_toc_file_preview * toc_file_preview, DBOOL compact)
 {
+    // If TOC file preview page pointer is NULL return DFALSE
     if (toc_file_preview == NULL)
     {
         return DFALSE;
@@ -643,6 +695,7 @@ char * afs_toc_file_preview_save_string(afs_toc_file_preview * toc_file_preview,
 
 DBOOL afs_toc_file_preview_save_xml(afs_toc_file_preview * toc_file_preview, mxml_node_t* out)
 {
+    // If output node pointer is NULL or TOC file preview pointer is NULL return DFALSE
     if (out == NULL || toc_file_preview == NULL)
     {
         return DFALSE;
@@ -689,6 +742,7 @@ DBOOL afs_toc_file_preview_save_xml(afs_toc_file_preview * toc_file_preview, mxm
 
 DBOOL afs_toc_file_preview_load_file(afs_toc_file_preview * toc_file_preview, const char * file_name)
 {
+    // If input file name string pointer is NULL or TOC file preview pointer is NULL return DFALSE
     if (file_name == NULL || toc_file_preview == NULL)
     {
         return DFALSE;
@@ -707,8 +761,16 @@ DBOOL afs_toc_file_preview_load_file(afs_toc_file_preview * toc_file_preview, co
 
     mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
 
-    DBOOL return_value = afs_toc_file_preview_load_xml(toc_file_preview, document);
+    if (document == NULL)
+    {
+        fclose(fp_load);
+        mxmlDelete(document);
 
+        return DFALSE;
+    }
+    
+    DBOOL return_value = afs_toc_file_preview_load_xml(toc_file_preview, document);
+    
     fclose(fp_load);
     mxmlDelete(document);
 
@@ -730,6 +792,7 @@ DBOOL afs_toc_file_preview_load_file(afs_toc_file_preview * toc_file_preview, co
 
 DBOOL afs_toc_file_preview_load_string(afs_toc_file_preview * toc_file_preview, const char * in)
 {
+    // If input string pointer is NULL or TOC file preview pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") == DTRUE || toc_file_preview == NULL)
     {
         return DFALSE;
@@ -737,11 +800,14 @@ DBOOL afs_toc_file_preview_load_string(afs_toc_file_preview * toc_file_preview, 
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    DBOOL return_value = afs_toc_file_preview_load_xml(toc_file_preview, document);
+    if (!afs_toc_file_preview_load_xml(toc_file_preview, document))
+    {
+        return DFALSE;
+    }
 
     mxmlDelete(document);
 
-    return return_value;
+    return DTRUE;
 }
 
 
@@ -759,6 +825,7 @@ DBOOL afs_toc_file_preview_load_string(afs_toc_file_preview * toc_file_preview, 
 
 DBOOL afs_toc_file_preview_load_xml(afs_toc_file_preview * toc_file_preview, mxml_node_t* node)
 {
+    // If input node pointer is NULL or TOC file preview pointer is NULL return DFALSE
     if (node == NULL || toc_file_preview == NULL)
     {
         return DFALSE;
@@ -830,7 +897,7 @@ DBOOL afs_toc_file_preview_load_xml(afs_toc_file_preview * toc_file_preview, mxm
 
 static const char * whitespace_cb(mxml_node_t *node, int where)
 {
-    const char *name;
+    const char *name, *parent_name;
 
     /*
     * We can conditionally break to a new line
@@ -839,6 +906,10 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
     */
 
     name = mxmlGetElement(node);
+    parent_name = mxmlGetElement(node->parent);
+
+    /// \todo warning: variable ‘parent_name’ set but not used [-Wunused-but-set-variable]
+    (void) parent_name;
 
     if (boxing_string_equal("preview", name))
     {

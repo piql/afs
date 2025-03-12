@@ -16,7 +16,6 @@
 //
 
 #include "tocdatareels.h"
-#include "boxing/platform/memory.h"
 #include "boxing/log.h"
 #include "boxing/utils.h"
 
@@ -60,8 +59,9 @@ static const char *               whitespace_cb(mxml_node_t *node, int where);
 
 afs_toc_data_reels * afs_toc_data_reels_create()
 {
-    afs_toc_data_reels * toc_data_reels = BOXING_MEMORY_ALLOCATE_TYPE(afs_toc_data_reels);
+    afs_toc_data_reels * toc_data_reels = malloc(sizeof(afs_toc_data_reels));
     toc_data_reels->reels = NULL;
+    toc_data_reels->reference_count = 1;
     return toc_data_reels;
 }
 
@@ -79,8 +79,9 @@ afs_toc_data_reels * afs_toc_data_reels_create()
 
 afs_toc_data_reels * afs_toc_data_reels_create2(afs_toc_data_reels_vector * reels)
 {
-    afs_toc_data_reels * toc_data_reels = BOXING_MEMORY_ALLOCATE_TYPE(afs_toc_data_reels);
+    afs_toc_data_reels * toc_data_reels = malloc(sizeof(afs_toc_data_reels));
     toc_data_reels->reels = reels;
+    toc_data_reels->reference_count = 1;
     return toc_data_reels;
 }
 
@@ -101,17 +102,22 @@ void afs_toc_data_reels_free(afs_toc_data_reels * toc_data_reels)
         return;
     }
 
-    if (toc_data_reels->reels != NULL)
-    {
-        for (unsigned int i = 0; i < toc_data_reels->reels->size; i++)
-        {
-            afs_toc_data_reel_free(GVECTORN(toc_data_reels->reels, afs_toc_data_reel *, i));
-            GVECTORN(toc_data_reels->reels, afs_toc_data_reel *, i) = NULL;
-        }
-    }
+    toc_data_reels->reference_count--;
 
-    gvector_free(toc_data_reels->reels);
-    boxing_memory_free(toc_data_reels);
+    if (toc_data_reels->reference_count <= 0)
+    {
+        if (toc_data_reels->reels != NULL)
+        {
+            for (unsigned int i = 0; i < toc_data_reels->reels->size; i++)
+            {
+                afs_toc_data_reel_free(GVECTORN(toc_data_reels->reels, afs_toc_data_reel *, i));
+                GVECTORN(toc_data_reels->reels, afs_toc_data_reel *, i) = NULL;
+            }
+        }
+
+        gvector_free(toc_data_reels->reels);
+        free(toc_data_reels);
+    }
 }
 
 
@@ -128,6 +134,7 @@ void afs_toc_data_reels_free(afs_toc_data_reels * toc_data_reels)
 
 afs_toc_data_reels * afs_toc_data_reels_clone(afs_toc_data_reels * toc_data_reels)
 {
+    // If TOC data reels pointer is NULL return NULL.
     if (toc_data_reels == NULL)
     {
         return NULL;
@@ -147,6 +154,31 @@ afs_toc_data_reels * afs_toc_data_reels_clone(afs_toc_data_reels * toc_data_reel
     }
 
     return return_toc_data_reels;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function returns a new reference to the input afs_toc_data_reels structure.
+ *
+ *  Function returns a new reference to the input afs_toc_data_reels structure.
+ *  The reference count is incremented by 1.
+ *  If TOC data reels pointer is NULL function return NULL.
+ *
+ *  \param[in]  toc_data_reels  Pointer to the afs_toc_data_reels structure.
+ *  \return new reference of afs_toc_data_reels structure or NULL.
+ */
+
+afs_toc_data_reels * afs_toc_data_reels_get_new_reference(afs_toc_data_reels * toc_data_reels)
+{
+    // If TOC data reels pointer is NULL return NULL.
+    if (toc_data_reels == NULL)
+    {
+        return NULL;
+    }
+
+    toc_data_reels->reference_count++;
+    return toc_data_reels;
 }
 
 
@@ -374,7 +406,6 @@ DBOOL afs_toc_data_reels_save_file(afs_toc_data_reels * toc_data_reels, const ch
 
     if (fp_save == NULL)
     {
-        mxmlDelete(tree);
         return DFALSE;
     }
 
@@ -411,6 +442,7 @@ DBOOL afs_toc_data_reels_save_file(afs_toc_data_reels * toc_data_reels, const ch
 
 char * afs_toc_data_reels_save_string(afs_toc_data_reels * toc_data_reels, DBOOL compact)
 {
+    // If TOC data reels pointer is NULL return DFALSE
     if (toc_data_reels == NULL)
     {
         return NULL;
@@ -456,6 +488,7 @@ char * afs_toc_data_reels_save_string(afs_toc_data_reels * toc_data_reels, DBOOL
 
 DBOOL afs_toc_data_reels_save_xml(afs_toc_data_reels * toc_data_reels, mxml_node_t * out)
 {
+    // If output node pointer is NULL or TOC data reels pointer is NULL return DFALSE
     if (out == NULL || toc_data_reels == NULL)
     {
         return DFALSE;
@@ -496,6 +529,7 @@ DBOOL afs_toc_data_reels_save_xml(afs_toc_data_reels * toc_data_reels, mxml_node
 
 DBOOL afs_toc_data_reels_load_file(afs_toc_data_reels * toc_data_reels, const char * file_name)
 {
+    // If input file name string pointer is NULL or TOC data reels pointer is NULL return DFALSE
     if (file_name == NULL || toc_data_reels == NULL)
     {
         return DFALSE;
@@ -513,9 +547,17 @@ DBOOL afs_toc_data_reels_load_file(afs_toc_data_reels * toc_data_reels, const ch
     }
 
     mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
+    
+    if (document == NULL)
+    {
+        fclose(fp_load);
+        mxmlDelete(document);
 
+        return DFALSE;
+    }
+    
     DBOOL return_value = afs_toc_data_reels_load_xml(toc_data_reels, document);
-
+    
     fclose(fp_load);
     mxmlDelete(document);
 
@@ -537,6 +579,7 @@ DBOOL afs_toc_data_reels_load_file(afs_toc_data_reels * toc_data_reels, const ch
 
 DBOOL afs_toc_data_reels_load_string(afs_toc_data_reels * toc_data_reels, const char * in)
 {
+    // If input string pointer is NULL or TOC data reels pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || toc_data_reels == NULL)
     {
         return DFALSE;
@@ -544,11 +587,14 @@ DBOOL afs_toc_data_reels_load_string(afs_toc_data_reels * toc_data_reels, const 
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    DBOOL return_value = afs_toc_data_reels_load_xml(toc_data_reels, document);
+    if (!afs_toc_data_reels_load_xml(toc_data_reels, document))
+    {
+        return DFALSE;
+    }
 
     mxmlDelete(document);
 
-    return return_value;
+    return DTRUE;
 }
 
 
@@ -566,6 +612,7 @@ DBOOL afs_toc_data_reels_load_string(afs_toc_data_reels * toc_data_reels, const 
 
 DBOOL afs_toc_data_reels_load_xml(afs_toc_data_reels * toc_data_reels, mxml_node_t * node)
 {
+    // If input node pointer is NULL or TOC data reels pointer is NULL return DFALSE
     if (node == NULL || toc_data_reels == NULL)
     {
         return DFALSE;
@@ -586,7 +633,6 @@ DBOOL afs_toc_data_reels_load_xml(afs_toc_data_reels * toc_data_reels, mxml_node
             if (load_reel_result == DFALSE)
             {
                 DLOG_INFO("Has no REEL.\n");
-                afs_toc_data_reel_free(toc_data_reel);
                 return DFALSE;
             }
 

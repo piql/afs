@@ -9,7 +9,7 @@
 
 * Afslib
 
-*afslib* is a library for reading Archival File Systems (*AFS*). The *AFS* has unique preservation capabilites, including support for human readable data, file format ids and other types of metadata. A design goal for *AFS* is to provide a completely self contained file system, containing all information needed to decede and understand its content in the near and distant future. The *AFS* file system is primarily intended for *linear tape storeage* mediums.
+*afslib* is a library for reading Archival File Systems (*AFS*). The *AFS* has unique preservation capabilites, including support for human readable data, file format ids and other types of metadata. A design goal for *AFS* is to provide a completely self contained file system, containing all information needed to decede and understand its content in the near and distant future. The *AFS* file system is primarily intended for *linear tape storage* mediums.
 
 The key components in the *AFS* is the *zero-reference-mark* indicating the start of the file system, the *control-frame* containing information about how to decode the rest of the reel and the *table-of-content* pointing to all files stored on the reel. The file system is organised into sectors, called *frames*, where a frame occupies a rectangle on the storage medium surface. The frame can contain either visual or digital data. The data on the frame could be encoded using any kind of 2D barcode format. Current instances of AFS uses the boxinglib 2D barcode format.
 
@@ -38,7 +38,7 @@ A design goal is to have as few dependencies as possible.
 git clone https://github.com/piql/afs
 cd afs
 ./autogen.sh
-./configure LIBBOXING_DIR=<absolute path to boxinglib>
+./configure LIBUNBOXING_DIR=<path to unboxinglib>
 make
 #+END_SRC
 

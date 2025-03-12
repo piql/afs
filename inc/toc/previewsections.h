@@ -30,14 +30,17 @@ typedef gvector afs_toc_preview_sections_vector;
 typedef struct afs_toc_preview_sections_s
 {
     afs_toc_preview_sections_vector * sections;
+
+    int reference_count;
 } afs_toc_preview_sections;
 
 afs_toc_preview_sections * afs_toc_preview_sections_create();
-afs_toc_preview_sections * afs_toc_preview_sections_create2(mxml_node_t* sections_node);
+afs_toc_preview_sections * afs_toc_preview_sections_create2(mxml_node_t * sections_node);
 
 void                       afs_toc_preview_sections_free(afs_toc_preview_sections * toc_preview_sections);
 
 afs_toc_preview_sections * afs_toc_preview_sections_clone(const afs_toc_preview_sections * toc_preview_sections);
+afs_toc_preview_sections * afs_toc_preview_sections_get_new_reference(afs_toc_preview_sections * toc_preview_sections);
 DBOOL                      afs_toc_preview_sections_equal(const afs_toc_preview_sections * toc_preview_sections1, const afs_toc_preview_sections * toc_preview_sections2);
 
 DBOOL                      afs_toc_preview_sections_is_valid(const afs_toc_preview_sections * toc_preview_sections);

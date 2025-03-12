@@ -15,7 +15,6 @@
 //  PROJECT INCLUDES
 //
 #include "administrativemetadata.h"
-#include "boxing/platform/memory.h"
 #include "boxing/string.h"
 #include "xmlutils.h"
 
@@ -74,7 +73,7 @@ static const char *                      whitespace_cb(mxml_node_t *node, int wh
 
 afs_administrative_metadata * afs_administrative_metadata_create()
 {
-    afs_administrative_metadata * administrative_metadata = BOXING_MEMORY_ALLOCATE_TYPE(afs_administrative_metadata);
+    afs_administrative_metadata * administrative_metadata = malloc(sizeof(afs_administrative_metadata));
     
     administrative_metadata->reel_id = NULL;
     administrative_metadata->print_reel_id = NULL;
@@ -82,6 +81,8 @@ afs_administrative_metadata * afs_administrative_metadata_create()
     administrative_metadata->description = NULL;
     administrative_metadata->creator = NULL;
     administrative_metadata->creation_date = NULL;
+
+    administrative_metadata->reference_count = 1;
     
     return administrative_metadata;
 }
@@ -112,13 +113,16 @@ afs_administrative_metadata * afs_administrative_metadata_create2(
     const char* creator,
     const char* creation_date)
 {
-    afs_administrative_metadata * administrative_metadata = BOXING_MEMORY_ALLOCATE_TYPE(afs_administrative_metadata);
+    afs_administrative_metadata * administrative_metadata = malloc(sizeof(afs_administrative_metadata));
     administrative_metadata->reel_id = boxing_string_clone(reel_id);
     administrative_metadata->print_reel_id = boxing_string_clone(print_reel_id);
     administrative_metadata->title = boxing_string_clone(title);
     administrative_metadata->description = boxing_string_clone(description);
     administrative_metadata->creator = boxing_string_clone(creator);
     administrative_metadata->creation_date = boxing_string_clone(creation_date);
+
+    administrative_metadata->reference_count = 1;
+
     return administrative_metadata;
 }
 
@@ -139,13 +143,18 @@ void afs_administrative_metadata_free(afs_administrative_metadata * administrati
         return;
     }
 
-    boxing_memory_free(administrative_metadata->reel_id);
-    boxing_memory_free(administrative_metadata->print_reel_id);
-    boxing_memory_free(administrative_metadata->title);
-    boxing_memory_free(administrative_metadata->description);
-    boxing_memory_free(administrative_metadata->creator);
-    boxing_memory_free(administrative_metadata->creation_date);
-    boxing_memory_free(administrative_metadata);
+    administrative_metadata->reference_count--;
+
+    if (administrative_metadata->reference_count <= 0)
+    {
+        free(administrative_metadata->reel_id);
+        free(administrative_metadata->print_reel_id);
+        free(administrative_metadata->title);
+        free(administrative_metadata->description);
+        free(administrative_metadata->creator);
+        free(administrative_metadata->creation_date);
+        free(administrative_metadata);
+    }
 }
 
 
@@ -162,6 +171,7 @@ void afs_administrative_metadata_free(afs_administrative_metadata * administrati
 
 afs_administrative_metadata * afs_administrative_metadata_clone(const afs_administrative_metadata * administrative_metadata)
 {
+    // If administrative metadata pointer is NULL return NULL.
     if (administrative_metadata == NULL)
     {
         return NULL;
@@ -176,6 +186,31 @@ afs_administrative_metadata * afs_administrative_metadata_clone(const afs_admini
     return_administrative_metadata->creation_date = boxing_string_clone(administrative_metadata->creation_date);
 
     return return_administrative_metadata;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function returns a new reference to the input afs_administrative_metadata structure.
+ *
+ *  Function returns a new reference to the input afs_administrative_metadata structure.
+ *  The reference count is incremented by 1.
+ *  If administrative metadata pointer is NULL function return NULL.
+ *
+ *  \param[in]  administrative_metadata  Pointer to the afs_administrative_metadata structure.
+ *  \return new reference of afs_administrative_metadata structure or NULL.
+ */
+
+afs_administrative_metadata * afs_administrative_metadata_get_new_reference(afs_administrative_metadata * administrative_metadata)
+{
+    // If administrative metadata pointer is NULL return NULL.
+    if (administrative_metadata == NULL)
+    {
+        return NULL;
+    }
+
+    administrative_metadata->reference_count++;
+    return administrative_metadata;
 }
 
 
@@ -228,6 +263,7 @@ DBOOL afs_administrative_metadata_equal(const afs_administrative_metadata * admi
 
 void afs_administrative_metadata_set_reel_id(afs_administrative_metadata * administrative_metadata, const char * reel_id)
 {
+    // If administrative metadata pointer is NULL return
     if (administrative_metadata == NULL)
     {
         return;
@@ -254,6 +290,7 @@ void afs_administrative_metadata_set_reel_id(afs_administrative_metadata * admin
 
 void afs_administrative_metadata_set_print_reel_id(afs_administrative_metadata * administrative_metadata, const char * print_reel_id)
 {
+    // If administrative metadata pointer is NULL return
     if (administrative_metadata == NULL)
     {
         return;
@@ -280,6 +317,7 @@ void afs_administrative_metadata_set_print_reel_id(afs_administrative_metadata *
 
 void afs_administrative_metadata_set_title(afs_administrative_metadata * administrative_metadata, const char * title)
 {
+    // If administrative metadata pointer is NULL return
     if (administrative_metadata == NULL)
     {
         return;
@@ -306,6 +344,7 @@ void afs_administrative_metadata_set_title(afs_administrative_metadata * adminis
 
 void afs_administrative_metadata_set_description(afs_administrative_metadata * administrative_metadata, const char * description)
 {
+    // If administrative metadata pointer is NULL return
     if (administrative_metadata == NULL)
     {
         return;
@@ -332,6 +371,7 @@ void afs_administrative_metadata_set_description(afs_administrative_metadata * a
 
 void afs_administrative_metadata_set_creator(afs_administrative_metadata * administrative_metadata, const char * creator)
 {
+    // If administrative metadata pointer is NULL return
     if (administrative_metadata == NULL)
     {
         return;
@@ -358,6 +398,7 @@ void afs_administrative_metadata_set_creator(afs_administrative_metadata * admin
 
 void afs_administrative_metadata_set_creation_date(afs_administrative_metadata * administrative_metadata, const char * creation_date)
 {
+    // If administrative metadata pointer is NULL return
     if (administrative_metadata == NULL)
     {
         return;
@@ -445,6 +486,7 @@ DBOOL afs_administrative_metadata_save_file(afs_administrative_metadata * admini
 
 char * afs_administrative_metadata_save_string(afs_administrative_metadata * administrative_metadata, DBOOL compact)
 {
+    // If TOC data reel pointer is NULL return DFALSE
     if (administrative_metadata == NULL)
     {
         return NULL;
@@ -490,6 +532,7 @@ char * afs_administrative_metadata_save_string(afs_administrative_metadata * adm
 
 DBOOL afs_administrative_metadata_save_xml(afs_administrative_metadata * administrative_metadata, mxml_node_t * out)
 {
+    // If output node pointer is NULL or administrative metadata pointer is NULL return DFALSE
     if (out == NULL || administrative_metadata == NULL)
     {
         return DFALSE;
@@ -501,11 +544,14 @@ DBOOL afs_administrative_metadata_save_xml(afs_administrative_metadata * adminis
 
     for (unsigned int i = 0; i < AFS_ADMINISTRATIVE_METADATA_TAG_COUNT; i++)
     {
-        mxml_node_t * current_tag = mxmlNewElement(administrative_metadata_node, tags[i].tag);
-        afs_xmlutils_set_node_text(*tags[i].content, current_tag);
+        if (*tags[i].content != NULL)
+        {
+            mxml_node_t * current_tag = mxmlNewElement(administrative_metadata_node, tags[i].tag);
+            afs_xmlutils_set_node_text(*tags[i].content, current_tag);
+        }
     }
 
-    boxing_memory_free(tags);
+    free(tags);
 
     return DTRUE;
 }
@@ -525,6 +571,7 @@ DBOOL afs_administrative_metadata_save_xml(afs_administrative_metadata * adminis
 
 DBOOL afs_administrative_metadata_load_file(afs_administrative_metadata * administrative_metadata, const char * file_name)
 {
+    // If input file name string pointer is NULL or administrative metadata pointer is NULL return DFALSE
     if (file_name == NULL || administrative_metadata == NULL)
     {
         return DFALSE;
@@ -574,6 +621,7 @@ DBOOL afs_administrative_metadata_load_file(afs_administrative_metadata * admini
 
 DBOOL afs_administrative_metadata_load_string(afs_administrative_metadata * administrative_metadata, const char * in)
 {
+    // If input string pointer is NULL or TOC data reel pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || administrative_metadata == NULL)
     {
         return DFALSE;
@@ -606,6 +654,7 @@ DBOOL afs_administrative_metadata_load_string(afs_administrative_metadata * admi
 
 DBOOL afs_administrative_metadata_load_xml(afs_administrative_metadata* administrative_metadata, mxml_node_t * in)
 {
+    // If input data pointer is NULL or administrative metadata pointer is NULL return DFALSE
     if (in == NULL || administrative_metadata == NULL)
     {
         return DFALSE;
@@ -626,14 +675,19 @@ DBOOL afs_administrative_metadata_load_xml(afs_administrative_metadata* administ
 
         if (current_tag_node == NULL)
         {
-            boxing_memory_free(tags);
-            return DFALSE;
+            *tags[i].content = NULL;
         }
-
-        *tags[i].content = afs_xmlutils_get_node_text(current_tag_node);
+        else
+        {
+            *tags[i].content = afs_xmlutils_get_node_text(current_tag_node);
+            if (*tags[i].content == NULL)
+            {
+                *tags[i].content = boxing_string_clone("");
+            }
+        }
     }
 
-    boxing_memory_free(tags);
+    free(tags);
 
     return DTRUE;
 }
@@ -650,7 +704,7 @@ DBOOL afs_administrative_metadata_load_xml(afs_administrative_metadata* administ
 
 static afs_administrative_metadata_tag * get_tags_list(afs_administrative_metadata * control_data)
 {
-    afs_administrative_metadata_tag * tags = BOXING_MEMORY_ALLOCATE_TYPE_ARRAY(afs_administrative_metadata_tag, AFS_ADMINISTRATIVE_METADATA_TAG_COUNT);
+    afs_administrative_metadata_tag *tags = calloc(AFS_ADMINISTRATIVE_METADATA_TAG_COUNT, sizeof(afs_administrative_metadata_tag));
     tags[0].tag = "ReelId";
     tags[0].content = &control_data->reel_id;
 

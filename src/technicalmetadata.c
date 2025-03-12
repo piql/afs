@@ -15,7 +15,6 @@
 //  PROJECT INCLUDES
 //
 #include "technicalmetadata.h"
-#include "boxing/platform/memory.h"
 
 // PRIVATE INTERFACE
 //
@@ -58,10 +57,12 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
 
 afs_technical_metadata * afs_technical_metadata_create()
 {
-    afs_technical_metadata * technical_metadata = BOXING_MEMORY_ALLOCATE_TYPE(afs_technical_metadata);
+    afs_technical_metadata * technical_metadata = malloc(sizeof(afs_technical_metadata));
 
     technical_metadata->afs_content_boxing_format = NULL;
     technical_metadata->afs_tocs = NULL;
+
+    technical_metadata->reference_count = 1;
 
     return technical_metadata;
 }
@@ -82,10 +83,12 @@ afs_technical_metadata * afs_technical_metadata_create()
 
 afs_technical_metadata * afs_technical_metadata_create2(afs_toc_files * tocs, afs_boxing_format * content_boxing_format)
 {
-    afs_technical_metadata * technical_metadata = BOXING_MEMORY_ALLOCATE_TYPE(afs_technical_metadata);
+    afs_technical_metadata * technical_metadata = malloc(sizeof(afs_technical_metadata));
 
     technical_metadata->afs_tocs = tocs;
     technical_metadata->afs_content_boxing_format = content_boxing_format;
+
+    technical_metadata->reference_count = 1;
 
     return technical_metadata;
 }
@@ -107,10 +110,15 @@ void afs_technical_metadata_free(afs_technical_metadata* technical_metadata)
         return;
     }
 
-    afs_boxing_format_free(technical_metadata->afs_content_boxing_format);
-    afs_toc_files_free(technical_metadata->afs_tocs);
+    technical_metadata->reference_count--;
 
-    boxing_memory_free(technical_metadata);
+    if (technical_metadata->reference_count <= 0)
+    {
+        afs_boxing_format_free(technical_metadata->afs_content_boxing_format);
+        afs_toc_files_free(technical_metadata->afs_tocs);
+
+        free(technical_metadata);
+    }
 }
 
 
@@ -127,6 +135,7 @@ void afs_technical_metadata_free(afs_technical_metadata* technical_metadata)
 
 afs_technical_metadata * afs_technical_metadata_clone(const afs_technical_metadata * technical_metadata)
 {
+    // If technical metadata pointer is NULL return NULL.
     if (technical_metadata == NULL)
     {
         return NULL;
@@ -137,6 +146,31 @@ afs_technical_metadata * afs_technical_metadata_clone(const afs_technical_metada
     return_technical_metadata->afs_content_boxing_format = technical_metadata->afs_content_boxing_format == NULL ? NULL : afs_boxing_format_create2(technical_metadata->afs_content_boxing_format->config);
 
     return return_technical_metadata;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function returns a new reference to the input afs_technical_metadata structure.
+ *
+ *  Function returns a new reference to the input afs_technical_metadata structure.
+ *  The reference count is incremented by 1.
+ *  If technical metadata pointer is NULL function return NULL.
+ *
+ *  \param[in]  technical_metadata  Pointer to the afs_technical_metadata structure.
+ *  \return new reference of afs_technical_metadata structure or NULL.
+ */
+
+afs_technical_metadata * afs_technical_metadata_get_new_reference(afs_technical_metadata * technical_metadata)
+{
+    // If technical metadata pointer is NULL return NULL.
+    if (technical_metadata == NULL)
+    {
+        return NULL;
+    }
+
+    technical_metadata->reference_count++;
+    return technical_metadata;
 }
 
 
@@ -212,6 +246,8 @@ DBOOL afs_technical_metadata_save_file(afs_technical_metadata * technical_metada
         return DFALSE;
     }
 
+    mxml_node_t *tree = mxmlNewXML("1.0");
+
 #ifndef WIN32
     FILE * fp_save = fopen(file_name, "w+");
 #else
@@ -222,8 +258,6 @@ DBOOL afs_technical_metadata_save_file(afs_technical_metadata * technical_metada
     {
         return DFALSE;
     }
-
-    mxml_node_t *tree = mxmlNewXML("1.0");
 
     if (!afs_technical_metadata_save_xml(technical_metadata, tree))
     {
@@ -265,6 +299,7 @@ DBOOL afs_technical_metadata_save_file(afs_technical_metadata * technical_metada
 
 char * afs_technical_metadata_save_string(afs_technical_metadata * technical_metadata, DBOOL compact)
 {
+    // If technical metadata pointer is NULL return DFALSE
     if (technical_metadata == NULL)
     {
         return NULL;
@@ -353,6 +388,7 @@ DBOOL afs_technical_metadata_save_xml(afs_technical_metadata * technical_metadat
 
 DBOOL afs_technical_metadata_load_file(afs_technical_metadata * technical_metadata, const char * file_name)
 {
+    // If input file name string pointer is NULL or technical metadata pointer is NULL return DFALSE
     if (file_name == NULL || technical_metadata == NULL)
     {
         return DFALSE;
@@ -370,9 +406,17 @@ DBOOL afs_technical_metadata_load_file(afs_technical_metadata * technical_metada
     }
 
     mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
+    
+    if (document == NULL)
+    {
+        fclose(fp_load);
+        mxmlDelete(document);
 
+        return DFALSE;
+    }
+    
     DBOOL return_value = afs_technical_metadata_load_xml(technical_metadata, document);
-
+    
     fclose(fp_load);
     mxmlDelete(document);
 
@@ -394,6 +438,7 @@ DBOOL afs_technical_metadata_load_file(afs_technical_metadata * technical_metada
 
 DBOOL afs_technical_metadata_load_string(afs_technical_metadata * technical_metadata, const char * in)
 {
+    // If input string pointer is NULL or technical metadata pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || technical_metadata == NULL)
     {
         return DFALSE;
@@ -401,11 +446,14 @@ DBOOL afs_technical_metadata_load_string(afs_technical_metadata * technical_meta
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    DBOOL return_value = afs_technical_metadata_load_xml(technical_metadata, document);
+    if (!afs_technical_metadata_load_xml(technical_metadata, document))
+    {
+        return DFALSE;
+    }
 
     mxmlDelete(document);
 
-    return return_value;
+    return DTRUE;
 }
 
 
@@ -423,6 +471,7 @@ DBOOL afs_technical_metadata_load_string(afs_technical_metadata * technical_meta
 
 DBOOL afs_technical_metadata_load_xml(afs_technical_metadata* technical_metadata, mxml_node_t * in)
 {
+    // If input data pointer is NULL or technical metadata pointer is NULL return DFALSE
     if (in == NULL || technical_metadata == NULL)
     {
         return DFALSE;

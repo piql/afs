@@ -47,6 +47,8 @@ typedef struct afs_toc_metadata_source_s
     int                            file_id;
     char *                         data;
     afs_toc_metadata_source_tags * tags;
+
+    int reference_count;
 } afs_toc_metadata_source;
 
 afs_toc_metadata_source * afs_toc_metadata_source_create();
@@ -66,6 +68,7 @@ void afs_toc_metadata_source_init3(afs_toc_metadata_source * toc_metadata_source
 void afs_toc_metadata_source_free(afs_toc_metadata_source * toc_metadata_source);
 
 afs_toc_metadata_source * afs_toc_metadata_source_clone(afs_toc_metadata_source * toc_metadata_source);
+afs_toc_metadata_source * afs_toc_metadata_source_get_new_reference(afs_toc_metadata_source * toc_metadata_source);
 DBOOL                     afs_toc_metadata_source_equal(afs_toc_metadata_source * toc_metadata_source1, afs_toc_metadata_source * toc_metadata_source2);
 DBOOL                     afs_toc_metadata_source_is_valid(afs_toc_metadata_source * toc_metadata_source);
 void                      afs_toc_metadata_source_set_tags(afs_toc_metadata_source * toc_metadata_source, const char * tags);

@@ -65,6 +65,8 @@ typedef struct afs_toc_file_s
     afs_toc_file_preview *       preview;
     char *                       file_format;
     afs_toc_data_file_metadata * metadata;
+
+    int reference_count;
 } afs_toc_file;
 
 
@@ -108,6 +110,7 @@ void                afs_toc_file_init2(
 void                afs_toc_file_free(afs_toc_file *);
 
 afs_toc_file *      afs_toc_file_clone(afs_toc_file *);
+afs_toc_file *      afs_toc_file_get_new_reference(afs_toc_file *);
 DBOOL               afs_toc_file_equal(afs_toc_file *, afs_toc_file *);
 DBOOL               afs_toc_file_not_equal(afs_toc_file *, afs_toc_file *);
 

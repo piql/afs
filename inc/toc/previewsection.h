@@ -33,6 +33,8 @@ typedef struct afs_toc_preview_section_s
     unsigned int width;
     unsigned int height;
     unsigned int rotation;
+
+    int reference_count;
 } afs_toc_preview_section;
 
 afs_toc_preview_section *  afs_toc_preview_section_create();
@@ -41,6 +43,7 @@ void                       afs_toc_preview_section_init(afs_toc_preview_section 
 void                       afs_toc_preview_section_free(afs_toc_preview_section * toc_preview_section);
 
 afs_toc_preview_section *  afs_toc_preview_section_clone(const afs_toc_preview_section * toc_preview_section);
+afs_toc_preview_section *  afs_toc_preview_section_get_new_reference(afs_toc_preview_section * toc_preview_section);
 DBOOL                      afs_toc_preview_section_equal(const afs_toc_preview_section * toc_preview_section1, const afs_toc_preview_section * toc_preview_section2);
 DBOOL                      afs_toc_preview_section_is_valid(const afs_toc_preview_section * toc_preview_section);
 unsigned int               afs_toc_preview_section_content_width(const afs_toc_preview_section * toc_preview_section);

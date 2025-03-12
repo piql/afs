@@ -25,7 +25,8 @@ extern "C" {
 
 void  afs_xmlutils_set_node_text(const char* text, mxml_node_t* node);
 char* afs_xmlutils_get_node_text(mxml_node_t* node);
-DBOOL afs_xmlutils_get_integer_attribute(int* int_storage, mxml_node_t* node, const char * name);
+char* afs_xmlutils_get_node_text_safe( mxml_node_t* node, const char* default_text );
+DBOOL afs_xmlutils_get_integer_attribute( int* int_storage, mxml_node_t* node, const char * name );
 DBOOL afs_xmlutils_get_unsigned_integer_attribute(unsigned int* int_storage, mxml_node_t* node, const char * name);
 void  afs_xmlutils_add_new_text_node(mxml_node_t* parent_node, const char * node_name, const char * text);
 void  afs_xmlutils_add_new_int_node(mxml_node_t* parent_node, const char * node_name, int node_value);

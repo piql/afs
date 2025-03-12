@@ -16,7 +16,6 @@
 //
 
 #include "tocfiles.h"
-#include "boxing/platform/memory.h"
 #include "boxing/log.h"
 #include "boxing/utils.h"
 #include <inttypes.h>
@@ -110,7 +109,7 @@ void                              string_copy_strip_newline(char* destination, c
 
 afs_toc_files* afs_toc_files_create()
 {
-    afs_toc_files* toc_files = BOXING_MEMORY_ALLOCATE_TYPE(afs_toc_files);
+    afs_toc_files* toc_files = malloc(sizeof(afs_toc_files));
     afs_toc_files_init(toc_files);
     return toc_files;
 }
@@ -129,7 +128,7 @@ afs_toc_files* afs_toc_files_create()
 
 afs_toc_files* afs_toc_files_create2(afs_toc_indices * tocs)
 {
-    afs_toc_files* toc_files = BOXING_MEMORY_ALLOCATE_TYPE(afs_toc_files);
+    afs_toc_files* toc_files = malloc(sizeof(afs_toc_files));
     afs_toc_files_init2(toc_files, tocs);
     return toc_files;
 }
@@ -153,6 +152,8 @@ void afs_toc_files_init(afs_toc_files * toc_files)
     }
 
     toc_files->tocs = NULL;
+
+    toc_files->reference_count = 1;
 }
 
 
@@ -175,6 +176,8 @@ void afs_toc_files_init2(afs_toc_files * toc_files, afs_toc_indices* tocs)
     }
 
     toc_files->tocs = tocs;
+
+    toc_files->reference_count = 1;
 }
 
 
@@ -194,17 +197,22 @@ void afs_toc_files_free(afs_toc_files * toc_files)
         return;
     }
 
-    if (toc_files->tocs != NULL)
-    {
-        for (unsigned int i = 0; i < toc_files->tocs->size; i++)
-        {
-            afs_toc_file_free(GVECTORN(toc_files->tocs, afs_toc_file *, i));
-            GVECTORN(toc_files->tocs, afs_toc_file *, i) = NULL;
-        }
-    }
+    toc_files->reference_count--;
 
-    gvector_free(toc_files->tocs);
-    boxing_memory_free(toc_files);
+    if (toc_files->reference_count <= 0)
+    {
+        if (toc_files->tocs != NULL)
+        {
+            for (unsigned int i = 0; i < toc_files->tocs->size; i++)
+            {
+                afs_toc_file_free(GVECTORN(toc_files->tocs, afs_toc_file *, i));
+                GVECTORN(toc_files->tocs, afs_toc_file *, i) = NULL;
+            }
+        }
+
+        gvector_free(toc_files->tocs);
+        free(toc_files);
+    }
 }
 
 
@@ -221,6 +229,7 @@ void afs_toc_files_free(afs_toc_files * toc_files)
 
 afs_toc_files* afs_toc_files_clone(afs_toc_files * toc_files)
 {
+    // If TOC files pointer is NULL return NULL.
     if (toc_files == NULL)
     {
         return NULL;
@@ -240,6 +249,31 @@ afs_toc_files* afs_toc_files_clone(afs_toc_files * toc_files)
     }
 
     return return_toc_files;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function returns a new reference to the input afs_toc_files structure.
+ *
+ *  Function returns a new reference to the input afs_toc_files structure.
+ *  The reference count is incremented by 1.
+ *  If TOC files pointer is NULL function return NULL.
+ *
+ *  \param[in]  toc_files  Pointer to the afs_toc_files structure.
+ *  \return new reference of afs_toc_files structure or NULL.
+ */
+
+afs_toc_files * afs_toc_files_get_new_reference(afs_toc_files * toc_files)
+{
+    // If TOC files pointer is NULL return NULL.
+    if (toc_files == NULL)
+    {
+        return NULL;
+    }
+
+    toc_files->reference_count++;
+    return toc_files;
 }
 
 
@@ -408,13 +442,10 @@ size_t afs_toc_files_get_tocs_count( const afs_toc_files * toc_files)
  *  \return frame duration.
  */
 
-int afs_toc_files_get_duration_frames(afs_toc_files * toc_files, unsigned int type)
+int afs_toc_files_get_duration_frames(afs_toc_files * toc_files, unsigned int type, afs_toc_preview_layout_definitions * definitions)
 {
     int first = afs_toc_files_get_first_frame(toc_files, type);
-    afs_toc_preview_layout_definitions * definitions = afs_toc_preview_layout_definitions_create();
     int last = afs_toc_files_get_last_frame(toc_files, type, definitions);
-
-    afs_toc_preview_layout_definitions_free(definitions);
 
     if (first < 0 || last < 0)
     {
@@ -454,19 +485,50 @@ int afs_toc_files_get_first_frame(afs_toc_files * toc_files, unsigned int type)
         return -1;
     }
 
-
-    int start = -1;
-    if (type & AFS_TOC_FILE_TYPE_DIGITAL)
+    if ( type == AFS_TOC_FILE_TYPE_UNDEFINED )
     {
-        start = GVECTORN(toc_files->tocs, afs_toc_file *, 0)->start_frame;
+        return -1;
     }
 
-    if (type & AFS_TOC_FILE_TYPE_PREVIEW)
+    if ( type == AFS_TOC_FILE_TYPE_ALL )
     {
-        DLOG_ERROR("Function afs_toc_files_get_first_frame is only used with type AFS_TOC_FILE_TYPE_DIGITAL.\n");
+        const int firstDigitalFrame = afs_toc_files_get_first_frame( toc_files, AFS_TOC_FILE_TYPE_DIGITAL );
+        const int firstVisualFrame = afs_toc_files_get_first_frame( toc_files, AFS_TOC_FILE_TYPE_PREVIEW );
+        if ( firstDigitalFrame != -1 && firstVisualFrame != -1 )
+        {
+            return BOXING_MATH_MIN( firstVisualFrame, firstDigitalFrame );
+        }
+        else if ( firstDigitalFrame != -1 )
+        {
+            return firstDigitalFrame;
+        }
+        else if ( firstVisualFrame != -1 )
+        {
+            return firstVisualFrame;
+        }
+    }
+    else
+    {
+        for ( size_t i = 0; i < toc_files->tocs->size; i++ )
+        {
+            afs_toc_file * current_toc = GVECTORN( toc_files->tocs, afs_toc_file *, i );
+
+            if ( current_toc != NULL )
+            {
+                if ( (type & AFS_TOC_FILE_TYPE_DIGITAL) && afs_toc_file_is_digital( current_toc ) )
+                {
+                    return current_toc->start_frame;
+                }
+
+                if ( (type & AFS_TOC_FILE_TYPE_PREVIEW) && afs_toc_file_is_preview( current_toc ) )
+                {
+                    return afs_toc_file_preview_get_start_frame( current_toc->preview );
+                }
+            }
+        }
     }
 
-    return start;
+    return -1;
 }
 
 
@@ -485,8 +547,6 @@ int afs_toc_files_get_first_frame(afs_toc_files * toc_files, unsigned int type)
 
 int afs_toc_files_get_last_frame(afs_toc_files * toc_files, unsigned int type, afs_toc_preview_layout_definitions * definitions)
 {
-    BOXING_UNUSED_PARAMETER(definitions);
-
     if (toc_files == NULL)
     {
         return -1;
@@ -502,27 +562,47 @@ int afs_toc_files_get_last_frame(afs_toc_files * toc_files, unsigned int type, a
         return -1;
     }
 
-    int end = -1;
-
-    for (unsigned int i = 0; i < toc_files->tocs->size; i++)
+    if ( type == AFS_TOC_FILE_TYPE_PREVIEW && definitions == NULL )
     {
-        afs_toc_file * current_toc = GVECTORN(toc_files->tocs, afs_toc_file *, i);
+        return -1;
+    }
 
-        if (current_toc != NULL)
+    if ( type == AFS_TOC_FILE_TYPE_UNDEFINED )
+    {
+        return -1;
+    }
+
+    if ( type == AFS_TOC_FILE_TYPE_ALL )
+    {
+        return BOXING_MATH_MAX(
+            afs_toc_files_get_last_frame( toc_files, AFS_TOC_FILE_TYPE_DIGITAL, NULL ), 
+            afs_toc_files_get_last_frame( toc_files, AFS_TOC_FILE_TYPE_PREVIEW, definitions ) );
+    }
+    else
+    {
+        for ( size_t i = toc_files->tocs->size; i > 0; i-- )
         {
-            if (type & AFS_TOC_FILE_TYPE_DIGITAL)
-            {
-                end = BOXING_MATH_MAX( end, current_toc->end_frame);
-            }
+            afs_toc_file * current_toc = GVECTORN( toc_files->tocs, afs_toc_file *, i - 1 );
 
-            if (type & AFS_TOC_FILE_TYPE_PREVIEW)
+            if ( current_toc != NULL )
             {
-                DLOG_ERROR("Function afs_toc_files_get_last_frame is only used with type AFS_TOC_FILE_TYPE_DIGITAL.\n");
+                if ( (type & AFS_TOC_FILE_TYPE_DIGITAL) && afs_toc_file_is_digital( current_toc ) )
+                {
+                    return current_toc->end_frame;
+                }
+
+                if ( (type & AFS_TOC_FILE_TYPE_PREVIEW) && afs_toc_file_is_preview( current_toc ) )
+                {
+                    const int startFrame = afs_toc_file_preview_get_start_frame( current_toc->preview );
+                    unsigned int frameCount;
+                    afs_toc_file_preview_get_frames_count( current_toc->preview, &frameCount, definitions );
+                    return startFrame + frameCount - 1;
+                }
             }
         }
     }
 
-    return end;
+    return -1;
 }
 
 
@@ -648,7 +728,6 @@ DBOOL afs_toc_files_save_file(afs_toc_files * toc_files, const char * file_name,
 
     if (fp_save == NULL)
     {
-        mxmlDelete(tree);
         return DFALSE;
     }
 
@@ -685,6 +764,7 @@ DBOOL afs_toc_files_save_file(afs_toc_files * toc_files, const char * file_name,
 
 char * afs_toc_files_save_string(afs_toc_files * toc_files, DBOOL compact)
 {
+    // If TOC files pointer is NULL return DFALSE
     if (toc_files == NULL)
     {
         return NULL;
@@ -730,6 +810,7 @@ char * afs_toc_files_save_string(afs_toc_files * toc_files, DBOOL compact)
 
 DBOOL afs_toc_files_save_xml(afs_toc_files * toc_files, mxml_node_t* out)
 {
+    // If output node pointer is NULL or TOC files pointer is NULL return DFALSE
     if (out == NULL || toc_files == NULL)
     {
         return DFALSE;
@@ -770,6 +851,7 @@ DBOOL afs_toc_files_save_xml(afs_toc_files * toc_files, mxml_node_t* out)
 
 DBOOL afs_toc_files_load_file(afs_toc_files * toc_files, const char * file_name)
 {
+    // If input file name string pointer is NULL or TOC files pointer is NULL return DFALSE
     if (file_name == NULL || toc_files == NULL)
     {
         return DFALSE;
@@ -787,9 +869,17 @@ DBOOL afs_toc_files_load_file(afs_toc_files * toc_files, const char * file_name)
     }
 
     mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
+    
+    if (document == NULL)
+    {
+        fclose(fp_load);
+        mxmlDelete(document);
 
+        return DFALSE;
+    }
+    
     DBOOL return_value = afs_toc_files_load_xml(toc_files, document);
-
+    
     fclose(fp_load);
     mxmlDelete(document);
 
@@ -811,6 +901,7 @@ DBOOL afs_toc_files_load_file(afs_toc_files * toc_files, const char * file_name)
 
 DBOOL afs_toc_files_load_string(afs_toc_files * toc_files, const char * in)
 {
+    // If input string pointer is NULL or TOC files pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || toc_files == NULL)
     {
         return DFALSE;
@@ -818,11 +909,14 @@ DBOOL afs_toc_files_load_string(afs_toc_files * toc_files, const char * in)
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    DBOOL return_value = afs_toc_files_load_xml(toc_files, document);
+    if (!afs_toc_files_load_xml(toc_files, document))
+    {
+        return DFALSE;
+    }
 
     mxmlDelete(document);
 
-    return return_value;
+    return DTRUE;
 }
 
 
@@ -840,6 +934,7 @@ DBOOL afs_toc_files_load_string(afs_toc_files * toc_files, const char * in)
 
 DBOOL afs_toc_files_load_xml(afs_toc_files * toc_files, mxml_node_t* node)
 {
+    // If input node pointer is NULL or TOC file preview pointer is NULL return DFALSE
     if (node == NULL || toc_files == NULL)
     {
         return DFALSE;
@@ -961,6 +1056,7 @@ char * afs_toc_files_save_as_table(afs_toc_files * toc_files)
 
 char * afs_toc_files_save_as_location_table(afs_toc_files * toc_files)
 {
+    // If TOC files pointer is NULL return NULL
     if (toc_files == NULL)
     {
         return NULL;
@@ -1000,8 +1096,6 @@ char * afs_toc_files_save_as_location_table(afs_toc_files * toc_files)
     char * return_string = boxing_string_allocate(digital_table_length + visual_table_length);
     char * current_string = return_string;
 
-    current_string += sprintf(current_string, "%s", digital_header);
-
     DBOOL digital_header_done = DFALSE;
     for (size_t i = 0; i < toc_files->tocs->size; i++)
     {
@@ -1016,7 +1110,7 @@ char * afs_toc_files_save_as_location_table(afs_toc_files * toc_files)
         {
             if (digital_header_done == DFALSE)
             {
-                current_string += sprintf(current_string, "%s", digital_header2);
+                current_string += sprintf(current_string, "%s%s", digital_header, digital_header2);
                 digital_header_done = DTRUE;
             }
 
@@ -1111,6 +1205,7 @@ char * afs_toc_files_save_as_location_table(afs_toc_files * toc_files)
 
 char * afs_toc_files_save_as_metadata_table(afs_toc_files * toc_files)
 {
+    // If TOC files pointer is NULL return NULL
     if (toc_files == NULL)
     {
         return NULL;
@@ -1131,7 +1226,7 @@ char * afs_toc_files_save_as_metadata_table(afs_toc_files * toc_files)
 
     unsigned int metadata_header_length = (unsigned int)(boxing_string_length(metadata_header) + boxing_string_length(metadata_columns));
     unsigned int metadata_table_width = lengths.file_id_length + lengths.id_length + lengths.source_file_id_length +
-        lengths.source_id_length + lengths.source_format_id_length + lengths.source_data_length + 5 + strlen("\n");
+        lengths.source_id_length + lengths.source_format_id_length + lengths.source_data_length + (unsigned int)5 + (unsigned int)strlen("\n");
     unsigned int metadata_table_length = metadata_header_length + metadata_table_width * lengths.metadata_sources_count + 1;
 
     char * return_string = boxing_string_allocate(metadata_table_length);
@@ -1165,14 +1260,14 @@ char * afs_toc_files_save_as_metadata_table(afs_toc_files * toc_files)
                 if (metadata_header_done == DFALSE)
                 {
                     current_string += sprintf(current_string, "%s", metadata_header);
-                    current_string += sprintf(current_string, metadata_columns);
+                    current_string += sprintf(current_string, "%s", metadata_columns);
                     metadata_header_done = DTRUE;
                 }
 
                 #define MAX_DATA_LENGTH 55
 
                 char data[MAX_DATA_LENGTH];
-                unsigned int data_length = boxing_string_length(metadata_source->data);
+                unsigned int data_length = (unsigned int)boxing_string_length(metadata_source->data);
                 
                 if (data_length >= MAX_DATA_LENGTH)
                 {
@@ -1184,7 +1279,13 @@ char * afs_toc_files_save_as_metadata_table(afs_toc_files * toc_files)
                     string_copy_strip_newline(data, metadata_source->data, data_length + 1);
                 }
 
-                char source_id[10];
+                char source_id[32];
+                if ( lengths.source_id_length > sizeof(source_id))
+                {
+                    boxing_string_free(return_string);
+                    return NULL;
+                }
+                
                 if ( metadata_source->source_id != -1 )
                 {
                     sprintf(source_id, "%0*d", lengths.source_id_length, metadata_source->source_id);
@@ -1207,6 +1308,7 @@ char * afs_toc_files_save_as_metadata_table(afs_toc_files * toc_files)
                     source_id,
                     lengths.source_format_id_length, metadata_source->format_id,
                     data);
+
             }
         }
     }

@@ -15,8 +15,6 @@
 **
 *****************************************************************************/
 
-#include "boxing/platform/memory.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

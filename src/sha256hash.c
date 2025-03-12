@@ -94,7 +94,7 @@ int func_name (afs_hash256_state * md, const unsigned char *in, unsigned long in
     }                                                                                       \
                                                                                             \
     if ((md->state_var.length + inlen) < md->state_var.length)                              \
-    {	                                                                                    \
+    {                                                                                       \
         return CRYPT_HASH_OVERFLOW;                                                         \
     }                                                                                       \
                                                                                             \

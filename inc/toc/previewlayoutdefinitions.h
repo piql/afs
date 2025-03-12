@@ -26,12 +26,15 @@ typedef gvector afs_toc_preview_layout_definitions_vector;
 typedef struct afs_toc_preview_layout_definitions_s
 {
     afs_toc_preview_layout_definitions_vector *  layout_definitions;
+
+    int reference_count;
 } afs_toc_preview_layout_definitions;
 
 afs_toc_preview_layout_definitions * afs_toc_preview_layout_definitions_create();
 void                                 afs_toc_preview_layout_definitions_free(afs_toc_preview_layout_definitions * toc_preview_layout_definitions);
 
 afs_toc_preview_layout_definitions * afs_toc_preview_layout_definitions_clone(const afs_toc_preview_layout_definitions * toc_preview_layout_definitions);
+afs_toc_preview_layout_definitions * afs_toc_preview_layout_definitions_get_new_reference(afs_toc_preview_layout_definitions * toc_preview_layout_definitions);
 DBOOL                                afs_toc_preview_layout_definitions_equal(const afs_toc_preview_layout_definitions * toc_preview_layout_definitions1, const afs_toc_preview_layout_definitions * toc_preview_layout_definitions2);
 DBOOL                                afs_toc_preview_layout_definitions_is_valid(const afs_toc_preview_layout_definitions * toc_preview_layout_definitions);
 

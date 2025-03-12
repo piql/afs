@@ -28,21 +28,24 @@ typedef gvector afs_toc_file_preview_pages;
 // Definition structure afs_toc_file_preview
 typedef struct afs_toc_file_preview_s
 {
-    afs_toc_file_preview_pages* pages;
-    int                         dpi;
+    afs_toc_file_preview_pages * pages;
+    int                          dpi;
+
+    int reference_count;
 } afs_toc_file_preview;
 
 
-afs_toc_file_preview* afs_toc_file_preview_create();
-afs_toc_file_preview* afs_toc_file_preview_create2(afs_toc_file_preview_pages* pages);
+afs_toc_file_preview * afs_toc_file_preview_create();
+afs_toc_file_preview * afs_toc_file_preview_create2(afs_toc_file_preview_pages* pages);
 
 void  afs_toc_file_preview_init(afs_toc_file_preview * toc_file_preview);
 void  afs_toc_file_preview_init2(afs_toc_file_preview * toc_file_preview, afs_toc_file_preview_pages* pages);
 
 void  afs_toc_file_preview_free(afs_toc_file_preview * toc_file_preview);
 
-afs_toc_file_preview* afs_toc_file_preview_clone(const afs_toc_file_preview * toc_file_preview);
-DBOOL                 afs_toc_file_preview_equal(afs_toc_file_preview * toc_file_preview1, afs_toc_file_preview * toc_file_preview2);
+afs_toc_file_preview * afs_toc_file_preview_clone(const afs_toc_file_preview * toc_file_preview);
+afs_toc_file_preview * afs_toc_file_preview_get_new_reference(afs_toc_file_preview * toc_file_preview);
+DBOOL                  afs_toc_file_preview_equal(afs_toc_file_preview * toc_file_preview1, afs_toc_file_preview * toc_file_preview2);
 
 DBOOL                        afs_toc_file_preview_add_page(afs_toc_file_preview * toc_file_preview, afs_toc_file_preview_page * toc_file_preview_page);
 afs_toc_file_preview_page *  afs_toc_file_preview_get_page(afs_toc_file_preview * toc_file_preview, unsigned int index);

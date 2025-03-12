@@ -29,6 +29,8 @@ typedef struct afs_technical_metadata_s
 {
     afs_toc_files *     afs_tocs;
     afs_boxing_format * afs_content_boxing_format;
+
+    int reference_count;
 } afs_technical_metadata;
 
 afs_technical_metadata * afs_technical_metadata_create();
@@ -36,6 +38,7 @@ afs_technical_metadata * afs_technical_metadata_create2(afs_toc_files * toc_file
 void                     afs_technical_metadata_free(afs_technical_metadata*);
 
 afs_technical_metadata * afs_technical_metadata_clone(const afs_technical_metadata * technical_metadata);
+afs_technical_metadata * afs_technical_metadata_get_new_reference(afs_technical_metadata * technical_metadata);
 DBOOL                    afs_technical_metadata_equal(const afs_technical_metadata * technical_metadata1, const afs_technical_metadata * technical_metadata2);
 
 DBOOL                    afs_technical_metadata_save_file(afs_technical_metadata * technical_metadata, const char * file_name, DBOOL compact);

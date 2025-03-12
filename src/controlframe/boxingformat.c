@@ -17,7 +17,6 @@
 #include "controlframe/boxingformat.h"
 #include "boxing/globals.h"
 #include "boxing/log.h"
-#include "boxing/platform/memory.h"
 #include "boxing/graphics/genericframefactory.h"
 #include "boxing/codecs/codecdispatcher.h"
 #include "boxing/math/math.h"
@@ -25,6 +24,19 @@
 static void         set_class_from_xml(boxing_config * config, struct mxml_node_s * dom_node);
 static DBOOL        save_config_xml(mxml_node_t * out, boxing_config * config);
 static const char * whitespace_cb(mxml_node_t *node, int where);
+static void         initialize_instance(afs_boxing_format * boxing_format);
+static const char * get_name(const afs_boxing_format * format);
+static unsigned int get_bytes_per_frame(const afs_boxing_format * format, boxing_frame * frame);
+static unsigned int get_data_bytes_per_frame(const afs_boxing_format * format, boxing_frame * frame);
+static unsigned int get_data_stripe_size(const afs_boxing_format * format);
+static unsigned int get_scaling_factor(const afs_boxing_format * boxing_format);
+static unsigned int get_width(boxing_frame * frame);
+static unsigned int get_height(boxing_frame * frame);
+static unsigned int get_data_frame_width(boxing_frame * frame);
+static unsigned int get_data_frame_height(boxing_frame * frame);
+static unsigned int get_bits_per_pixel(afs_boxing_format * boxing_format, boxing_frame * frame);
+static unsigned int get_symbol_per_pixel(afs_boxing_format * boxing_format);
+static unsigned int get_ceil(const size_t dividend, const unsigned int divisor);
 
 
 //----------------------------------------------------------------------------
@@ -67,10 +79,15 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
  *  \return instance of allocated afs_boxing_format structure.
  */
 
-afs_boxing_format* afs_boxing_format_create()
+afs_boxing_format * afs_boxing_format_create()
 {
-    afs_boxing_format* boxing_format = BOXING_MEMORY_ALLOCATE_TYPE(afs_boxing_format);
-    afs_boxing_format_init(boxing_format);
+    afs_boxing_format * boxing_format = malloc(sizeof(afs_boxing_format));
+
+    boxing_format->config = NULL;
+    initialize_instance(boxing_format);
+
+    boxing_format->reference_count = 1;
+
     return boxing_format;
 }
 
@@ -87,54 +104,16 @@ afs_boxing_format* afs_boxing_format_create()
  *  \return instance of allocated afs_boxing_format structure.
  */
 
-afs_boxing_format* afs_boxing_format_create2(const boxing_config * config)
+afs_boxing_format * afs_boxing_format_create2(const boxing_config * config)
 {
-    afs_boxing_format* boxing_format = BOXING_MEMORY_ALLOCATE_TYPE(afs_boxing_format);
-    afs_boxing_format_init2(boxing_format, config);
-    return boxing_format;
-}
-
-
-//----------------------------------------------------------------------------
-/*!
- *  \brief Initialize .
- *
- *  Initialize input structure pointer with NULL values.
- *  If input pointer is NULL, then return without initialization.
- *
- *  \param[in]  boxing_format  Pointer to the afs_boxing_format structure.
- */
-
-void afs_boxing_format_init(afs_boxing_format* boxing_format)
-{
-    if (boxing_format == NULL)
-    {
-        return;
-    }
-
-    boxing_format->config = NULL;
-}
-
-
-//----------------------------------------------------------------------------
-/*!
- *  \brief Initialize boxing_config structure pointer.
- *
- *  Initialize input boxing_config structure pointer with specified boxing_config structure.
- *  If one of the input pointers is NULL, then return without initialization.
- *
- *  \param[in]  boxing_format  Pointer to the afs_boxing_format structure.
- *  \param[in]  config         Pointer to the boxing_config structure.
- */
-
-void afs_boxing_format_init2(afs_boxing_format* boxing_format, const boxing_config * config)
-{
-    if (boxing_format == NULL)
-    {
-        return;
-    }
-
+    afs_boxing_format * boxing_format = malloc(sizeof(afs_boxing_format));
+    
     boxing_format->config = boxing_config_clone(config);
+    initialize_instance(boxing_format);
+
+    boxing_format->reference_count = 1;
+    
+    return boxing_format;
 }
 
 
@@ -154,8 +133,169 @@ void afs_boxing_format_free(afs_boxing_format* boxing_format)
         return;
     }
 
-    boxing_config_free(boxing_format->config);
-    boxing_memory_free(boxing_format);
+    boxing_format->reference_count--;
+
+    if (boxing_format->reference_count <= 0)
+    {
+        boxing_config_free(boxing_format->config);
+        free(boxing_format);
+    }
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function create a copy of input afs_boxing_format structure.
+ *
+ *  Function create a copy of input afs_boxing_format structure and return it.
+ *  If boxing format pointer is NULL function return NULL.
+ *
+ *  \param[in]  boxing_format  Pointer to the afs_boxing_format structure.
+ *  \return new copy of afs_boxing_format structure or NULL.
+ */
+
+afs_boxing_format * afs_boxing_format_clone(const afs_boxing_format * boxing_format)
+{
+    // If boxing format pointer is NULL return NULL.
+    if (boxing_format == NULL)
+    {
+        return NULL;
+    }
+
+    afs_boxing_format * return_boxing_format = afs_boxing_format_create();
+    return_boxing_format->config = boxing_config_clone(boxing_format->config);
+    return_boxing_format->name = get_name(return_boxing_format);
+    return_boxing_format->bytes_per_frame = boxing_format->bytes_per_frame;
+    return_boxing_format->data_bytes_per_frame = boxing_format->data_bytes_per_frame;
+    return_boxing_format->data_stripe_size = boxing_format->data_stripe_size;
+    return_boxing_format->scaling_factor = boxing_format->scaling_factor;
+    return_boxing_format->width = boxing_format->width;
+    return_boxing_format->height = boxing_format->height;
+    return_boxing_format->data_frame_width = boxing_format->data_frame_width;
+    return_boxing_format->data_frame_height = boxing_format->data_frame_height;
+    return_boxing_format->bits_per_pixel = boxing_format->bits_per_pixel;
+    return_boxing_format->symbol_per_pixel = boxing_format->symbol_per_pixel;
+
+    return return_boxing_format;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function returns a new reference to the input afs_boxing_format structure.
+ *
+ *  Function returns a new reference to the input afs_boxing_format structure.
+ *  The reference count is incremented by 1.
+ *  If boxing format pointer is NULL function return NULL.
+ *
+ *  \param[in]  boxing_format  Pointer to the afs_boxing_format structure.
+ *  \return new reference of afs_boxing_format structure or NULL.
+ */
+
+afs_boxing_format * afs_boxing_format_get_new_reference(afs_boxing_format * boxing_format)
+{
+    // If boxing format pointer is NULL return NULL.
+    if (boxing_format == NULL)
+    {
+        return NULL;
+    }
+
+    boxing_format->reference_count++;
+    return boxing_format;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function checks two instances of the afs_boxing_format structures on the identity.
+ *
+ *  Function checks two instances of the afs_boxing_format structures on the identity.
+ *
+ *  \param[in]   boxing_format1  Pointer to the first instance of the afs_boxing_format structure.
+ *  \param[in]   boxing_format2  Pointer to the second instance of the afs_boxing_format structure.
+ *  \return sign of identity of the input structures.
+ */
+
+DBOOL afs_boxing_format_equal(const afs_boxing_format * boxing_format1, const afs_boxing_format * boxing_format2)
+{
+    if (boxing_format1 == NULL && boxing_format2 == NULL)
+    {
+        return DTRUE;
+    }
+
+    if (boxing_format1 == NULL || boxing_format2 == NULL)
+    {
+        return DFALSE;
+    }
+
+    if (boxing_config_is_equal(boxing_format1->config, boxing_format2->config) == DTRUE &&
+        boxing_string_equal(boxing_format1->name, boxing_format2->name) == DTRUE &&
+        boxing_format1->bytes_per_frame == boxing_format2->bytes_per_frame &&
+        boxing_format1->data_bytes_per_frame == boxing_format2->data_bytes_per_frame &&
+        boxing_format1->data_stripe_size == boxing_format2->data_stripe_size &&
+        boxing_format1->scaling_factor == boxing_format2->scaling_factor &&
+        boxing_format1->width == boxing_format2->width &&
+        boxing_format1->height == boxing_format2->height &&
+        boxing_format1->data_frame_width == boxing_format2->data_frame_width &&
+        boxing_format1->data_frame_height == boxing_format2->data_frame_height &&
+        boxing_format1->bits_per_pixel == boxing_format2->bits_per_pixel &&
+        boxing_format1->symbol_per_pixel == boxing_format2->symbol_per_pixel)
+    {
+        return DTRUE;
+    }
+
+    return DFALSE;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief The function gives the data frames count.
+ *
+ *  Function calculates the data frames count and returns it.
+ *  If afs_boxing_format pointer equal to NULL then function return zero.
+ *
+ *  \param[in]  boxing_format   Pointer to the afs_boxing_format structure.
+ *  \param[in]  file_size       File size.
+ *  \return data frames count or zero.
+ */
+
+unsigned int afs_boxing_format_get_data_frames(const afs_boxing_format * boxing_format, const size_t file_size)
+{
+    if (boxing_format == NULL)
+    {
+        return 0;
+    }
+
+    return get_ceil(file_size, boxing_format->bytes_per_frame);
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief The function sets a new instance of the configuration.
+ *
+ *  The function sets a new configuration instance and initializes the structure data based on the new configuration.
+ *  If the pointer to structure afs_boxing_format is NULL, then the function exits without specifying a new configuration.
+ *
+ *  \param[in]  boxing_format   Pointer to the afs_boxing_format structure.
+ *  \param[in]  config          Pointer to the boxing_config structure.
+ */
+
+void afs_boxing_format_set_config(afs_boxing_format * boxing_format, const boxing_config * config)
+{
+    if (boxing_format == NULL)
+    {
+        return;
+    }
+
+    if (boxing_format->config != NULL)
+    {
+        boxing_config_free(boxing_format->config);
+    }
+
+    boxing_format->config = boxing_config_clone(config);
+    initialize_instance(boxing_format);
 }
 
 
@@ -173,6 +313,7 @@ void afs_boxing_format_free(afs_boxing_format* boxing_format)
 
 DBOOL afs_boxing_format_save_xml(mxml_node_t * out, afs_boxing_format* boxing_format)
 {
+    // If output node pointer is NULL or boxing format pointer is NULL return DFALSE
     if (out == NULL || boxing_format == NULL)
     {
         return DFALSE;
@@ -200,18 +341,17 @@ DBOOL afs_boxing_format_save_xml(mxml_node_t * out, afs_boxing_format* boxing_fo
  *  \return resulting string or NULL.
  */
 
-char * afs_boxing_format_save_string(afs_boxing_format* boxing_format, DBOOL compact)
+char * afs_boxing_format_save_string(afs_boxing_format * boxing_format, DBOOL compact)
 {
     if (boxing_format == NULL)
     {
         return NULL;
     }
 
-    struct mxml_node_s* document = mxmlNewXML("1.0");
+    struct mxml_node_s * document = mxmlNewXML("1.0");
 
     if (!afs_boxing_format_save_xml(document, boxing_format))
     {
-        mxmlDelete(document);
         return NULL;
     }
 
@@ -245,8 +385,9 @@ char * afs_boxing_format_save_string(afs_boxing_format* boxing_format, DBOOL com
  *  \return DTRUE on success.
  */
 
-DBOOL afs_boxing_format_load_xml(afs_boxing_format* boxing_format, mxml_node_t * in)
+DBOOL afs_boxing_format_load_xml(afs_boxing_format * boxing_format, mxml_node_t * in)
 {
+    // If input XML node pointer pointer is NULL or boxing format pointer is NULL return DFALSE
     if (in == NULL || boxing_format == NULL)
     {
         return DFALSE;
@@ -256,6 +397,7 @@ DBOOL afs_boxing_format_load_xml(afs_boxing_format* boxing_format, mxml_node_t *
 
     if (null_node != NULL)
     {
+        afs_boxing_format_set_config(boxing_format, NULL);
         return DTRUE;
     }
 
@@ -266,8 +408,7 @@ DBOOL afs_boxing_format_load_xml(afs_boxing_format* boxing_format, mxml_node_t *
         return DFALSE;
     }
 
-    boxing_config_free(boxing_format->config);
-    boxing_format->config = boxing_config_create();
+    boxing_config * config = boxing_config_create();
 
     mxml_node_t * class_node = mxmlGetFirstChild(work_node);
     while (class_node != NULL)
@@ -276,11 +417,15 @@ DBOOL afs_boxing_format_load_xml(afs_boxing_format* boxing_format, mxml_node_t *
         {
             if (strcmp(mxmlGetElement(class_node), CONFIG_XML_NODE_CLASS) == 0)
             {
-                set_class_from_xml(boxing_format->config, class_node);
+                set_class_from_xml(config, class_node);
             }
         }
         class_node = mxmlWalkNext(class_node, work_node, MXML_NO_DESCEND);
     }
+
+    afs_boxing_format_set_config(boxing_format, config);
+
+    boxing_config_free(config);
 
     return DTRUE;
 }
@@ -300,6 +445,7 @@ DBOOL afs_boxing_format_load_xml(afs_boxing_format* boxing_format, mxml_node_t *
 
 DBOOL afs_boxing_format_load_string(afs_boxing_format* boxing_format, const char * in)
 {
+    // If input string pointer is NULL or boxing format pointer is NULL return DFALSE
     if (in == NULL || boxing_format == NULL)
     {
         return DFALSE;
@@ -307,11 +453,15 @@ DBOOL afs_boxing_format_load_string(afs_boxing_format* boxing_format, const char
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    DBOOL return_value = afs_boxing_format_load_xml(boxing_format, document);
+    if (!afs_boxing_format_load_xml(boxing_format, document))
+    {
+        mxmlDelete(document);
+        return DFALSE;
+    }
 
     mxmlDelete(document);
 
-    return return_value;
+    return DTRUE;
 }
 
 
@@ -335,6 +485,8 @@ DBOOL afs_boxing_format_save_config_file(const char * file_name, afs_boxing_form
         return DFALSE;
     }
 
+    mxml_node_t *tree = mxmlNewXML("1.0");
+
 #ifndef WIN32
     FILE * fp_save = fopen(file_name, "w+");
 #else
@@ -345,8 +497,6 @@ DBOOL afs_boxing_format_save_config_file(const char * file_name, afs_boxing_form
     {
         return DFALSE;
     }
-
-    mxml_node_t *tree = mxmlNewXML("1.0");
 
     if (boxing_format->config != NULL)
     {
@@ -393,7 +543,7 @@ DBOOL afs_boxing_format_save_config_file(const char * file_name, afs_boxing_form
  *  \return DTRUE on success.
  */
 
-DBOOL afs_boxing_format_load_config_file(afs_boxing_format* boxing_format, const char * file_name)
+DBOOL afs_boxing_format_load_config_file(afs_boxing_format * boxing_format, const char * file_name)
 {
     if (file_name == NULL || boxing_format == NULL)
     {
@@ -413,275 +563,20 @@ DBOOL afs_boxing_format_load_config_file(afs_boxing_format* boxing_format, const
 
     mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
 
+    if (document == NULL)
+    {
+        fclose(fp_load);
+        mxmlDelete(document);
+
+        return DFALSE;
+    }
+
     DBOOL return_value = afs_boxing_format_load_xml(boxing_format, document);
 
     fclose(fp_load);
     mxmlDelete(document);
 
     return return_value;
-}
-
-
-//----------------------------------------------------------------------------
-/*!
- *  \brief The function gives the current format name.
- *
- *  Function retrieves the name from given configuration and returns it.
- *  If afs_boxing_format pointer equal to NULL or config pointer equal to NULL or
- *  the name is not found then function return NULL.
- *
- *  \param[in]  boxing_format   Pointer to the afs_boxing_format structure.
- *  \return name of the configuration or NULL.
- */
-
-const char* afs_boxing_format_get_name(afs_boxing_format* boxing_format)
-{
-    if (boxing_format == NULL)
-    {
-        return NULL;
-    }
-
-    if (boxing_format->config == NULL)
-    {
-        return NULL;
-    }
-
-    return boxing_config_property(boxing_format->config, "FormatInfo", "name");
-}
-
-
-//----------------------------------------------------------------------------
-/*!
- *  \brief The function gives the current scaling factor.
- *
- *  Function retrieves the current value of scaling factor from given configuration and returns it.
- *  If afs_boxing_format is NULL or boxing_format->config is NULL 0 is returned.
- *
- *  \param[in]  boxing_format   Pointer to the afs_boxing_format structure.
- *  \return the current value of scaling factor.
- */
-
-unsigned int afs_boxing_format_get_scaling_factor(afs_boxing_format* boxing_format)
-{
-    if (boxing_format == NULL)
-    {
-        return 0;
-    }
-
-    if (boxing_format->config == NULL)
-    {
-        return 0;
-    }
-
-    if (boxing_config_is_set(boxing_format->config, "FrameRaster", "scalingFactor"))
-    {
-        return boxing_config_property_int(boxing_format->config, "FrameRaster", "scalingFactor");
-    }
-    else if (!boxing_config_is_set(boxing_format->config, "BaseBuilder", FRAME_BUILDER_SCALINGFACTOR))
-    {
-        return 1;
-    }
-    else
-    {
-        return boxing_config_property_uint(boxing_format->config, "BaseBuilder", FRAME_BUILDER_SCALINGFACTOR);
-    }
-}
-
-
-//----------------------------------------------------------------------------
-/*!
- *  \brief The function gives the current width of the frame.
- *
- *  Function retrieves the current width of the frame from given configuration and returns it.
- *  If afs_boxing_format pointer equal to NULL
- *  then function return 0.
- *
- *  \param[in]  boxing_format   Pointer to the afs_boxing_format structure.
- *  \return the current width of the frame.
- */
-
-unsigned int afs_boxing_format_get_width(afs_boxing_format* boxing_format)
-{
-    if (boxing_format == NULL)
-    {
-        return 0;
-    }
-
-    if (boxing_format->config == NULL)
-    {
-        return 0;
-    }
-
-    DBOOL has_point = DFALSE;
-
-    return boxing_config_property_pointi(boxing_format->config, "FrameBuilder", "dimensions", &has_point).x;
-}
-
-
-//----------------------------------------------------------------------------
-/*!
- *  \brief The function gives the current height of the frame.
- *
- *  Function retrieves the current height of the frame from given configuration and returns it.
- *  If afs_boxing_format pointer equal to NULL
- *  then function return 0.
- *
- *  \param[in]  boxing_format   Pointer to the afs_boxing_format structure.
- *  \return the current height of the frame.
- */
-
-unsigned int afs_boxing_format_get_height(afs_boxing_format* boxing_format)
-{
-    if (boxing_format == NULL)
-    {
-        return 0;
-    }
-
-    if (boxing_format->config == NULL)
-    {
-        return 0;
-    }
-
-    DBOOL has_point = DFALSE;
-
-    return boxing_config_property_pointi(boxing_format->config, "FrameBuilder", "dimensions", &has_point).y;
-}
-
-
-//----------------------------------------------------------------------------
-/*!
- *  \brief The function gives the current data width of the frame.
- *
- *  Function retrieves the current data width of the frame from given configuration and returns it.
- *  If afs_boxing_format pointer equal to NULL
- *  then function return 0.
- *
- *  \param[in]  boxing_format   Pointer to the afs_boxing_format structure.
- *  \return the current data width of the frame.
- */
-
-unsigned int afs_boxing_format_get_data_frame_width(afs_boxing_format * boxing_format)
-{
-    if (boxing_format == NULL)
-    {
-        return 0;
-    }
-
-    if (boxing_format->config == NULL)
-    {
-        return 0;
-    }
-
-    boxing_frame *  frame = boxing_generic_frame_factory_create(boxing_format->config);
-
-    if (frame == NULL)
-    {
-        return 0;
-    }
-
-    int return_value = frame->container(frame)->dimension(frame->container(frame)).x;
-    boxing_generic_frame_factory_free(frame);
-    return return_value;
-}
-
-
-//----------------------------------------------------------------------------
-/*!
- *  \brief The function gives the current data height of the frame.
- *
- *  Function retrieves the current data height of the frame from given configuration and returns it.
- *  If afs_boxing_format pointer equal to NULL
- *  then function return 0.
- *
- *  \param[in]  boxing_format   Pointer to the afs_boxing_format structure.
- *  \return the current data height of the frame.
- */
-
-unsigned int afs_boxing_format_get_data_frame_height(afs_boxing_format* boxing_format)
-{
-    if (boxing_format == NULL)
-    {
-        return 0;
-    }
-
-    if (boxing_format->config == NULL)
-    {
-        return 0;
-    }
-
-    boxing_frame *  frame = boxing_generic_frame_factory_create(boxing_format->config);
-
-    if (frame == NULL)
-    {
-        return 0;
-    }
-
-    int return_value = frame->container(frame)->dimension(frame->container(frame)).y;
-    boxing_generic_frame_factory_free(frame);
-    return return_value;
-}
-
-
-//----------------------------------------------------------------------------
-/*!
- *  \brief The function gives the current bit per pixel value.
- *
- *  Function retrieves the current bit per pixel value from given configuration and returns it.
- *  If afs_boxing_format pointer equal to NULL or configuration pointer equal to NULL
- *  then function return 0.
- *
- *  \param[in]  boxing_format   Pointer to the afs_boxing_format structure.
- *  \return the current bit per pixel value.
- */
-
-unsigned int afs_boxing_format_get_bits_per_pixel(afs_boxing_format* boxing_format)
-{
-    if (boxing_format == NULL)
-    {
-        return 0;
-    }
-
-    if (boxing_format->config == NULL)
-    {
-        return 0;
-    }
-
-    return boxing_config_property_uint(boxing_format->config, "BaseBuilder", FRAME_BUILDER_COLORDEPTH);
-}
-
-
-//----------------------------------------------------------------------------
-/*!
- *  \brief The function gives the current symbols per pixel value.
- *
- *  Function retrieves the current synmols per pixel value from given configuration and returns it.
- *  If afs_boxing_format pointer equal to NULL or configuration pointer equal to NULL
- *  then function return 0.
- *
- *  \param[in]  boxing_format   Pointer to the afs_boxing_format structure.
- *  \return the current symbols per pixel value.
- */
-
-unsigned int afs_boxing_format_get_symbols_per_pixel(afs_boxing_format* boxing_format)
-{
-    if (boxing_format == NULL)
-    {
-        return 0;
-    }
-
-    if (boxing_format->config == NULL)
-    {
-        return 0;
-    }
-
-    unsigned int bits_per_pixel = afs_boxing_format_get_bits_per_pixel(boxing_format);
-
-    if (bits_per_pixel == 0)
-    {
-        return 0;
-    }
-
-    return (unsigned int)powf(2.0f, (float)bits_per_pixel);
 }
 
 
@@ -718,7 +613,7 @@ static void set_class_from_xml(boxing_config * config, mxml_node_t * dom_node)
                     if (name_property != NULL && name_property[0] != '\0')
                     {
                         const char * property_value = mxmlElementGetAttr(node_in_class, CONFIG_XML_ATTR_VALUE);
-                        if (name_property != NULL)
+                        if (property_value != NULL && property_value[0] != '\0')
                         {
                             boxing_config_set_property(config, clave, name_property, property_value);
                         }
@@ -728,7 +623,7 @@ static void set_class_from_xml(boxing_config * config, mxml_node_t * dom_node)
                 {
                     if (in_class_name[0] != '!' && strcmp(in_class_name, "#comment") != 0)
                     {
-                        DLOG_WARNING1("Unknown XML node type in CLASS Node %s", in_class_name);
+                        DLOG_WARNING1("(set_class_from_xml) Unknown XML node type in CLASS Node %s", in_class_name);
                     }
                 }
             }
@@ -810,13 +705,14 @@ static void set_version(struct mxml_node_s* node, GHashTable * class_hash)
     {
         char * string_value = g_variant_to_string(version_property);
         mxmlElementSetAttr(node, CONFIG_XML_ATTR_VERSION, string_value);
-        boxing_memory_free(string_value);
+        free(string_value);
     }
 }
 
 
 static DBOOL save_config_xml(mxml_node_t * out, boxing_config * config)
 {
+    // If output XML node pointer is NULL or boxing format pointer is NULL return DFALSE
     if (out == NULL || config == NULL)
     {
         return DFALSE;
@@ -876,4 +772,257 @@ static DBOOL save_config_xml(mxml_node_t * out, boxing_config * config)
     }
 
     return DTRUE;
+}
+
+
+static void initialize_empty_instance(afs_boxing_format * boxing_format)
+{
+    if (boxing_format == NULL)
+    {
+        return;
+    }
+
+    boxing_format->name = NULL;
+    boxing_format->bytes_per_frame = 0;
+    boxing_format->data_bytes_per_frame = 0;
+    boxing_format->data_stripe_size = 0;
+    boxing_format->scaling_factor = 0;
+    boxing_format->width = 0;
+    boxing_format->height = 0;
+    boxing_format->data_frame_width = 0;
+    boxing_format->data_frame_height = 0;
+    boxing_format->bits_per_pixel = 0;
+    boxing_format->symbol_per_pixel = 0;
+
+    return;
+}
+
+
+static void initialize_instance(afs_boxing_format * boxing_format)
+{
+    if (boxing_format == NULL)
+    {
+        return;
+    }
+
+    if (boxing_format->config == NULL)
+    {
+        initialize_empty_instance(boxing_format);
+        return;
+    }
+
+    boxing_frame * frame = boxing_generic_frame_factory_create(boxing_format->config);
+
+    if (frame == NULL)
+    {
+        initialize_empty_instance(boxing_format);
+        return;
+    }
+    
+    boxing_format->name = get_name(boxing_format);
+    boxing_format->data_stripe_size = get_data_stripe_size(boxing_format);
+    boxing_format->scaling_factor = get_scaling_factor(boxing_format);
+    boxing_format->width = get_width(frame);
+    boxing_format->height = get_height(frame);
+    boxing_format->data_frame_width = get_data_frame_width(frame);
+    boxing_format->data_frame_height = get_data_frame_height(frame);
+    boxing_format->bits_per_pixel = get_bits_per_pixel(boxing_format, frame);
+    boxing_format->symbol_per_pixel = get_symbol_per_pixel(boxing_format);
+    boxing_format->bytes_per_frame = get_bytes_per_frame(boxing_format, frame);
+    boxing_format->data_bytes_per_frame = get_data_bytes_per_frame(boxing_format, frame);
+
+    boxing_generic_frame_factory_free(frame);
+}
+
+
+static const char * get_name(const afs_boxing_format * format)
+{
+    if (format == NULL)
+    {
+        return NULL;
+    }
+
+    if (format->config == NULL)
+    {
+        return NULL;
+    }
+
+    return boxing_config_property(format->config, "FormatInfo", "name");
+}
+
+
+static unsigned int get_bytes_per_frame(const afs_boxing_format * format, boxing_frame * frame)
+{
+    if (format == NULL || frame == NULL)
+    {
+        return 0;
+    }
+           
+    return frame->container(frame)->capasity(frame->container(frame)) * format->bits_per_pixel / CHAR_BIT;
+}
+
+
+static unsigned int get_data_bytes_per_frame(const afs_boxing_format * format, boxing_frame * frame)
+{
+    if (format == NULL || frame == NULL)
+    {
+        return 0;
+    }
+
+    int capasity = frame->container(frame)->capasity(frame->container(frame));
+
+    boxing_codecdispatcher * codec_dispatcher = boxing_codecdispatcher_create(capasity, 1 << format->bits_per_pixel, format->config, "DataCodingScheme");
+    unsigned int packetSize = boxing_codecdispatcher_get_decoded_packet_size(codec_dispatcher);
+    boxing_codecdispatcher_free(codec_dispatcher);
+
+    return packetSize;
+}
+
+
+static unsigned int get_data_stripe_size(const afs_boxing_format * format)
+{
+    if (format == NULL)
+    {
+        return 0;
+    }
+
+    return (unsigned int)boxing_codecdispatcher_get_stripe_size(format->config);
+}
+
+
+static unsigned int get_scaling_factor(const afs_boxing_format * boxing_format)
+{
+    if (boxing_format == NULL)
+    {
+        return 0;
+    }
+
+    if (boxing_format->config == NULL)
+    {
+        return 0;
+    }
+
+    if (boxing_config_is_set(boxing_format->config, "FrameRaster", "scalingFactor"))
+    {
+        return boxing_config_property_int(boxing_format->config, "FrameRaster", "scalingFactor");
+    }
+    else if (!boxing_config_is_set(boxing_format->config, "BaseBuilder", FRAME_BUILDER_SCALINGFACTOR))
+    {
+        return 1;
+    }
+    else
+    {
+        return boxing_config_property_uint(boxing_format->config, "BaseBuilder", FRAME_BUILDER_SCALINGFACTOR);
+    }
+}
+
+
+static unsigned int get_width(boxing_frame * frame)
+{
+    if (frame == NULL)
+    {
+        return 0;
+    }
+
+    return frame->size(frame).x;
+}
+
+
+static unsigned int get_height(boxing_frame * frame)
+{
+    if (frame == NULL)
+    {
+        return 0;
+    }
+
+    return frame->size(frame).y;
+}
+
+
+static unsigned int get_data_frame_width(boxing_frame * frame)
+{
+    if (frame == NULL)
+    {
+        return 0;
+    }
+
+    return frame->container(frame)->dimension(frame->container(frame)).x;
+}
+
+
+static unsigned int get_data_frame_height(boxing_frame * frame)
+{
+    if (frame == NULL)
+    {
+        return 0;
+    }
+
+    return frame->container(frame)->dimension(frame->container(frame)).y;
+}
+
+static unsigned int get_bits_per_pixel(afs_boxing_format * boxing_format, boxing_frame * frame)
+{
+    if (boxing_format == NULL)
+    {
+        return 0;
+    }
+
+    if (boxing_format->config == NULL)
+    {
+        return 0;
+    }
+
+    if (frame)
+    {
+        int levelsPerSymbol = frame->levels_per_symbol(frame) - 1;
+        unsigned int color_depth = 0;
+        while (levelsPerSymbol)
+        {
+            color_depth++;
+            levelsPerSymbol >>= 1;
+        }
+
+        return color_depth;
+    }
+    else if (boxing_config_is_set(boxing_format->config, "BaseBuilder", FRAME_BUILDER_COLORDEPTH))
+    {
+        return boxing_config_property_uint(boxing_format->config, "BaseBuilder", FRAME_BUILDER_COLORDEPTH);
+    }
+    else
+    {
+        return 1;
+    }
+}
+
+
+static unsigned int get_symbol_per_pixel(afs_boxing_format * boxing_format)
+{
+    if (boxing_format == NULL)
+    {
+        return 0;
+    }
+
+    if (boxing_format->bits_per_pixel == 0)
+    {
+        return 0;
+    }
+
+    return (unsigned int)powf(2.0f, (float)boxing_format->bits_per_pixel);
+}
+
+
+static unsigned int get_ceil(const size_t dividend, const unsigned int divisor)
+{
+    if (divisor == 0)
+    {
+        return 0;
+    }
+
+    unsigned int result = dividend / divisor;
+    
+    if (dividend % divisor)
+    {
+        result++;
+    }
+    return result;
 }

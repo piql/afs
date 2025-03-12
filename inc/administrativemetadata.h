@@ -31,6 +31,8 @@ typedef struct afs_administrative_metadata_s
     char * description;
     char * creator;
     char * creation_date;
+
+    int reference_count;
 } afs_administrative_metadata;
 
 
@@ -45,6 +47,7 @@ afs_administrative_metadata * afs_administrative_metadata_create2(
 void                          afs_administrative_metadata_free(afs_administrative_metadata * administrative_metadata);
 
 afs_administrative_metadata * afs_administrative_metadata_clone(const afs_administrative_metadata * administrative_metadata);
+afs_administrative_metadata * afs_administrative_metadata_get_new_reference(afs_administrative_metadata * administrative_metadata);
 DBOOL                         afs_administrative_metadata_equal(const afs_administrative_metadata * administrative_metadata1, const afs_administrative_metadata * administrative_metadata2);
 
 void                          afs_administrative_metadata_set_reel_id(afs_administrative_metadata * administrative_metadata, const char * reel_id);

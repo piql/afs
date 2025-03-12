@@ -29,6 +29,8 @@ typedef struct afs_control_data_s
 {
     afs_administrative_metadata * administrative_metadata;
     afs_technical_metadata *      technical_metadata;
+
+    int reference_count;
 } afs_control_data;
 
 afs_control_data * afs_control_data_create();
@@ -36,6 +38,7 @@ afs_control_data * afs_control_data_create2(afs_administrative_metadata * admini
 void               afs_control_data_free(afs_control_data * control_data);
 
 afs_control_data * afs_control_data_clone(const afs_control_data * control_data);
+afs_control_data * afs_control_data_get_new_reference(afs_control_data * control_data);
 DBOOL              afs_control_data_equal(const afs_control_data * control_data1, const afs_control_data * control_data2);
 
 DBOOL              afs_control_data_save_file(afs_control_data * control_data, const char * file_name, DBOOL compact);

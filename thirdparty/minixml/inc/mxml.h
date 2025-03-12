@@ -24,12 +24,18 @@
 /*
  * Include necessary headers...
  */
-
-#  include <stdio.h>
-#  include <stdlib.h>
-#  include <string.h>
-#  include <ctype.h>
-#  include <errno.h>
+#ifdef __cplusplus
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cerrno>
+#else
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <errno.h>
+#endif
 
 
 /*

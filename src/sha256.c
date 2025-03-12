@@ -58,13 +58,17 @@ char* afs_sha256_sum2(const char* file_name, boxing_int64 start, boxing_int64 si
     FILE *file;
     char *check_sum = NULL;
 
+    // If there is no file name, then exit with an error
     if (file_name == NULL)
     {
         return check_sum;
     }
 
+
+    // Open the file for reading
     file = fopen(file_name, "rb");
 
+    // If the file does not open, then exit with an error
     if (file == NULL)
     {
         return check_sum;
@@ -89,7 +93,7 @@ char* afs_sha256_sum2(const char* file_name, boxing_int64 start, boxing_int64 si
 
 char* afs_sha256_sum1(const char* file_name)
 {
-    return afs_sha256_sum2(file_name, 0, 0);
+    return afs_sha256_sum2(file_name, 0, -1);
 }
 
 //----------------------------------------------------------------------------
@@ -185,7 +189,7 @@ static char* sum2_private(FILE *in, boxing_int64 start, boxing_int64 size)
     }
 
     // If the data size is set incorrectly, then define the size of the data in the file
-    if (size == 0)
+    if (size == -1)
     {
         size = file_size - start;
     }

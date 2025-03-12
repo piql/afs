@@ -121,7 +121,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
 
 afs_toc_file* afs_toc_file_create()
 {
-    afs_toc_file * toc_data_file = BOXING_MEMORY_ALLOCATE_TYPE(afs_toc_file);
+    afs_toc_file * toc_data_file = malloc(sizeof(afs_toc_file));
     afs_toc_file_init(toc_data_file);
     return toc_data_file;
 }
@@ -222,6 +222,8 @@ void afs_toc_file_init(afs_toc_file * toc_data_file)
     toc_data_file->end_byte = -1;
     toc_data_file->parent_id = AFS_TOC_FILE_NO_PARENT;
     toc_data_file->types = AFS_TOC_FILE_TYPE_UNDEFINED;
+
+    toc_data_file->reference_count = 1;
 }
 
 
@@ -288,6 +290,8 @@ void afs_toc_file_init2(
     toc_data_file->preview = preview;
     toc_data_file->file_format = boxing_string_clone(file_format);
     toc_data_file->metadata = metadata;
+
+    toc_data_file->reference_count = 1;
 }
 
 
@@ -307,14 +311,19 @@ void afs_toc_file_free(afs_toc_file* toc_data_file)
         return;
     }
 
-    boxing_string_free(toc_data_file->name);
-    boxing_string_free(toc_data_file->date);
-    boxing_string_free(toc_data_file->checksum);
-    boxing_string_free(toc_data_file->unique_id);
-    afs_toc_file_preview_free(toc_data_file->preview);
-    boxing_string_free(toc_data_file->file_format);
-    afs_toc_data_file_metadata_free(toc_data_file->metadata);
-    boxing_memory_free(toc_data_file);
+    toc_data_file->reference_count--;
+
+    if (toc_data_file->reference_count <= 0)
+    {
+        boxing_string_free(toc_data_file->name);
+        boxing_string_free(toc_data_file->date);
+        boxing_string_free(toc_data_file->checksum);
+        boxing_string_free(toc_data_file->unique_id);
+        afs_toc_file_preview_free(toc_data_file->preview);
+        boxing_string_free(toc_data_file->file_format);
+        afs_toc_data_file_metadata_free(toc_data_file->metadata);
+        free(toc_data_file);
+    }
 }
 
 
@@ -331,6 +340,7 @@ void afs_toc_file_free(afs_toc_file* toc_data_file)
 
 afs_toc_file * afs_toc_file_clone(afs_toc_file * toc_data_file)
 {
+    // If TOC data file pointer is NULL return NULL.
     if (toc_data_file == NULL)
     {
         return NULL;
@@ -352,6 +362,31 @@ afs_toc_file * afs_toc_file_clone(afs_toc_file * toc_data_file)
         afs_toc_file_preview_clone(toc_data_file->preview),
         toc_data_file->file_format,
         afs_toc_data_file_metadata_clone(toc_data_file->metadata));
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function returns a new reference to the input afs_toc_file structure.
+ *
+ *  Function returns a new reference to the input afs_toc_file structure.
+ *  The reference count is incremented by 1.
+ *  If TOC file pointer is NULL function return NULL.
+ *
+ *  \param[in]  toc_file  Pointer to the afs_toc_file structure.
+ *  \return new reference of afs_toc_file structure or NULL.
+ */
+
+afs_toc_file * afs_toc_file_get_new_reference(afs_toc_file * toc_file)
+{
+    // If TOC file pointer is NULL return NULL.
+    if (toc_file == NULL)
+    {
+        return NULL;
+    }
+
+    toc_file->reference_count++;
+    return toc_file;
 }
 
 
@@ -430,6 +465,7 @@ DBOOL afs_toc_file_not_equal(afs_toc_file * toc_data_file1, afs_toc_file * toc_d
 
 void afs_toc_file_add_frame_offset(afs_toc_file * toc_data_file, unsigned int offset)
 {
+    // If TOC data file pointer is NULL return
     if (toc_data_file == NULL)
     {
         return;
@@ -457,6 +493,7 @@ void afs_toc_file_add_frame_offset(afs_toc_file * toc_data_file, unsigned int of
 
 void afs_toc_file_add_type(afs_toc_file * toc_data_file, unsigned int type)
 {
+    // If TOC data file pointer is NULL return
     if (toc_data_file == NULL)
     {
         return;
@@ -478,6 +515,7 @@ void afs_toc_file_add_type(afs_toc_file * toc_data_file, unsigned int type)
 
 void afs_toc_file_set_name(afs_toc_file * toc_data_file, const char * name)
 {
+    // If TOC data file pointer is NULL return
     if (toc_data_file == NULL)
     {
         return;
@@ -504,6 +542,7 @@ void afs_toc_file_set_name(afs_toc_file * toc_data_file, const char * name)
 
 void afs_toc_file_set_date(afs_toc_file * toc_data_file, const char * date)
 {
+    // If TOC data file pointer is NULL return
     if (toc_data_file == NULL)
     {
         return;
@@ -530,6 +569,7 @@ void afs_toc_file_set_date(afs_toc_file * toc_data_file, const char * date)
 
 void afs_toc_file_set_checksum(afs_toc_file * toc_data_file, const char * checksum)
 {
+    // If TOC data file pointer is NULL return
     if (toc_data_file == NULL)
     {
         return;
@@ -556,6 +596,7 @@ void afs_toc_file_set_checksum(afs_toc_file * toc_data_file, const char * checks
 
 void afs_toc_file_set_unique_id(afs_toc_file * toc_data_file, const char * unique_id)
 {
+    // If TOC data file pointer is NULL return
     if (toc_data_file == NULL)
     {
         return;
@@ -582,6 +623,7 @@ void afs_toc_file_set_unique_id(afs_toc_file * toc_data_file, const char * uniqu
 
 void afs_toc_file_set_file_format(afs_toc_file * toc_data_file, const char * file_format)
 {
+    // If TOC data file pointer is NULL return
     if (toc_data_file == NULL)
     {
         return;
@@ -609,6 +651,7 @@ void afs_toc_file_set_file_format(afs_toc_file * toc_data_file, const char * fil
 
 void afs_toc_file_set_preview(afs_toc_file * toc_data_file, const afs_toc_file_preview * toc_file_preview)
 {
+    // If TOC data file pointer is NULL return
     if (toc_data_file == NULL)
     {
         return;
@@ -636,6 +679,7 @@ void afs_toc_file_set_preview(afs_toc_file * toc_data_file, const afs_toc_file_p
 
 void afs_toc_file_set_metadata(afs_toc_file * toc_data_file, const afs_toc_data_file_metadata * toc_data_file_metadata)
 {
+    // If TOC data file pointer is NULL return
     if (toc_data_file == NULL)
     {
         return;
@@ -663,6 +707,7 @@ void afs_toc_file_set_metadata(afs_toc_file * toc_data_file, const afs_toc_data_
 
 DBOOL afs_toc_file_load_file(afs_toc_file * toc_data_file, const char * file_name)
 {
+    // If input file name string pointer is NULL or TOC data file pointer is NULL return DFALSE
     if (file_name == NULL || toc_data_file == NULL)
     {
         return DFALSE;
@@ -680,6 +725,14 @@ DBOOL afs_toc_file_load_file(afs_toc_file * toc_data_file, const char * file_nam
     }
 
     mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
+
+    if (document == NULL)
+    {
+        fclose(fp_load);
+        mxmlDelete(document);
+
+        return DFALSE;
+    }
 
     DBOOL return_value = afs_toc_file_load_xml(toc_data_file, document);
 
@@ -703,18 +756,22 @@ DBOOL afs_toc_file_load_file(afs_toc_file * toc_data_file, const char * file_nam
 
 DBOOL afs_toc_file_load_string(afs_toc_file * toc_data_file, const char * in)
 {
-    if (in == NULL || boxing_string_equal(in, "") || toc_data_file == NULL)
+    // If input string pointer is NULL or TOC data file pointer is NULL return DFALSE
+    if (in == NULL|| boxing_string_equal(in, "") || toc_data_file == NULL)
     {
         return DFALSE;
     }
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    DBOOL return_value = afs_toc_file_load_xml(toc_data_file, document);
+    if (!afs_toc_file_load_xml(toc_data_file, document))
+    {
+        return DFALSE;
+    }
 
     mxmlDelete(document);
 
-    return return_value;
+    return DTRUE;
 }
 
 
@@ -731,6 +788,7 @@ DBOOL afs_toc_file_load_string(afs_toc_file * toc_data_file, const char * in)
 
 DBOOL afs_toc_file_load_xml(afs_toc_file * toc_data_file, mxml_node_t* node)
 {
+    // If input node pointer is NULL or TOC data file pointer is NULL return DFALSE
     if (node == NULL || toc_data_file == NULL)
     {
         return DFALSE;
@@ -745,6 +803,7 @@ DBOOL afs_toc_file_load_xml(afs_toc_file * toc_data_file, mxml_node_t* node)
         return DFALSE;
     }
     toc_data_file->file_format = boxing_string_clone(mxmlElementGetAttr(file_node, "formatId"));
+    if ( toc_data_file->file_format == NULL ) toc_data_file->file_format = boxing_string_clone( "undefined" );
 
     mxml_node_t * name_node = mxmlFindElement(file_node, file_node, "name", NULL, NULL, MXML_DESCEND);
     if (name_node != NULL)
@@ -866,6 +925,7 @@ DBOOL afs_toc_file_load_xml(afs_toc_file * toc_data_file, mxml_node_t* node)
 
 DBOOL afs_toc_file_load_data_v1(afs_toc_file * toc_data_file, mxml_node_t* node)
 {
+    // If input node pointer is NULL or TOC data file pointer is NULL return DFALSE
     if (node == NULL || toc_data_file == NULL)
     {
         return DFALSE;
@@ -874,16 +934,13 @@ DBOOL afs_toc_file_load_data_v1(afs_toc_file * toc_data_file, mxml_node_t* node)
     mxml_node_t * size_node = mxmlFindElement(node, node, "size", NULL, NULL, MXML_DESCEND);
     if (size_node != NULL)
     {
-        char * node_text = afs_xmlutils_get_node_text(size_node);
+        char * node_text = afs_xmlutils_get_node_text_safe(size_node,"0");
         toc_data_file->size = STRING_TO_LONG_INT(node_text);
         boxing_string_free(node_text);
     }
 
     mxml_node_t * checksum_node = mxmlFindElement(node, node, "checksum", NULL, NULL, MXML_DESCEND);
-    if (checksum_node != NULL)
-    {
-        toc_data_file->checksum = afs_xmlutils_get_node_text(checksum_node);
-    }
+    toc_data_file->checksum = afs_xmlutils_get_node_text_safe( checksum_node, "" );
     
     mxml_node_t * start_node = mxmlFindElement(node, node, "start", NULL, NULL, MXML_DESCEND);
     if (start_node != NULL)
@@ -916,6 +973,7 @@ DBOOL afs_toc_file_load_data_v1(afs_toc_file * toc_data_file, mxml_node_t* node)
 
 DBOOL afs_toc_file_load_data_v2(afs_toc_file * toc_data_file, mxml_node_t* node)
 {
+    // If input node pointer is NULL or TOC data file pointer is NULL return DFALSE
     if (node == NULL || toc_data_file == NULL)
     {
         return DFALSE;
@@ -924,16 +982,13 @@ DBOOL afs_toc_file_load_data_v2(afs_toc_file * toc_data_file, mxml_node_t* node)
     mxml_node_t * size_node = mxmlFindElement(node, node, "size", NULL, NULL, MXML_DESCEND);
     if (size_node != NULL)
     {
-        char * node_text = afs_xmlutils_get_node_text(size_node);
+        char * node_text = afs_xmlutils_get_node_text_safe(size_node,"0");
         toc_data_file->size = STRING_TO_LONG_INT(node_text);
         boxing_string_free(node_text);
     }
 
     mxml_node_t * checksum_node = mxmlFindElement(node, node, "checksum", NULL, NULL, MXML_DESCEND);
-    if (checksum_node != NULL)
-    {
-        toc_data_file->checksum = afs_xmlutils_get_node_text(checksum_node);
-    }
+    toc_data_file->checksum = afs_xmlutils_get_node_text_safe( checksum_node, "" );
 
     mxml_node_t * start_node = mxmlFindElement(node, node, "start", NULL, NULL, MXML_DESCEND);
     if (start_node != NULL)
@@ -967,6 +1022,7 @@ DBOOL afs_toc_file_load_data_v2(afs_toc_file * toc_data_file, mxml_node_t* node)
 
 DBOOL afs_toc_file_save_xml(afs_toc_file * toc_data_file, mxml_node_t* out, DBOOL data_v1)
 {
+    // If output node pointer is NULL or TOC data file pointer is NULL or TOC data file instance is not valid return DFALSE
     if (out == NULL || toc_data_file == NULL || afs_toc_file_is_valid(toc_data_file) == DFALSE)
     {
         return DFALSE;
@@ -1037,6 +1093,7 @@ DBOOL afs_toc_file_save_xml(afs_toc_file * toc_data_file, mxml_node_t* out, DBOO
 
 char * afs_toc_file_save_string(afs_toc_file * toc_data_file, DBOOL compact, DBOOL data_v1)
 {
+    // If TOC data file pointer is NULL return DFALSE
     if (toc_data_file == NULL)
     {
         return DFALSE;
@@ -1088,6 +1145,8 @@ DBOOL afs_toc_file_save_file(afs_toc_file * toc_data_file, const char * file_nam
         return DFALSE;
     }
 
+    mxml_node_t *tree = mxmlNewXML("1.0");
+
 #ifndef WIN32
     FILE * fp_save = fopen(file_name, "w+");
 #else
@@ -1098,8 +1157,6 @@ DBOOL afs_toc_file_save_file(afs_toc_file * toc_data_file, const char * file_nam
     {
         return DFALSE;
     }
-
-    mxml_node_t *tree = mxmlNewXML("1.0");
 
     if (!afs_toc_file_save_xml(toc_data_file, tree, data_v1))
     {
@@ -1139,6 +1196,7 @@ DBOOL afs_toc_file_save_file(afs_toc_file * toc_data_file, const char * file_nam
 
 DBOOL afs_toc_file_has_parent(afs_toc_file * toc_data_file)
 {
+    // If TOC data file pointer is NULL return DFALSE
     if (toc_data_file == NULL)
     {
         return DFALSE;
@@ -1165,6 +1223,7 @@ DBOOL afs_toc_file_has_parent(afs_toc_file * toc_data_file)
 
 DBOOL afs_toc_file_is_standalone(afs_toc_file * toc_data_file)
 {
+    // If TOC data file pointer is NULL return DFALSE
     if (toc_data_file == NULL)
     {
         return DFALSE;
@@ -1191,6 +1250,7 @@ DBOOL afs_toc_file_is_standalone(afs_toc_file * toc_data_file)
 
 DBOOL afs_toc_file_is_parent(const afs_toc_file * toc_data_file)
 {
+    // If TOC data file pointer is NULL return DFALSE
     if (toc_data_file == NULL)
     {
         return DFALSE;
@@ -1217,6 +1277,7 @@ DBOOL afs_toc_file_is_parent(const afs_toc_file * toc_data_file)
 
 DBOOL afs_toc_file_is_digital(const afs_toc_file * toc_data_file)
 {
+    // If TOC data file pointer is NULL return DFALSE
     if (toc_data_file == NULL)
     {
         return DFALSE;
@@ -1243,6 +1304,7 @@ DBOOL afs_toc_file_is_digital(const afs_toc_file * toc_data_file)
 
 DBOOL afs_toc_file_is_preview(const afs_toc_file * toc_data_file)
 {
+    // If TOC data file pointer is NULL return DFALSE
     if (toc_data_file == NULL)
     {
         return DFALSE;
@@ -1269,6 +1331,7 @@ DBOOL afs_toc_file_is_preview(const afs_toc_file * toc_data_file)
 
 DBOOL afs_toc_file_has_metadata(const afs_toc_file * toc_data_file)
 {
+    // If TOC data file pointer is NULL return DFALSE
     if (toc_data_file == NULL)
     {
         return DFALSE;
@@ -1288,7 +1351,7 @@ DBOOL afs_toc_file_has_metadata(const afs_toc_file * toc_data_file)
  *  \brief Check if file is valid.
  *
  *  Check if the structure represents a valid file: File name is set, has 
- *  digital and/or preview or is a parent file, positiion on reel is valid, 
+ *  digital and/or preview or is a parent file, position on reel is valid, 
  *  etc.
  *
  *  \param[in]   toc_data_file   Pointer to the afs_toc_file structure.
@@ -1297,13 +1360,8 @@ DBOOL afs_toc_file_has_metadata(const afs_toc_file * toc_data_file)
 
 DBOOL afs_toc_file_is_valid(const afs_toc_file * toc_data_file)
 {
+    // If TOC data file pointer is NULL return DFALSE
     if (toc_data_file == NULL)
-    {
-        return DFALSE;
-    }
-
-    // Invalid TOC file, is neither digital nor preview
-    if (!afs_toc_file_is_digital(toc_data_file) && !afs_toc_file_is_preview(toc_data_file) && !afs_toc_file_is_parent(toc_data_file))
     {
         return DFALSE;
     }
@@ -1330,7 +1388,7 @@ DBOOL afs_toc_file_is_valid(const afs_toc_file * toc_data_file)
         if (toc_data_file->start_frame < 0 ||
             toc_data_file->start_byte < 0 ||
             toc_data_file->end_frame < toc_data_file->start_frame ||
-            toc_data_file->checksum == NULL || boxing_string_equal(toc_data_file->checksum, "") ||
+            toc_data_file->checksum == NULL ||
             (toc_data_file->end_frame == toc_data_file->start_frame && toc_data_file->end_byte < toc_data_file->start_byte))
         {
             return DFALSE;
@@ -1393,6 +1451,7 @@ int afs_toc_file_get_duration_frames(afs_toc_file * toc_file)
 
 static DBOOL save_data_v1(afs_toc_file * toc_data_file, mxml_node_t* node)
 {
+    // If TOC data file pointer is NULL or XML node pointer is NULL return DFALSE
     if (toc_data_file == NULL || node == NULL)
     {
         return DFALSE;
@@ -1414,6 +1473,7 @@ static DBOOL save_data_v1(afs_toc_file * toc_data_file, mxml_node_t* node)
 
 static DBOOL save_data_v2(afs_toc_file * toc_data_file, mxml_node_t* node)
 {
+    // If TOC data file pointer is NULL or XML node pointer is NULL return DFALSE
     if (toc_data_file == NULL || node == NULL)
     {
         return DFALSE;
@@ -1425,11 +1485,11 @@ static DBOOL save_data_v2(afs_toc_file * toc_data_file, mxml_node_t* node)
     afs_xmlutils_add_new_uint64_node(data_node, "size", toc_data_file->size);
 
     mxml_node_t *start_node = mxmlNewElement(data_node, "start");
-    mxmlElementSetAttrf(start_node, "frame", "%d", toc_data_file->start_frame);
+    mxmlElementSetAttrf(start_node, "frame", "%06d", toc_data_file->start_frame);
     mxmlElementSetAttrf(start_node, "byte", "%d", toc_data_file->start_byte);
 
     mxml_node_t *end_node = mxmlNewElement(data_node, "end");
-    mxmlElementSetAttrf(end_node, "frame", "%d", toc_data_file->end_frame);
+    mxmlElementSetAttrf(end_node, "frame", "%06d", toc_data_file->end_frame);
     mxmlElementSetAttrf(end_node, "byte", "%d", toc_data_file->end_byte);
 
     return DTRUE;
@@ -1503,7 +1563,12 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
                 return ("\n        ");
             }
 
-            if (where == MXML_WS_AFTER_OPEN && !boxing_string_equal("start", name) && !boxing_string_equal("end", name))
+            if (where == MXML_WS_AFTER_OPEN && !boxing_string_equal("start", name) && !boxing_string_equal("end", name) && !boxing_string_equal("checksum", name))
+            {
+                return ("\n            ");
+            }
+
+            if (where == MXML_WS_AFTER_OPEN && boxing_string_equal("checksum", name) && boxing_string_length(afs_xmlutils_get_node_text(node)) != 0)
             {
                 return ("\n            ");
             }

@@ -25,6 +25,11 @@ int   afs_sha1_test(void);
 char* afs_sha1_sum1(const char* file_name);
 char* afs_sha1_sum2(const char* file_name, boxing_int64 start, boxing_int64 size);
 
+#ifdef D_OS_WIN32
+char* afs_sha1_sum1w( const wchar_t* file_name );
+char* afs_sha1_sum2w( const wchar_t* file_name, boxing_int64 start, boxing_int64 size );
+#endif
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

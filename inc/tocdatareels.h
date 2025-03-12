@@ -30,6 +30,8 @@ typedef gvector afs_toc_data_reels_vector;
 typedef struct afs_toc_data_reels_s
 {
     afs_toc_data_reels_vector * reels;
+
+    int reference_count;
 } afs_toc_data_reels;
 
 afs_toc_data_reels * afs_toc_data_reels_create();
@@ -38,6 +40,7 @@ afs_toc_data_reels * afs_toc_data_reels_create2(afs_toc_data_reels_vector * reel
 void                 afs_toc_data_reels_free(afs_toc_data_reels * toc_data_reels);
 
 afs_toc_data_reels * afs_toc_data_reels_clone(afs_toc_data_reels * toc_data_reels);
+afs_toc_data_reels * afs_toc_data_reels_get_new_reference(afs_toc_data_reels * toc_data_reels);
 DBOOL                afs_toc_data_reels_equal(afs_toc_data_reels * toc_data_reels1, afs_toc_data_reels * toc_data_reels2);
 
 DBOOL                afs_toc_data_reels_add_reel(afs_toc_data_reels * toc_data_reels, afs_toc_data_reel * toc_data_reel);

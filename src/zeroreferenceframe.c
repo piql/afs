@@ -16,8 +16,7 @@
 //
 
 #include "zeroreferenceframe.h"
-#include "boxing/platform/memory.h"
-
+#include <stdlib.h>
 //  DEFINES
 //
 
@@ -102,7 +101,7 @@ afs_zero_reference_mark* afs_zero_reference_mark_create(unsigned int frame_width
         return NULL;
     }
 
-    afs_zero_reference_mark* zero_reference_mark = BOXING_MEMORY_ALLOCATE_TYPE(afs_zero_reference_mark);
+    afs_zero_reference_mark* zero_reference_mark = malloc(sizeof(afs_zero_reference_mark));
 
     if (!afs_zero_reference_mark_init(zero_reference_mark, frame_width, frame_height))
     {
@@ -172,7 +171,7 @@ void afs_zero_reference_mark_free(afs_zero_reference_mark* zero_reference_mark)
         return;
     }
 
-    boxing_memory_free(zero_reference_mark);
+    free(zero_reference_mark);
 }
 
 
@@ -201,7 +200,7 @@ afs_zero_reference_frame* afs_zero_reference_frame_create(unsigned int frame_wid
         return NULL;
     }
 
-    afs_zero_reference_frame* zero_reference_frame = BOXING_MEMORY_ALLOCATE_TYPE(afs_zero_reference_frame);
+    afs_zero_reference_frame* zero_reference_frame = malloc(sizeof(afs_zero_reference_frame));
     zero_reference_frame->zero_reference_mark = NULL;
 
     if (afs_zero_reference_frame_init(zero_reference_frame, frame_width, frame_height) == DFALSE)
@@ -271,7 +270,7 @@ void afs_zero_reference_frame_free(afs_zero_reference_frame* zero_reference_fram
     {
         afs_zero_reference_mark_free(zero_reference_frame->zero_reference_mark);
     }
-    boxing_memory_free(zero_reference_frame);
+    free(zero_reference_frame);
 }
 
 

@@ -18,7 +18,6 @@
 #include "tocfilepreviewpage.h"
 #include "xmlutils.h"
 #include "boxing/math/math.h"
-#include "boxing/platform/memory.h"
 #include "boxing/string.h"
 #include "boxing/log.h"
 
@@ -74,7 +73,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
 
 afs_toc_file_preview_page* afs_toc_file_preview_page_create()
 {
-    afs_toc_file_preview_page* toc_file_preview_page = BOXING_MEMORY_ALLOCATE_TYPE(afs_toc_file_preview_page);
+    afs_toc_file_preview_page* toc_file_preview_page = malloc(sizeof(afs_toc_file_preview_page));
     afs_toc_file_preview_page_init(toc_file_preview_page);
     return toc_file_preview_page;
 }
@@ -109,7 +108,7 @@ afs_toc_file_preview_page* afs_toc_file_preview_page_create2(
     unsigned int  overlap_x,
     unsigned int  overlap_y)
 {
-    afs_toc_file_preview_page* toc_file_preview_page = BOXING_MEMORY_ALLOCATE_TYPE(afs_toc_file_preview_page);
+    afs_toc_file_preview_page* toc_file_preview_page = malloc(sizeof(afs_toc_file_preview_page));
     afs_toc_file_preview_page_init2(toc_file_preview_page, layout_id, start_frame, start_section, section_count, dimension_x, dimension_y, overlap_x, overlap_y);
     return toc_file_preview_page;
 }
@@ -140,6 +139,8 @@ void afs_toc_file_preview_page_init(afs_toc_file_preview_page * toc_file_preview
     toc_file_preview_page->dimension_y = 0;
     toc_file_preview_page->overlap_x = 0;
     toc_file_preview_page->overlap_y = 0;
+
+    toc_file_preview_page->reference_count = 1;
 }
 
 
@@ -185,6 +186,8 @@ void afs_toc_file_preview_page_init2(
     toc_file_preview_page->dimension_y = dimension_y;
     toc_file_preview_page->overlap_x = overlap_x;
     toc_file_preview_page->overlap_y = overlap_y;
+
+    toc_file_preview_page->reference_count = 1;
 }
 
 
@@ -204,8 +207,13 @@ void afs_toc_file_preview_page_free(afs_toc_file_preview_page * toc_file_preview
         return;
     }
 
-    boxing_string_free(toc_file_preview_page->layout_id);
-    boxing_memory_free(toc_file_preview_page);
+    toc_file_preview_page->reference_count--;
+
+    if (toc_file_preview_page->reference_count <= 0)
+    {
+        boxing_string_free(toc_file_preview_page->layout_id);
+        free(toc_file_preview_page);
+    }
 }
 
 
@@ -220,8 +228,9 @@ void afs_toc_file_preview_page_free(afs_toc_file_preview_page * toc_file_preview
  *  \return new copy of afs_toc_file_preview_page structure or NULL.
  */
 
-afs_toc_file_preview_page* afs_toc_file_preview_page_clone(afs_toc_file_preview_page * toc_file_preview_page)
+afs_toc_file_preview_page * afs_toc_file_preview_page_clone(afs_toc_file_preview_page * toc_file_preview_page)
 {
+    // If TOC file preview page pointer is NULL return NULL.
     if (toc_file_preview_page == NULL)
     {
         return NULL;
@@ -236,6 +245,31 @@ afs_toc_file_preview_page* afs_toc_file_preview_page_clone(afs_toc_file_preview_
         toc_file_preview_page->dimension_y,
         toc_file_preview_page->overlap_x,
         toc_file_preview_page->overlap_y);
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function returns a new reference to the input afs_toc_file_preview_page structure.
+ *
+ *  Function returns a new reference to the input afs_toc_file_preview_page structure.
+ *  The reference count is incremented by 1.
+ *  If TOC file preview page pointer is NULL function return NULL.
+ *
+ *  \param[in]  toc_file_preview_page  Pointer to the afs_toc_file_preview_page structure.
+ *  \return new reference of afs_toc_file_preview_page structure or NULL.
+ */
+
+afs_toc_file_preview_page * afs_toc_file_preview_page_get_new_reference(afs_toc_file_preview_page * toc_file_preview_page)
+{
+    // If TOC file preview page pointer is NULL return NULL.
+    if (toc_file_preview_page == NULL)
+    {
+        return NULL;
+    }
+
+    toc_file_preview_page->reference_count++;
+    return toc_file_preview_page;
 }
 
 
@@ -324,7 +358,14 @@ DBOOL afs_toc_file_preview_page_is_valid(afs_toc_file_preview_page * toc_file_pr
 
 DBOOL afs_toc_file_preview_page_get_frames_count(afs_toc_file_preview_page * toc_file_preview_page, unsigned int * frames_count, const afs_toc_preview_layout_definitions * definitions)
 {
-    if (toc_file_preview_page == NULL || frames_count == NULL || definitions == NULL)
+    if ( frames_count == NULL )
+    {
+        return DFALSE;
+    }
+
+    *frames_count = 0;
+
+    if ( toc_file_preview_page == NULL || definitions == NULL )
     {
         return DFALSE;
     }
@@ -346,6 +387,11 @@ DBOOL afs_toc_file_preview_page_get_frames_count(afs_toc_file_preview_page * toc
     if (frame_section_capacity == 0)
     {
         return DFALSE;
+    }
+
+    if ( toc_file_preview_page->section_count == 0 )
+    {
+        return DTRUE;
     }
 
     *frames_count = (toc_file_preview_page->start_section + toc_file_preview_page->section_count) / frame_section_capacity;
@@ -422,6 +468,8 @@ DBOOL afs_toc_file_preview_page_save_file(afs_toc_file_preview_page * toc_file_p
         return DFALSE;
     }
 
+    mxml_node_t * tree = mxmlNewXML("1.0");
+
 #ifndef WIN32
     FILE * fp_save = fopen(file_name, "w+");
 #else
@@ -432,8 +480,6 @@ DBOOL afs_toc_file_preview_page_save_file(afs_toc_file_preview_page * toc_file_p
     {
         return DFALSE;
     }
-
-    mxml_node_t *tree = mxmlNewXML("1.0");
 
     if (!afs_toc_file_preview_page_save_xml(toc_file_preview_page, tree))
     {
@@ -475,6 +521,7 @@ DBOOL afs_toc_file_preview_page_save_file(afs_toc_file_preview_page * toc_file_p
 
 char * afs_toc_file_preview_page_save_string(afs_toc_file_preview_page * toc_file_preview_page, DBOOL compact)
 {
+    // If TOC file preview page pointer is NULL return DFALSE
     if (toc_file_preview_page == NULL)
     {
         return DFALSE;
@@ -485,7 +532,6 @@ char * afs_toc_file_preview_page_save_string(afs_toc_file_preview_page * toc_fil
     if (!afs_toc_file_preview_page_save_xml(toc_file_preview_page, document))
     {
         DLOG_INFO("Load XML failed!\n");
-        mxmlDelete(document);
         return NULL;
     }
 
@@ -521,13 +567,14 @@ char * afs_toc_file_preview_page_save_string(afs_toc_file_preview_page * toc_fil
 
 DBOOL afs_toc_file_preview_page_save_xml(afs_toc_file_preview_page * toc_file_preview_page, mxml_node_t* out)
 {
+    // If output node pointer is NULL or TOC file preview page pointer is NULL return DFALSE
     if (out == NULL || toc_file_preview_page == NULL)
     {
         return DFALSE;
     }
 
     // Start file tag
-    mxml_node_t *file_node = mxmlNewElement(out, "pages");
+    mxml_node_t * file_node = mxmlNewElement(out, "pages");
 
     if (toc_file_preview_page->layout_id != NULL)
     {
@@ -566,6 +613,7 @@ DBOOL afs_toc_file_preview_page_save_xml(afs_toc_file_preview_page * toc_file_pr
 
 DBOOL afs_toc_file_preview_page_load_file(afs_toc_file_preview_page * toc_file_preview_page, const char * file_name)
 {
+    // If input file name string pointer is NULL or TOC file preview page pointer is NULL return DFALSE
     if (file_name == NULL || toc_file_preview_page == NULL)
     {
         return DFALSE;
@@ -584,8 +632,16 @@ DBOOL afs_toc_file_preview_page_load_file(afs_toc_file_preview_page * toc_file_p
 
     mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
 
-    DBOOL return_value = afs_toc_file_preview_page_load_xml(toc_file_preview_page, document);
+    if (document == NULL)
+    {
+        fclose(fp_load);
+        mxmlDelete(document);
 
+        return DFALSE;
+    }
+
+    DBOOL return_value = afs_toc_file_preview_page_load_xml(toc_file_preview_page, document);
+    
     fclose(fp_load);
     mxmlDelete(document);
 
@@ -607,6 +663,7 @@ DBOOL afs_toc_file_preview_page_load_file(afs_toc_file_preview_page * toc_file_p
 
 DBOOL afs_toc_file_preview_page_load_string(afs_toc_file_preview_page * toc_file_preview_page, const char * in)
 {
+    // If input string pointer is NULL or TOC file preview page pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || toc_file_preview_page == NULL)
     {
         return DFALSE;
@@ -614,11 +671,14 @@ DBOOL afs_toc_file_preview_page_load_string(afs_toc_file_preview_page * toc_file
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    DBOOL return_value = afs_toc_file_preview_page_load_xml(toc_file_preview_page, document);
+    if (!afs_toc_file_preview_page_load_xml(toc_file_preview_page, document))
+    {
+        return DFALSE;
+    }
 
     mxmlDelete(document);
 
-    return return_value;
+    return DTRUE;
 }
 
 
@@ -636,6 +696,7 @@ DBOOL afs_toc_file_preview_page_load_string(afs_toc_file_preview_page * toc_file
 
 DBOOL afs_toc_file_preview_page_load_xml(afs_toc_file_preview_page * toc_file_preview_page, mxml_node_t* node)
 {
+    // If input node pointer is NULL or TOC file preview page pointer is NULL return DFALSE
     if (node == NULL || toc_file_preview_page == NULL)
     {
         return DFALSE;
@@ -689,7 +750,7 @@ DBOOL afs_toc_file_preview_page_load_xml(afs_toc_file_preview_page * toc_file_pr
 //
 
 
-static DBOOL extract_xy_from_string(unsigned int* x, unsigned int* y, const char* text)
+static DBOOL extract_xy_from_string(unsigned int * x, unsigned int * y, const char * text)
 {
     if (x == NULL || y == NULL)
     {
@@ -715,9 +776,9 @@ static DBOOL extract_xy_from_string(unsigned int* x, unsigned int* y, const char
 }
 
 
-static const char * whitespace_cb(mxml_node_t *node, int where)
+static const char * whitespace_cb(mxml_node_t * node, int where)
 {
-    const char *name;
+    const char *name, *parent_name;
 
     /*
     * We can conditionally break to a new line
@@ -726,6 +787,10 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
     */
 
     name = mxmlGetElement(node);
+    parent_name = mxmlGetElement(node->parent);
+
+    /// \todo warning: variable ‘parent_name’ set but not used [-Wunused-but-set-variable]
+    (void) parent_name;
 
     if (boxing_string_equal("pages", name))
     {

@@ -16,7 +16,6 @@
 //
 #include "toc/previewlayoutdefinitions.h"
 #include "boxing/string.h"
-#include "boxing/platform/memory.h"
 #include "boxing/log.h"
 #include "boxing/math/math.h"
 
@@ -84,8 +83,9 @@ static layout_definitions_lengths get_max_layout_id_lenght(const afs_toc_preview
 
 afs_toc_preview_layout_definitions * afs_toc_preview_layout_definitions_create()
 {
-    afs_toc_preview_layout_definitions * toc_preview_layout_definitions = boxing_memory_allocate(sizeof(afs_toc_preview_layout_definitions));
+    afs_toc_preview_layout_definitions * toc_preview_layout_definitions = malloc(sizeof(afs_toc_preview_layout_definitions));
     toc_preview_layout_definitions->layout_definitions = NULL;
+    toc_preview_layout_definitions->reference_count = 1;
     return toc_preview_layout_definitions;
 }
 
@@ -106,19 +106,24 @@ void afs_toc_preview_layout_definitions_free(afs_toc_preview_layout_definitions 
         return;
     }
 
-    if (toc_preview_layout_definitions->layout_definitions != NULL)
+    toc_preview_layout_definitions->reference_count--;
+
+    if (toc_preview_layout_definitions->reference_count == 0)
     {
-        for (unsigned int i = 0; i < toc_preview_layout_definitions->layout_definitions->size; i++)
+        if (toc_preview_layout_definitions->layout_definitions != NULL)
         {
-            afs_toc_preview_layout_definition_free(GVECTORN(toc_preview_layout_definitions->layout_definitions, afs_toc_preview_layout_definition *, i));
-            GVECTORN(toc_preview_layout_definitions->layout_definitions, afs_toc_preview_layout_definition *, i) = NULL;
+            for (unsigned int i = 0; i < toc_preview_layout_definitions->layout_definitions->size; i++)
+            {
+                afs_toc_preview_layout_definition_free(GVECTORN(toc_preview_layout_definitions->layout_definitions, afs_toc_preview_layout_definition *, i));
+                GVECTORN(toc_preview_layout_definitions->layout_definitions, afs_toc_preview_layout_definition *, i) = NULL;
+            }
+
+            gvector_free(toc_preview_layout_definitions->layout_definitions);
+            toc_preview_layout_definitions->layout_definitions = NULL;
         }
 
-        gvector_free(toc_preview_layout_definitions->layout_definitions);
-        toc_preview_layout_definitions->layout_definitions = NULL;
+        free(toc_preview_layout_definitions);
     }
-
-    boxing_memory_free(toc_preview_layout_definitions);
 }
 
 
@@ -135,6 +140,7 @@ void afs_toc_preview_layout_definitions_free(afs_toc_preview_layout_definitions 
 
 afs_toc_preview_layout_definitions * afs_toc_preview_layout_definitions_clone(const afs_toc_preview_layout_definitions * toc_preview_layout_definitions)
 {
+    // If TOC preview layout definitions pointer is NULL return NULL.
     if (toc_preview_layout_definitions == NULL)
     {
         return NULL;
@@ -155,6 +161,32 @@ afs_toc_preview_layout_definitions * afs_toc_preview_layout_definitions_clone(co
     }
 
     return return_toc_preview_layout_definitions;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function returns a new reference to the input afs_toc_preview_layout_definitions structure.
+ *
+ *  Function returns a new reference to the input afs_toc_preview_layout_definitions structure.
+ *  The reference count is incremented by 1.
+ *  If TOC preview layout definitions pointer is NULL function return NULL.
+ *
+ *  \param[in]  toc_preview_layout_definitions  Pointer to the afs_toc_preview_layout_definitions structure.
+ *  \return new reference of afs_toc_preview_layout_definitions structure or NULL.
+ */
+
+afs_toc_preview_layout_definitions * afs_toc_preview_layout_definitions_get_new_reference(afs_toc_preview_layout_definitions * toc_preview_layout_definitions)
+{
+    // If TOC preview layout definitions pointer is NULL return NULL.
+    if (toc_preview_layout_definitions == NULL)
+    {
+        return NULL;
+    }
+
+    toc_preview_layout_definitions->reference_count++;
+
+    return toc_preview_layout_definitions;
 }
 
 
@@ -500,6 +532,8 @@ DBOOL afs_toc_preview_layout_definitions_save_file(const afs_toc_preview_layout_
         return DFALSE;
     }
 
+    mxml_node_t *tree = mxmlNewXML("1.0");
+
 #ifndef WIN32
     FILE * fp_save = fopen(file_name, "w+");
 #else
@@ -510,8 +544,6 @@ DBOOL afs_toc_preview_layout_definitions_save_file(const afs_toc_preview_layout_
     {
         return DFALSE;
     }
-
-    mxml_node_t *tree = mxmlNewXML("1.0");
 
     if (!afs_toc_preview_layout_definitions_save_xml(toc_preview_layout_definitions, tree))
     {
@@ -552,6 +584,7 @@ DBOOL afs_toc_preview_layout_definitions_save_file(const afs_toc_preview_layout_
 
 char * afs_toc_preview_layout_definitions_save_string(const afs_toc_preview_layout_definitions * toc_preview_layout_definitions, DBOOL compact)
 {
+    // If TOC preview layout definitions pointer is NULL return DFALSE
     if (toc_preview_layout_definitions == NULL)
     {
         return DFALSE;
@@ -596,6 +629,7 @@ char * afs_toc_preview_layout_definitions_save_string(const afs_toc_preview_layo
 
 char * afs_toc_preview_layout_definitions_save_as_table(const afs_toc_preview_layout_definitions * toc_preview_layout_definitions)
 {
+    // If TOC preview layout definitions pointer is NULL return DFALSE
     if (toc_preview_layout_definitions == NULL)
     {
         return NULL;
@@ -669,6 +703,7 @@ char * afs_toc_preview_layout_definitions_save_as_table(const afs_toc_preview_la
 
 DBOOL afs_toc_preview_layout_definitions_save_xml(const afs_toc_preview_layout_definitions * toc_preview_layout_definitions, mxml_node_t* out)
 {
+    // If output node pointer is NULL or TOC preview layout definitions pointer is NULL return DFALSE
     if (out == NULL || toc_preview_layout_definitions == NULL || afs_toc_preview_layout_definitions_is_valid(toc_preview_layout_definitions) == DFALSE)
     {
         return DFALSE;
@@ -704,6 +739,7 @@ DBOOL afs_toc_preview_layout_definitions_save_xml(const afs_toc_preview_layout_d
 
 DBOOL afs_toc_preview_layout_definitions_load_file(afs_toc_preview_layout_definitions * toc_preview_layout_definitions, const char * file_name)
 {
+    // If input file name string pointer is NULL or TOC preview layout definitions pointer is NULL return DFALSE
     if (file_name == NULL || toc_preview_layout_definitions == NULL)
     {
         return DFALSE;
@@ -721,6 +757,14 @@ DBOOL afs_toc_preview_layout_definitions_load_file(afs_toc_preview_layout_defini
     }
 
     mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
+
+    if (document == NULL)
+    {
+        fclose(fp_load);
+        mxmlDelete(document);
+
+        return DFALSE;
+    }
 
     DBOOL return_value = afs_toc_preview_layout_definitions_load_xml(toc_preview_layout_definitions, document);
 
@@ -745,6 +789,7 @@ DBOOL afs_toc_preview_layout_definitions_load_file(afs_toc_preview_layout_defini
 
 DBOOL afs_toc_preview_layout_definitions_load_string(afs_toc_preview_layout_definitions * toc_preview_layout_definitions, const char * in)
 {
+    // If input string pointer is NULL or TOC preview layout definitions pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || toc_preview_layout_definitions == NULL)
     {
         return DFALSE;
@@ -752,11 +797,14 @@ DBOOL afs_toc_preview_layout_definitions_load_string(afs_toc_preview_layout_defi
 
     mxml_node_t * document = mxmlLoadString(NULL, in, MXML_OPAQUE_CALLBACK);
 
-    DBOOL return_value = afs_toc_preview_layout_definitions_load_xml(toc_preview_layout_definitions, document);
+    if (!afs_toc_preview_layout_definitions_load_xml(toc_preview_layout_definitions, document))
+    {
+        return DFALSE;
+    }
 
     mxmlDelete(document);
 
-    return return_value;
+    return DTRUE;
 }
 
 
@@ -774,6 +822,7 @@ DBOOL afs_toc_preview_layout_definitions_load_string(afs_toc_preview_layout_defi
 
 DBOOL afs_toc_preview_layout_definitions_load_xml(afs_toc_preview_layout_definitions * toc_preview_layout_definitions, mxml_node_t* input_node)
 {
+    // If input node pointer is NULL or TOC preview layout definitions pointer is NULL return DFALSE
     if (input_node == NULL || toc_preview_layout_definitions == NULL)
     {
         return DFALSE;

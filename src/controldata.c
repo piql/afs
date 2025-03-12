@@ -16,7 +16,6 @@
 //
 #include "controldata.h"
 #include "boxing/string.h"
-#include "boxing/platform/memory.h"
 
 // PRIVATE INTERFACE
 //
@@ -73,10 +72,12 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
 
 afs_control_data *  afs_control_data_create()
 {
-    afs_control_data* control_data = BOXING_MEMORY_ALLOCATE_TYPE(afs_control_data);
+    afs_control_data* control_data = malloc(sizeof(afs_control_data));
 
     control_data->administrative_metadata = NULL;
     control_data->technical_metadata = NULL;
+
+    control_data->reference_count = 1;
 
     return control_data;
 }
@@ -97,10 +98,12 @@ afs_control_data *  afs_control_data_create()
 
 afs_control_data * afs_control_data_create2(afs_administrative_metadata * administrative_metadata, afs_technical_metadata * technical_metadata)
 {
-    afs_control_data * control_data = BOXING_MEMORY_ALLOCATE_TYPE(afs_control_data);
+    afs_control_data * control_data = malloc(sizeof(afs_control_data));
 
     control_data->administrative_metadata = administrative_metadata;
     control_data->technical_metadata = technical_metadata;
+
+    control_data->reference_count = 1;
 
     return control_data;
 }
@@ -122,9 +125,14 @@ void afs_control_data_free(afs_control_data * control_data)
         return;
     }
 
-    afs_administrative_metadata_free(control_data->administrative_metadata);
-    afs_technical_metadata_free(control_data->technical_metadata);
-    boxing_memory_free(control_data);
+    control_data->reference_count--;
+
+    if (control_data->reference_count <= 0)
+    {
+        afs_administrative_metadata_free(control_data->administrative_metadata);
+        afs_technical_metadata_free(control_data->technical_metadata);
+        free(control_data);
+    }
 }
 
 
@@ -141,6 +149,7 @@ void afs_control_data_free(afs_control_data * control_data)
 
 afs_control_data * afs_control_data_clone(const afs_control_data * control_data)
 {
+    // If control data pointer is NULL return NULL.
     if (control_data == NULL)
     {
         return NULL;
@@ -151,6 +160,31 @@ afs_control_data * afs_control_data_clone(const afs_control_data * control_data)
     return_control_data->technical_metadata = afs_technical_metadata_clone(control_data->technical_metadata);
 
     return return_control_data;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function returns a new reference to the input afs_control_data structure.
+ *
+ *  Function returns a new reference to the input afs_control_data structure.
+ *  The reference count is incremented by 1.
+ *  If control data pointer is NULL function return NULL.
+ *
+ *  \param[in]  control_data  Pointer to the afs_control_data structure.
+ *  \return new reference of afs_control_data structure or NULL.
+ */
+
+afs_control_data * afs_control_data_get_new_reference(afs_control_data * control_data)
+{
+    // If Tcontrol data pointer is NULL return NULL.
+    if (control_data == NULL)
+    {
+        return NULL;
+    }
+
+    control_data->reference_count++;
+    return control_data;
 }
 
 
@@ -228,7 +262,6 @@ DBOOL afs_control_data_save_file(afs_control_data * control_data, const char * f
 
     if (fp_save == NULL)
     {
-        mxmlDelete(tree);
         return DFALSE;
     }
 
@@ -265,6 +298,7 @@ DBOOL afs_control_data_save_file(afs_control_data * control_data, const char * f
 
 char * afs_control_data_save_string(afs_control_data * control_data, DBOOL compact)
 {
+    // If control data pointer is NULL return DFALSE
     if (control_data == NULL)
     {
         return NULL;
@@ -345,6 +379,7 @@ DBOOL afs_control_data_save_xml(afs_control_data * control_data, mxml_node_t * o
 
 DBOOL afs_control_data_load_file(afs_control_data * control_data, const char * file_name)
 {
+    // If input file name string pointer is NULL or control data pointer is NULL return DFALSE
     if (file_name == NULL || control_data == NULL)
     {
         return DFALSE;
@@ -362,9 +397,17 @@ DBOOL afs_control_data_load_file(afs_control_data * control_data, const char * f
     }
 
     mxml_node_t * document = mxmlLoadFile(NULL, fp_load, MXML_OPAQUE_CALLBACK);
+    
+    if (document == NULL)
+    {
+        fclose(fp_load);
+        mxmlDelete(document);
 
+        return DFALSE;
+    }
+    
     DBOOL return_value = afs_control_data_load_xml(control_data, document);
-
+    
     fclose(fp_load);
     mxmlDelete(document);
 
@@ -386,6 +429,7 @@ DBOOL afs_control_data_load_file(afs_control_data * control_data, const char * f
 
 DBOOL afs_control_data_load_string(afs_control_data * control_data, const char * in)
 {
+    // If input string pointer is NULL or control data pointer is NULL return DFALSE
     if (in == NULL || boxing_string_equal(in, "") || control_data == NULL)
     {
         return DFALSE;

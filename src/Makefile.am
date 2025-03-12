@@ -3,8 +3,8 @@ lib_LIBRARIES = libafs.a
 libafs_a_CFLAGS = \
 	-I${top_srcdir}/inc \
 	-I${top_srcdir}/thirdparty/minixml/inc \
-    -I$(LIBBOXING_DIR)/inc \
-    -I$(LIBBOXING_DIR)/thirdparty/glib 
+    -I$(LIBUNBOXING_DIR)/inc \
+    -I$(LIBUNBOXING_DIR)/thirdparty/glib
 
 libafs_a_SOURCES = \
     toc/previewsections.c \

@@ -16,7 +16,6 @@
 //
 
 #include "framerange.h"
-#include "boxing/platform/memory.h"
 #include "boxing/log.h"
 
 //  DEFINES
@@ -64,7 +63,7 @@ static void afs_frame_range_init2(afs_frame_range * frame_range, afs_frame_range
 
 afs_frame_range * afs_frame_range_create()
 {
-    afs_frame_range * frame_range = BOXING_MEMORY_ALLOCATE_TYPE(afs_frame_range);
+    afs_frame_range * frame_range = malloc(sizeof(afs_frame_range));
     afs_frame_range_init(frame_range);
     return frame_range;
 }
@@ -85,7 +84,7 @@ afs_frame_range * afs_frame_range_create()
 
 afs_frame_range * afs_frame_range_create2(afs_frame_range_type start, afs_frame_range_type count)
 {
-    afs_frame_range * frame_range = BOXING_MEMORY_ALLOCATE_TYPE(afs_frame_range);
+    afs_frame_range * frame_range = malloc(sizeof(afs_frame_range));
     afs_frame_range_init2(frame_range, start, count);
     return frame_range;
 }
@@ -110,7 +109,12 @@ void afs_frame_range_free(afs_frame_range * frame_range)
         return;
     }
 
-    boxing_memory_free(frame_range);
+    frame_range->reference_count--;
+
+    if (frame_range->reference_count <= 0)
+    {
+        free(frame_range);
+    }
 }
 
 
@@ -127,12 +131,38 @@ void afs_frame_range_free(afs_frame_range * frame_range)
 
 afs_frame_range * afs_frame_range_clone(afs_frame_range * frame_range)
 {
+    // If frma range pointer is NULL return NULL.
     if (frame_range == NULL)
     {
         return NULL;
     }
 
     return afs_frame_range_create2(frame_range->start, frame_range->count);
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Function returns a new reference to the input afs_frame_range structure.
+ *
+ *  Function returns a new reference to the input afs_frame_range structure.
+ *  The reference count is incremented by 1.
+ *  If frame range pointer is NULL function return NULL.
+ *
+ *  \param[in]  frame_range  Pointer to the afs_frame_range structure.
+ *  \return new reference of afs_frame_range structure or NULL.
+ */
+
+afs_frame_range * afs_frame_range_get_new_reference(afs_frame_range * frame_range)
+{
+    // If frame range pointer is NULL return NULL.
+    if (frame_range == NULL)
+    {
+        return NULL;
+    }
+
+    frame_range->reference_count++;
+    return frame_range;
 }
 
 
@@ -215,6 +245,8 @@ static void afs_frame_range_init(afs_frame_range * frame_range)
 
     frame_range->start = 0;
     frame_range->count = 0;
+
+    frame_range->reference_count = 1;
 }
 
 
@@ -227,4 +259,6 @@ static void afs_frame_range_init2(afs_frame_range * frame_range, afs_frame_range
 
     frame_range->start = start;
     frame_range->count = count;
+
+    frame_range->reference_count = 1;
 }

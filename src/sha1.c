@@ -75,8 +75,16 @@ int afs_sha1_test(void)
 
 char* afs_sha1_sum1(const char* file_name)
 {
-    return afs_sha1_sum2(file_name, 0, 0);
+    return afs_sha1_sum2(file_name, 0, -1);
 }
+
+#ifdef D_OS_WIN32
+// Windows variant supporting unicode filenames
+char* afs_sha1_sum1w( const wchar_t* file_name )
+{
+    return afs_sha1_sum2w( file_name, 0, -1 );
+}
+#endif
 
 
 //----------------------------------------------------------------------------
@@ -96,13 +104,17 @@ char* afs_sha1_sum2(const char* file_name, boxing_int64 start, boxing_int64 size
     FILE *file;
     char *check_sum = NULL;
 
+    // If there is no file name, then exit with an error
     if (file_name == NULL)
     {
         return check_sum;
     }
 
-    file = fopen(file_name, "rb");
 
+    // Open the file for reading
+    file = fopen(file_name, "rb");
+    
+    // If the file does not open, then exit with an error
     if (file == NULL)
     {
         return check_sum;
@@ -114,6 +126,38 @@ char* afs_sha1_sum2(const char* file_name, boxing_int64 start, boxing_int64 size
     return check_sum;
 }
 
+#ifdef D_OS_WIN32
+// Windows variant supporting unicode filenames
+char* afs_sha1_sum2w( const wchar_t* file_name, boxing_int64 start, boxing_int64 size )
+{
+    FILE *file;
+    char *check_sum = NULL;
+
+    // If there is no file name, then exit with an error
+    if ( file_name == NULL )
+    {
+        return check_sum;
+    }
+
+
+    // Open the file for reading
+    file = _wfopen( file_name, L"rb" );
+
+    // If the file does not open, then exit with an error
+    if ( file == NULL )
+    {
+        return check_sum;
+    }
+
+    check_sum = sum2_private( file, start, size );
+
+    if ( fclose( file ) != 0 )
+    {
+        DLOG_INFO1( "Error closing file %ls.\n", file_name );
+    }
+    return check_sum;
+}
+#endif
 
 //----------------------------------------------------------------------------
 /*!
@@ -192,7 +236,7 @@ static char* sum2_private(FILE *in, boxing_int64 start, boxing_int64 size)
     }
 
     // If the data size is set incorrectly, then define the size of the data in the file
-    if (size == 0)
+    if (size == -1)
     {
         size = file_size - start;
     }

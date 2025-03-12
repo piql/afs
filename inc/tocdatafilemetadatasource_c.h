@@ -32,6 +32,8 @@ typedef struct afs_toc_data_file_metadata_source_s
     char * format_id;
     int    file_id;
     int    source_id;
+
+    int reference_count;
 } afs_toc_data_file_metadata_source;
 
 afs_toc_data_file_metadata_source * afs_toc_data_file_metadata_source_create();
@@ -40,6 +42,7 @@ void                                afs_toc_data_file_metadata_source_init(afs_t
 void                                afs_toc_data_file_metadata_source_free(afs_toc_data_file_metadata_source * toc_data_file_metadata_source);
 
 afs_toc_data_file_metadata_source * afs_toc_data_file_metadata_source_clone(afs_toc_data_file_metadata_source * toc_data_file_metadata_source);
+afs_toc_data_file_metadata_source * afs_toc_data_file_metadata_source_get_new_reference(afs_toc_data_file_metadata_source * toc_data_file_metadata_source);
 DBOOL                               afs_toc_data_file_metadata_source_equal(afs_toc_data_file_metadata_source * toc_data_file_metadata_source1, afs_toc_data_file_metadata_source * toc_data_file_metadata_source2);
 DBOOL                               afs_toc_data_file_metadata_source_is_valid(afs_toc_data_file_metadata_source * toc_data_file_metadata_source);
 
