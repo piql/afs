@@ -20,6 +20,7 @@
 #include "boxing/math/math.h"
 #include "boxing/string.h"
 #include "boxing/log.h"
+#include "mxml.h"
 
 //  DEFINES
 //

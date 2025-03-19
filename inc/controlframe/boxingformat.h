@@ -21,9 +21,10 @@ extern "C" {
 
 #include "boxing/config.h"
 #include "boxing/graphics/genericframe.h"
-#include "mxml.h"
 
-// Definition structure afs_boxing_format
+struct mxml_node_s;
+
+    // Definition structure afs_boxing_format
 typedef struct afs_boxing_format_s
 {
     boxing_config * config;
@@ -45,6 +46,8 @@ typedef struct afs_boxing_format_s
 
 afs_boxing_format * afs_boxing_format_create();
 afs_boxing_format * afs_boxing_format_create2(const boxing_config *);
+void                afs_boxing_format_init(afs_boxing_format *boxing_format);
+void                afs_boxing_format_init2(afs_boxing_format *boxing_format, const boxing_config *config);
 void                afs_boxing_format_free(afs_boxing_format *);
 
 afs_boxing_format * afs_boxing_format_clone(const afs_boxing_format * boxing_format);
@@ -54,9 +57,9 @@ DBOOL               afs_boxing_format_equal(const afs_boxing_format * boxing_for
 unsigned int        afs_boxing_format_get_data_frames(const afs_boxing_format * boxing_format, const size_t file_size);
 void                afs_boxing_format_set_config(afs_boxing_format * boxing_format, const boxing_config * config);
 
-DBOOL               afs_boxing_format_save_xml(mxml_node_t * out, afs_boxing_format * boxing_format);
+DBOOL               afs_boxing_format_save_xml(struct mxml_node_s * out, afs_boxing_format * boxing_format);
 char *              afs_boxing_format_save_string(afs_boxing_format * boxing_format, DBOOL compact);
-DBOOL               afs_boxing_format_load_xml(afs_boxing_format * boxing_format, mxml_node_t * in);
+DBOOL               afs_boxing_format_load_xml(afs_boxing_format * boxing_format, struct mxml_node_s * in);
 DBOOL               afs_boxing_format_load_string(afs_boxing_format * boxing_format, const char * in);
 
 #if !defined( AFS_DISABLE_FILE_IO )

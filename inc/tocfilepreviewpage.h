@@ -16,7 +16,6 @@
 *****************************************************************************/
 
 #include "boxing/bool.h"
-#include "mxml.h"
 #include "toc/previewlayoutdefinitions.h"
 
 #ifdef __cplusplus
@@ -74,11 +73,11 @@ DBOOL                       afs_toc_file_preview_page_get_sections_on_frame(afs_
 
 DBOOL                       afs_toc_file_preview_page_save_file(afs_toc_file_preview_page * toc_file_preview_page, const char * file_name, DBOOL compact);
 char *                      afs_toc_file_preview_page_save_string(afs_toc_file_preview_page * toc_file_preview_page, DBOOL compact);
-DBOOL                       afs_toc_file_preview_page_save_xml(afs_toc_file_preview_page * toc_file_preview_page, mxml_node_t* out);
+DBOOL                       afs_toc_file_preview_page_save_xml(afs_toc_file_preview_page * toc_file_preview_page, struct mxml_node_s* out);
 
 DBOOL                       afs_toc_file_preview_page_load_file(afs_toc_file_preview_page * toc_file_preview_page, const char * file_name);
 DBOOL                       afs_toc_file_preview_page_load_string(afs_toc_file_preview_page * toc_file_preview_page, const char * in);
-DBOOL                       afs_toc_file_preview_page_load_xml(afs_toc_file_preview_page * toc_file_preview_page, mxml_node_t* node);
+DBOOL                       afs_toc_file_preview_page_load_xml(afs_toc_file_preview_page * toc_file_preview_page, struct mxml_node_s* node);
 
 #ifdef __cplusplus
 } /* extern "C" */

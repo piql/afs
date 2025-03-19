@@ -20,6 +20,7 @@
 #include "boxing/graphics/genericframefactory.h"
 #include "boxing/codecs/codecdispatcher.h"
 #include "boxing/math/math.h"
+#include "mxml.h"
 
 static void         set_class_from_xml(boxing_config * config, struct mxml_node_s * dom_node);
 static DBOOL        save_config_xml(mxml_node_t * out, boxing_config * config);
@@ -107,13 +108,56 @@ afs_boxing_format * afs_boxing_format_create()
 afs_boxing_format * afs_boxing_format_create2(const boxing_config * config)
 {
     afs_boxing_format * boxing_format = malloc(sizeof(afs_boxing_format));
-    
+    afs_boxing_format_init2(boxing_format, config);
+    return boxing_format;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Initialize.
+ *
+ *  Initialize input structure pointer with NULL values.
+ *  If input pointer is NULL, then return without initialization.
+ *
+ *  \param[in]  boxing_format  Pointer to the afs_boxing_format structure.
+ */
+
+void afs_boxing_format_init(afs_boxing_format* boxing_format)
+{
+    if (boxing_format == NULL)
+    {
+        return;
+    }
+
+    boxing_format->config = NULL;
+
+    boxing_format->reference_count = 1;
+}
+
+
+//----------------------------------------------------------------------------
+/*!
+ *  \brief Initialize boxing_config structure pointer.
+ *
+ *  Initialize input boxing_config structure pointer with specified boxing_config structure.
+ *  If one of the input pointers is NULL, then return without initialization.
+ *
+ *  \param[in]  boxing_format  Pointer to the afs_boxing_format structure.
+ *  \param[in]  config         Pointer to the boxing_config structure.
+ */
+
+void afs_boxing_format_init2(afs_boxing_format* boxing_format, const boxing_config * config)
+{
+    if (boxing_format == NULL)
+    {
+        return;
+    }
+
     boxing_format->config = boxing_config_clone(config);
     initialize_instance(boxing_format);
 
     boxing_format->reference_count = 1;
-    
-    return boxing_format;
 }
 
 
@@ -311,7 +355,7 @@ void afs_boxing_format_set_config(afs_boxing_format * boxing_format, const boxin
  *  \return DTRUE on success.
  */
 
-DBOOL afs_boxing_format_save_xml(mxml_node_t * out, afs_boxing_format* boxing_format)
+DBOOL afs_boxing_format_save_xml(struct mxml_node_s * out, afs_boxing_format* boxing_format)
 {
     // If output node pointer is NULL or boxing format pointer is NULL return DFALSE
     if (out == NULL || boxing_format == NULL)

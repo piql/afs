@@ -49,9 +49,9 @@ AC_TYPE_UINT8_T
 AC_CHECK_TYPES([ptrdiff_t])
 
 # Checks for library functions.
-AC_FUNC_MALLOC
-AC_FUNC_REALLOC
-AC_CHECK_FUNCS([floor memmove memset pow sqrt strcasecmp strchr strtol strtoull])
+#AC_FUNC_MALLOC
+#AC_FUNC_REALLOC
+AC_CHECK_FUNCS([floor memmove memset pow sqrt strcasecmp strchr strtol strtoull malloc])
 
 
 AC_ARG_VAR(LIBUNBOXING_DIR, path to unboxing lib)

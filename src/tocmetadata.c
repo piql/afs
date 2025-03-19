@@ -17,6 +17,7 @@
 
 #include "tocmetadata_c.h"
 #include "boxing/log.h"
+#include "mxml.h"
 
 // PRIVATE INTERFACE
 //

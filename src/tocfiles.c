@@ -18,6 +18,10 @@
 #include "tocfiles.h"
 #include "boxing/log.h"
 #include "boxing/utils.h"
+#include "mxml.h"
+
+//  SYSTEM INCLUDES
+//
 #include <inttypes.h>
 
 // DEFINES

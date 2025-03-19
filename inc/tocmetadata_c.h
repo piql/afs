@@ -18,7 +18,6 @@
 #include "tocmetadatasource_c.h"
 #include "boxing/config.h"
 #include "gvector.h"
-#include "mxml.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,7 +33,7 @@ typedef struct afs_toc_metadata_s
 
 afs_toc_metadata * afs_toc_metadata_create();
 afs_toc_metadata * afs_toc_metadata_create2(afs_toc_metadata_sources * sources);
-afs_toc_metadata * afs_toc_metadata_create3(mxml_node_t* sources_node);
+afs_toc_metadata * afs_toc_metadata_create3(struct mxml_node_s* sources_node);
 
 void               afs_toc_metadata_init(afs_toc_metadata * toc_metadata);
 void               afs_toc_metadata_init2(afs_toc_metadata * toc_metadata, afs_toc_metadata_sources * sources);
@@ -52,11 +51,11 @@ DBOOL                     afs_toc_metadata_is_valid(afs_toc_metadata * toc_metad
 
 DBOOL              afs_toc_metadata_save_file(afs_toc_metadata * toc_metadata, const char * file_name, DBOOL compact);
 char *             afs_toc_metadata_save_string(afs_toc_metadata * toc_metadata, DBOOL compact);
-DBOOL              afs_toc_metadata_save_xml(afs_toc_metadata * toc_metadata, mxml_node_t* out);
+DBOOL              afs_toc_metadata_save_xml(afs_toc_metadata * toc_metadata, struct mxml_node_s* out);
 
 DBOOL              afs_toc_metadata_load_file(afs_toc_metadata * toc_metadata, const char * file_name);
 DBOOL              afs_toc_metadata_load_string(afs_toc_metadata * toc_metadata, const char * in);
-DBOOL              afs_toc_metadata_load_xml(afs_toc_metadata * toc_metadata, mxml_node_t* node);
+DBOOL              afs_toc_metadata_load_xml(afs_toc_metadata * toc_metadata, struct mxml_node_s* node);
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -17,6 +17,7 @@
 #include "toc/previewlayoutdefinition.h"
 #include "boxing/string.h"
 #include "xmlutils.h"
+#include "mxml.h"
 
 // PRIVATE INTERFACE
 //

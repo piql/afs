@@ -20,7 +20,8 @@ extern "C" {
 #endif
 
 #include    "boxing/bool.h"
-#include    "mxml.h"
+
+struct mxml_node_s;
 
 // Definition structure afs_administrative_metadata
 typedef struct afs_administrative_metadata_s
@@ -59,11 +60,11 @@ void                          afs_administrative_metadata_set_creation_date(afs_
 
 DBOOL                         afs_administrative_metadata_save_file(afs_administrative_metadata * administrative_metadata, const char * file_name, DBOOL compact);
 char *                        afs_administrative_metadata_save_string(afs_administrative_metadata * administrative_metadata, DBOOL compact);
-DBOOL                         afs_administrative_metadata_save_xml(afs_administrative_metadata * administrative_metadata, mxml_node_t * out);
+DBOOL                         afs_administrative_metadata_save_xml(afs_administrative_metadata * administrative_metadata, struct mxml_node_s * out);
 
 DBOOL                         afs_administrative_metadata_load_file(afs_administrative_metadata * administrative_metadata, const char * file_name);
 DBOOL                         afs_administrative_metadata_load_string(afs_administrative_metadata * administrative_metadata, const char * in);
-DBOOL                         afs_administrative_metadata_load_xml(afs_administrative_metadata * administrative_metadata, mxml_node_t * in);
+DBOOL                         afs_administrative_metadata_load_xml(afs_administrative_metadata * administrative_metadata, struct mxml_node_s * in);
 
 #ifdef __cplusplus
 } /* extern "C" */

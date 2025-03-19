@@ -18,12 +18,13 @@
 #include    "administrativemetadata.h"
 #include    "technicalmetadata.h"
 #include    "boxing/bool.h"
-#include    "mxml.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+struct mxml_node_s;
+    
 // Definition structure afs_control_data
 typedef struct afs_control_data_s
 {
@@ -43,11 +44,11 @@ DBOOL              afs_control_data_equal(const afs_control_data * control_data1
 
 DBOOL              afs_control_data_save_file(afs_control_data * control_data, const char * file_name, DBOOL compact);
 char *             afs_control_data_save_string(afs_control_data * control_data, DBOOL compact);
-DBOOL              afs_control_data_save_xml(afs_control_data * control_data, mxml_node_t * out);
+DBOOL              afs_control_data_save_xml(afs_control_data * control_data, struct mxml_node_s * out);
 
 DBOOL              afs_control_data_load_file(afs_control_data * control_data, const char * file_name);
 DBOOL              afs_control_data_load_string(afs_control_data * control_data, const char * in);
-DBOOL              afs_control_data_load_xml(afs_control_data * control_data, mxml_node_t * in);
+DBOOL              afs_control_data_load_xml(afs_control_data * control_data, struct mxml_node_s * in);
 
 
 #ifdef __cplusplus

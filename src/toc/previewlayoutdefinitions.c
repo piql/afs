@@ -18,6 +18,7 @@
 #include "boxing/string.h"
 #include "boxing/log.h"
 #include "boxing/math/math.h"
+#include "mxml.h"
 
 
 // PRIVATE INTERFACE

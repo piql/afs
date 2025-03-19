@@ -17,6 +17,7 @@
 
 #include "xmlutils.h"
 #include "boxing/string.h"
+#include "mxml.h"
 
 
 // PUBLIC AFS XML UTILS FUNCTIONS

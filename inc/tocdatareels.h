@@ -18,7 +18,6 @@
 #include "tocdatareel_c.h"
 #include "toc/previewlayoutdefinitions.h"
 #include "gvector.h"
-#include "mxml.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,11 +49,11 @@ DBOOL                afs_toc_data_reels_is_valid(afs_toc_data_reels * toc_data_r
 
 DBOOL                afs_toc_data_reels_save_file(afs_toc_data_reels * toc_data_reels, const char * file_name, DBOOL compact);
 char *               afs_toc_data_reels_save_string(afs_toc_data_reels * toc_data_reels, DBOOL compact);
-DBOOL                afs_toc_data_reels_save_xml(afs_toc_data_reels * toc_data_reels, mxml_node_t* out);
+DBOOL                afs_toc_data_reels_save_xml(afs_toc_data_reels * toc_data_reels, struct mxml_node_s* out);
 
 DBOOL                afs_toc_data_reels_load_file(afs_toc_data_reels * toc_data_reels, const char * file_name);
 DBOOL                afs_toc_data_reels_load_string(afs_toc_data_reels * toc_data_reels, const char * in);
-DBOOL                afs_toc_data_reels_load_xml(afs_toc_data_reels * toc_data_reels, mxml_node_t* node);
+DBOOL                afs_toc_data_reels_load_xml(afs_toc_data_reels * toc_data_reels, struct mxml_node_s* node);
 
 
 #ifdef __cplusplus

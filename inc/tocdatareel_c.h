@@ -18,7 +18,6 @@
 #include "tocfiles.h"
 #include "frameranges.h"
 #include "gvector.h"
-#include "mxml.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -72,11 +71,11 @@ afs_frame_ranges *  afs_toc_data_reel_get_frame_ranges(const afs_toc_files * toc
 
 DBOOL               afs_toc_data_reel_save_file(afs_toc_data_reel * toc_data_reel, const char * file_name, DBOOL compact);
 char *              afs_toc_data_reel_save_string(afs_toc_data_reel * toc_data_reel, DBOOL compact);
-DBOOL               afs_toc_data_reel_save_xml(afs_toc_data_reel * toc_data_reel, mxml_node_t* out);
+DBOOL               afs_toc_data_reel_save_xml(afs_toc_data_reel * toc_data_reel, struct mxml_node_s* out);
 
 DBOOL               afs_toc_data_reel_load_file(afs_toc_data_reel * toc_data_reel, const char * file_name);
 DBOOL               afs_toc_data_reel_load_string(afs_toc_data_reel * toc_data_reel, const char * in);
-DBOOL               afs_toc_data_reel_load_xml(afs_toc_data_reel * toc_data_reel, mxml_node_t* node);
+DBOOL               afs_toc_data_reel_load_xml(afs_toc_data_reel * toc_data_reel, struct mxml_node_s* node);
 
 #ifdef __cplusplus
 } /* extern "C" */

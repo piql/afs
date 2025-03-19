@@ -16,6 +16,7 @@
 //
 #include "controldata.h"
 #include "boxing/string.h"
+#include "mxml.h"
 
 // PRIVATE INTERFACE
 //
@@ -130,7 +131,9 @@ void afs_control_data_free(afs_control_data * control_data)
     if (control_data->reference_count <= 0)
     {
         afs_administrative_metadata_free(control_data->administrative_metadata);
+        control_data->administrative_metadata = NULL;
         afs_technical_metadata_free(control_data->technical_metadata);
+        control_data->technical_metadata = NULL;
         free(control_data);
     }
 }
