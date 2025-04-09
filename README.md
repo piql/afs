@@ -49,7 +49,7 @@ A design goal is to have as few dependencies as possible.
 
 ## iVM
 
-The iVM virtual machine is a minimal execution environment for file format decoders. It's design goal is to minimize future implementation effort by providing an unabmbigious and compact implementation description.
+The iVM virtual machine is a minimal execution environment for file format decoders. Its design goal is to minimize future implementation effort by providing an unambiguous and compact implementation description.
 
 The afs library is one of the formats the iVM natively supports.
 
