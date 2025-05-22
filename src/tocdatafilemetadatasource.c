@@ -31,8 +31,6 @@
 //
 
 static const char * whitespace_cb(mxml_node_t *node, int where);
-static char *       get_substring(const char* input_string, size_t start_index, size_t end_index);
-
 
 /*! 
   * \addtogroup file

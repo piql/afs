@@ -17,6 +17,7 @@
 
 #include "boxing/bool.h"
 #include "boxing/platform/types.h"
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
