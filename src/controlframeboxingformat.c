@@ -1,4 +1,4 @@
-#include "controlframeboxingformat.h"
+#include "../inc/controlframeboxingformat.h"
 
 // Generated using: xxd -i afs_reel_4k_controlframe_v7 source file=../conf/reel-4k-controlframe-v7.xml
 unsigned char afs_reel_4k_controlframe_v7[] = {
