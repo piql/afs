@@ -21,6 +21,9 @@
 #include "boxing/log.h"
 #include "mxml.h"
 
+// SYSTEM INCLUDES
+#include <string.h>
+
 //  DEFINES
 //
 
@@ -153,8 +156,8 @@ void afs_toc_data_file_metadata_source_free(afs_toc_data_file_metadata_source * 
 
     if (toc_data_file_metadata_source->reference_count <= 0)
     {
-        boxing_string_free(toc_data_file_metadata_source->data);
-        boxing_string_free(toc_data_file_metadata_source->format_id);
+        free(toc_data_file_metadata_source->data);
+        free(toc_data_file_metadata_source->format_id);
         free(toc_data_file_metadata_source);
     }
 }
@@ -238,8 +241,8 @@ DBOOL afs_toc_data_file_metadata_source_equal(afs_toc_data_file_metadata_source 
         return DFALSE;
     }
 
-    if (boxing_string_equal(toc_data_file_metadata_source1->data, toc_data_file_metadata_source2->data) == DFALSE ||
-        boxing_string_equal(toc_data_file_metadata_source1->format_id, toc_data_file_metadata_source2->format_id) == DFALSE ||
+    if (strcmp(toc_data_file_metadata_source1->data, toc_data_file_metadata_source2->data) != 0 ||
+        strcmp(toc_data_file_metadata_source1->format_id, toc_data_file_metadata_source2->format_id) != 0 ||
         toc_data_file_metadata_source1->file_id != toc_data_file_metadata_source2->file_id ||
         toc_data_file_metadata_source1->source_id != toc_data_file_metadata_source2->source_id)
     {
@@ -269,7 +272,7 @@ DBOOL afs_toc_data_file_metadata_source_is_valid(afs_toc_data_file_metadata_sour
         return DFALSE;
     }
 
-    if ((toc_data_file_metadata_source->data != NULL && boxing_string_length(toc_data_file_metadata_source->data) != 0) ||
+    if ((toc_data_file_metadata_source->data != NULL && strlen(toc_data_file_metadata_source->data) != 0) ||
         toc_data_file_metadata_source->file_id != -1)
     {
         return DTRUE;
@@ -292,14 +295,14 @@ DBOOL afs_toc_data_file_metadata_source_is_valid(afs_toc_data_file_metadata_sour
 
 void afs_toc_data_file_metadata_source_set_data(afs_toc_data_file_metadata_source * toc_data_file_metadata_source, const char * data)
 {
-    if (toc_data_file_metadata_source == NULL || data == NULL || boxing_string_length(data) == 0)
+    if (toc_data_file_metadata_source == NULL || data == NULL || strlen(data) == 0)
     {
         return;
     }
 
     if (toc_data_file_metadata_source->data != NULL)
     {
-        boxing_string_free(toc_data_file_metadata_source->data);
+        free(toc_data_file_metadata_source->data);
     }
 
     toc_data_file_metadata_source->data = boxing_string_clone(data);
@@ -319,14 +322,14 @@ void afs_toc_data_file_metadata_source_set_data(afs_toc_data_file_metadata_sourc
 
 void afs_toc_data_file_metadata_source_set_format_id(afs_toc_data_file_metadata_source * toc_data_file_metadata_source, const char * format_id)
 {
-    if (toc_data_file_metadata_source == NULL || format_id == NULL || boxing_string_length(format_id) == 0)
+    if (toc_data_file_metadata_source == NULL || format_id == NULL || strlen(format_id) == 0)
     {
         return;
     }
 
     if (toc_data_file_metadata_source->format_id != NULL)
     {
-        boxing_string_free(toc_data_file_metadata_source->format_id);
+        free(toc_data_file_metadata_source->format_id);
     }
 
     toc_data_file_metadata_source->format_id = boxing_string_clone(format_id);
@@ -544,7 +547,7 @@ DBOOL afs_toc_data_file_metadata_source_load_file(afs_toc_data_file_metadata_sou
 DBOOL afs_toc_data_file_metadata_source_load_string(afs_toc_data_file_metadata_source * toc_data_file_metadata_source, const char * in)
 {
     // If input string pointer is NULL or TOC data file metadata source pointer is NULL return DFALSE
-    if (in == NULL || boxing_string_equal(in, "") || toc_data_file_metadata_source == NULL)
+    if (in == NULL || strlen(in) == 0 || toc_data_file_metadata_source == NULL)
     {
         return DFALSE;
     }
@@ -585,7 +588,7 @@ DBOOL afs_toc_data_file_metadata_source_load_xml(afs_toc_data_file_metadata_sour
 
     mxml_node_t * source_node = NULL;
 
-    if (boxing_string_equal(mxmlGetElement(input_node), "source") == DTRUE)
+    if (strcmp(mxmlGetElement(input_node), "source") == 0)
     {
         source_node = input_node;
     }
@@ -628,7 +631,11 @@ DBOOL afs_toc_data_file_metadata_source_load_xml(afs_toc_data_file_metadata_sour
                 const size_t cdataLength = strlen(cdata);
                 if (cdata[cdataLength - 1] == ']' && cdata[cdataLength - 2] == ']')
                 {
-                    toc_data_file_metadata_source->data = get_substring(cdata, 0, cdataLength - 2);
+                    size_t new_len = cdataLength - 2;
+                    char *data = malloc(new_len + 1);
+                    memcpy(data, cdata, new_len);
+                    data[new_len] = '\0';
+                    toc_data_file_metadata_source->data = data;
                 }
                 else
                 {
@@ -674,7 +681,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
     name = mxmlGetElement(node);
     parent_name = mxmlGetElement(node->parent);
 
-    if (boxing_string_equal("source", name))
+    if (strcmp("source", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -682,7 +689,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("source", parent_name))
+    if (strcmp("source", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -690,7 +697,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("data", name))
+    if (strcmp("data", name) == 0)
     {
         if (where == MXML_WS_AFTER_OPEN)
         {
@@ -699,41 +706,4 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
     }
 
     return (NULL);
-}
-
-
-static char * get_substring(const char* input_string, size_t start_index, size_t end_index)
-{
-    if (input_string == NULL || start_index > end_index)
-    {
-        return NULL;
-    }
-
-    if (start_index == end_index)
-    {
-        return boxing_string_allocate(0);
-    }
-
-    size_t string_size = boxing_string_length(input_string);
-    if (start_index >= string_size || end_index > string_size)
-    {
-        return NULL;
-    }
-
-    if (start_index == 0 && end_index == string_size)
-    {
-        return NULL;
-    }
-
-    size_t new_string_size = end_index - start_index + 1;
-    char* new_string = boxing_string_allocate(new_string_size);
-
-    for (size_t i = 0; i < new_string_size; i++)
-    {
-        new_string[i] = input_string[i + start_index];
-    }
-
-    new_string[new_string_size - 1] = '\0';
-
-    return new_string;
 }

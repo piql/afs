@@ -20,6 +20,9 @@
 #include "boxing/string.h"
 #include "mxml.h"
 
+// SYSTEM INCLUDES
+#include <string.h>
+
 //  DEFINES
 //
 
@@ -418,13 +421,13 @@ void afs_toc_metadata_source_free(afs_toc_metadata_source * toc_metadata_source)
         {
             for (unsigned int i = 0; i < toc_metadata_source->tags->size; i++)
             {
-                boxing_string_free(GVECTORN(toc_metadata_source->tags, char *, i));
+                free(GVECTORN(toc_metadata_source->tags, char *, i));
                 GVECTORN(toc_metadata_source->tags, char *, i) = NULL;
             }
         }
 
-        boxing_string_free(toc_metadata_source->format);
-        boxing_string_free(toc_metadata_source->data);
+        free(toc_metadata_source->format);
+        free(toc_metadata_source->data);
         gvector_free(toc_metadata_source->tags);
         free(toc_metadata_source);
     }
@@ -525,10 +528,10 @@ DBOOL afs_toc_metadata_source_equal(afs_toc_metadata_source * toc_metadata_sourc
     DBOOL tags_identity = toc_metadata_source_tags_equal(toc_metadata_source1->tags, toc_metadata_source2->tags);
 
     if (tags_identity == DFALSE ||
-        boxing_string_equal(toc_metadata_source1->format, toc_metadata_source2->format) == DFALSE ||
+        strcmp(toc_metadata_source1->format, toc_metadata_source2->format) != 0 ||
         toc_metadata_source1->id != toc_metadata_source2->id ||
         toc_metadata_source1->file_id != toc_metadata_source2->file_id ||
-        boxing_string_equal(toc_metadata_source1->data, toc_metadata_source2->data) == DFALSE)
+        strcmp(toc_metadata_source1->data, toc_metadata_source2->data) != 0)
     {
         return DFALSE;
     }
@@ -557,9 +560,9 @@ DBOOL afs_toc_metadata_source_is_valid(afs_toc_metadata_source * toc_metadata_so
     }
 
     if (toc_metadata_source->format == NULL ||
-        boxing_string_equal(toc_metadata_source->format, "") == DTRUE ||
+        strlen(toc_metadata_source->format) == 0 ||
         (toc_metadata_source->file_id != FILE_ID_UNDEFINED && toc_metadata_source->file_id < 0) ||
-        (toc_metadata_source->file_id == FILE_ID_UNDEFINED && (toc_metadata_source->data == NULL || boxing_string_equal(toc_metadata_source->data, ""))))
+        (toc_metadata_source->file_id == FILE_ID_UNDEFINED && (toc_metadata_source->data == NULL || strlen(toc_metadata_source->data) == 0)))
     {
         return DFALSE;
     }
@@ -582,7 +585,7 @@ DBOOL afs_toc_metadata_source_is_valid(afs_toc_metadata_source * toc_metadata_so
 
 void afs_toc_metadata_source_set_tags(afs_toc_metadata_source * toc_metadata_source, const char * tags)
 {
-    if (toc_metadata_source == NULL || tags == NULL || boxing_string_equal(tags, "") == DTRUE)
+    if (toc_metadata_source == NULL || tags == NULL || strlen(tags) == 0)
     {
         return;
     }
@@ -591,7 +594,7 @@ void afs_toc_metadata_source_set_tags(afs_toc_metadata_source * toc_metadata_sou
     {
         for (unsigned int i = 0; i < toc_metadata_source->tags->size; i++)
         {
-            boxing_string_free(GVECTORN(toc_metadata_source->tags, char *, i));
+            free(GVECTORN(toc_metadata_source->tags, char *, i));
             GVECTORN(toc_metadata_source->tags, char *, i) = NULL;
         }
         gvector_free(toc_metadata_source->tags);
@@ -631,14 +634,14 @@ char * afs_toc_metadata_source_get_tags(afs_toc_metadata_source * toc_metadata_s
 
     for (unsigned int i = 0; i < toc_metadata_source->tags->size; i++)
     {
-        string_size += boxing_string_length(GVECTORN(toc_metadata_source->tags, char *, i));
+        string_size += strlen(GVECTORN(toc_metadata_source->tags, char *, i));
         if (i < toc_metadata_source->tags->size - 1)
         {
             string_size++;
         }
     }
 
-    char * return_string = boxing_string_allocate(string_size);
+    char * return_string = malloc(string_size + 1);
 
     for (unsigned int i = 0; i < toc_metadata_source->tags->size; i++)
     {
@@ -679,7 +682,7 @@ DBOOL afs_toc_metadata_source_save_xml(afs_toc_metadata_source * toc_metadata_so
     mxmlElementSetAttrf(source_node, "id", "%d", toc_metadata_source->id);
     mxmlElementSetAttrf(source_node, "fileId", "%d", toc_metadata_source->file_id);
 
-    if (toc_metadata_source->data != NULL) //  && boxing_string_length(toc_metadata_source->data)
+    if (toc_metadata_source->data != NULL)
     {
         mxml_node_t * data_node = mxmlNewElement(source_node, "data");
         mxmlNewCDATA(data_node, toc_metadata_source->data);
@@ -689,7 +692,7 @@ DBOOL afs_toc_metadata_source_save_xml(afs_toc_metadata_source * toc_metadata_so
     {
         char * source_tags = afs_toc_metadata_source_get_tags(toc_metadata_source);
         afs_xmlutils_add_new_text_node(source_node, "tags", source_tags);
-        boxing_string_free(source_tags);
+        free(source_tags);
     }
 
     return DTRUE;
@@ -823,7 +826,7 @@ DBOOL afs_toc_metadata_source_load_xml(afs_toc_metadata_source * toc_metadata_so
 
     mxml_node_t * source_node = NULL;
 
-    if (boxing_string_equal(mxmlGetElement(input_node), "source") == DTRUE)
+    if (strcmp(mxmlGetElement(input_node), "source") == 0)
     {
         source_node = input_node;
     }
@@ -864,7 +867,11 @@ DBOOL afs_toc_metadata_source_load_xml(afs_toc_metadata_source * toc_metadata_so
                 const size_t cdataLength = strlen(cdata);
                 if (cdata[cdataLength - 1] == ']' && cdata[cdataLength - 2] == ']')
                 {
-                    toc_metadata_source->data = get_substring(cdata, 0, cdataLength - 2);
+                    size_t new_len = cdataLength - 2;
+                    char *data = malloc(new_len + 1);
+                    memcpy(data, cdata, new_len);
+                    data[new_len] = '\0';
+                    toc_metadata_source->data = data;
                 }
                 else
                 {
@@ -887,7 +894,7 @@ DBOOL afs_toc_metadata_source_load_xml(afs_toc_metadata_source * toc_metadata_so
     {
         char * node_text = afs_xmlutils_get_node_text(tags_node);
         afs_toc_metadata_source_set_tags(toc_metadata_source, node_text);
-        boxing_string_free(node_text);
+        free(node_text);
     }
 
     return afs_toc_metadata_source_is_valid(toc_metadata_source);
@@ -909,7 +916,7 @@ DBOOL afs_toc_metadata_source_load_xml(afs_toc_metadata_source * toc_metadata_so
 DBOOL afs_toc_metadata_source_load_string(afs_toc_metadata_source * toc_metadata_source, const char * in)
 {
     // If input string pointer is NULL or TOC metadata source pointer is NULL return DFALSE
-    if (in == NULL || boxing_string_equal(in, "") || toc_metadata_source == NULL)
+    if (in == NULL || strlen(in) == 0 || toc_metadata_source == NULL)
     {
         return DFALSE;
     }
@@ -1005,7 +1012,7 @@ static DBOOL toc_metadata_source_tags_equal(afs_toc_metadata_source_tags * metad
 
     for (unsigned int i = 0; i < metadata_source_tags1->size; i++)
     {
-        if (boxing_string_equal(GVECTORN(metadata_source_tags1, const char *, i), GVECTORN(metadata_source_tags2, const char *, i)) == DFALSE)
+        if (strcmp(GVECTORN(metadata_source_tags1, const char *, i), GVECTORN(metadata_source_tags2, const char *, i)) != 0)
         {
             return DFALSE;
         }
@@ -1028,7 +1035,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
     name = mxmlGetElement(node);
     parent_name = mxmlGetElement(node->parent);
 
-    if (boxing_string_equal("source", name))
+    if (strcmp("source", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1036,7 +1043,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("source", parent_name))
+    if (strcmp("source", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1044,7 +1051,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("data", name) || boxing_string_equal("tags", name))
+    if (strcmp("data", name) == 0 || strcmp("tags", name) == 0)
     {
         if (where == MXML_WS_AFTER_OPEN)
         {
@@ -1053,41 +1060,4 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
     }
 
     return (NULL);
-}
-
-
-static char * get_substring(const char* input_string, size_t start_index, size_t end_index)
-{
-    if (input_string == NULL || start_index > end_index)
-    {
-        return NULL;
-    }
-
-    if (start_index == end_index)
-    {
-        return boxing_string_allocate(0);
-    }
-
-    size_t string_size = boxing_string_length(input_string);
-    if (start_index >= string_size || end_index > string_size)
-    {
-        return NULL;
-    }
-
-    if (start_index == 0 && end_index == string_size)
-    {
-        return NULL;
-    }
-
-    size_t new_string_size = end_index - start_index + 1;
-    char* new_string = boxing_string_allocate(new_string_size);
-
-    for (size_t i = 0; i < new_string_size; i++)
-    {
-        new_string[i] = input_string[i + start_index];
-    }
-
-    new_string[new_string_size - 1] = '\0';
-
-    return new_string;
 }

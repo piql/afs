@@ -20,6 +20,7 @@
 #include "platform/io.h"
 #include "mxml.h"
 #include <stdlib.h>
+#include <string.h>
 
 //  DEFINES
 //
@@ -189,10 +190,10 @@ void afs_toc_data_free(afs_toc_data * toc_data)
 
     if (toc_data->reference_count <= 0)
     {
-        boxing_string_free(toc_data->version);
-        boxing_string_free(toc_data->index_type);
-        boxing_string_free(toc_data->job_id);
-        boxing_string_free(toc_data->reel_id);
+        free(toc_data->version);
+        free(toc_data->index_type);
+        free(toc_data->job_id);
+        free(toc_data->reel_id);
         afs_toc_data_reels_free(toc_data->reels);
         afs_toc_metadata_free(toc_data->metadata);
         afs_toc_preview_layout_definitions_free(toc_data->preview_layout_definitions);
@@ -277,10 +278,10 @@ DBOOL afs_toc_data_equal(afs_toc_data * toc_data1, afs_toc_data * toc_data2)
         return DFALSE;
     }
 
-    if (boxing_string_equal(toc_data1->version, toc_data2->version) &&
-        boxing_string_equal(toc_data1->index_type, toc_data2->index_type) &&
-        boxing_string_equal(toc_data1->job_id, toc_data2->job_id) &&
-        boxing_string_equal(toc_data1->reel_id, toc_data2->reel_id) &&
+    if (strcmp(toc_data1->version, toc_data2->version) == 0 &&
+        strcmp(toc_data1->index_type, toc_data2->index_type) == 0 &&
+        strcmp(toc_data1->job_id, toc_data2->job_id) == 0 &&
+        strcmp(toc_data1->reel_id, toc_data2->reel_id) == 0 &&
         (afs_toc_data_reels_equal(toc_data1->reels, toc_data2->reels) || (afs_toc_data_reel_count(toc_data1) == 0 && afs_toc_data_reel_count(toc_data2) == 0)) &&
         (afs_toc_metadata_equal(toc_data1->metadata, toc_data2->metadata) || (afs_toc_data_metadata_source_count(toc_data1) == 0 && afs_toc_data_metadata_source_count(toc_data2) == 0)) &&
         (afs_toc_preview_layout_definitions_equal(toc_data1->preview_layout_definitions, toc_data2->preview_layout_definitions) || (afs_toc_data_preview_layout_definition_count(toc_data1) == 0 && afs_toc_data_preview_layout_definition_count(toc_data2) == 0)))
@@ -348,7 +349,7 @@ afs_toc_data_reel * afs_toc_data_get_reel_by_id(const afs_toc_data * toc_data, c
     {
         afs_toc_data_reel * toc_data_reel = afs_toc_data_reels_get_reel(toc_data->reels, i);
 
-        if (boxing_string_equal(toc_data_reel->id, id) == DTRUE)
+        if (strcmp(toc_data_reel->id, id) == 0)
         {
             return toc_data_reel;
         }
@@ -427,7 +428,7 @@ afs_toc_file * afs_toc_data_get_file_by_id(const afs_toc_data * toc_data, const 
 
 afs_toc_file * afs_toc_data_get_file_by_unique_id(const afs_toc_data * toc_data, const char * unique_id)
 {
-    if (unique_id == NULL || boxing_string_length(unique_id) == 0)
+    if (unique_id == NULL || strlen(unique_id) == 0)
     {
         return NULL;
     }
@@ -614,7 +615,7 @@ void afs_toc_data_set_version(afs_toc_data * toc_data, const char * version)
 
     if (toc_data->version != NULL)
     {
-        boxing_string_free(toc_data->version);
+        free(toc_data->version);
     }
 
     toc_data->version = boxing_string_clone(version);
@@ -641,7 +642,7 @@ void afs_toc_data_set_index_type(afs_toc_data * toc_data, const char * index_typ
 
     if (toc_data->index_type != NULL)
     {
-        boxing_string_free(toc_data->index_type);
+        free(toc_data->index_type);
     }
 
     toc_data->index_type = boxing_string_clone(index_type);
@@ -668,7 +669,7 @@ void afs_toc_data_set_job_id(afs_toc_data * toc_data, const char * job_id)
 
     if (toc_data->job_id != NULL)
     {
-        boxing_string_free(toc_data->job_id);
+        free(toc_data->job_id);
     }
 
     toc_data->job_id = boxing_string_clone(job_id);
@@ -695,7 +696,7 @@ void afs_toc_data_set_reel_id(afs_toc_data * toc_data, const char * reel_id)
 
     if (toc_data->reel_id != NULL)
     {
-        boxing_string_free(toc_data->reel_id);
+        free(toc_data->reel_id);
     }
 
     toc_data->reel_id = boxing_string_clone(reel_id);
@@ -1066,23 +1067,23 @@ DBOOL afs_toc_data_is_valid(const afs_toc_data * toc_data)
         return DFALSE;
     }
 
-    if (toc_data->version == NULL || boxing_string_length(toc_data->version) == 0)
+    if (toc_data->version == NULL || strlen(toc_data->version) == 0)
     {
         return DFALSE;
     }
 
-    if (toc_data->job_id == NULL || boxing_string_length(toc_data->job_id) == 0)
+    if (toc_data->job_id == NULL || strlen(toc_data->job_id) == 0)
     {
         return DFALSE;
     }
 
-    if (toc_data->reel_id == NULL || boxing_string_length(toc_data->reel_id) == 0)
+    if (toc_data->reel_id == NULL || strlen(toc_data->reel_id) == 0)
     {
         return DFALSE;
     }
 
-    if (boxing_string_equal(toc_data->index_type, AFS_TOC_INDEX_TYPE_JOB) == DFALSE && 
-        boxing_string_equal(toc_data->index_type, AFS_TOC_INDEX_TYPE_REEL) == DFALSE)
+    if (strcmp(toc_data->index_type, AFS_TOC_INDEX_TYPE_JOB) != 0 &&
+        strcmp(toc_data->index_type, AFS_TOC_INDEX_TYPE_REEL) != 0)
     {
         return DFALSE;
     }
@@ -1382,7 +1383,7 @@ DBOOL afs_toc_data_load_file(afs_toc_data * toc_data, const char * file_name)
 DBOOL afs_toc_data_load_string(afs_toc_data * toc_data, const char * in)
 {
     // If input string pointer is NULL or TOC data pointer is NULL return DFALSE
-    if (in == NULL || boxing_string_equal(in, "") || toc_data == NULL)
+    if (in == NULL || strlen(in) == 0 || toc_data == NULL)
     {
         return DFALSE;
     }
@@ -1422,7 +1423,7 @@ DBOOL afs_toc_data_load_xml(afs_toc_data * toc_data, mxml_node_t * node)
 
     mxml_node_t * index_node = NULL;
 
-    index_node = boxing_string_equal(mxmlGetElement(node), "Index") == DTRUE ? node : mxmlFindElement(node, node, "Index", NULL, NULL, MXML_DESCEND);
+    index_node = strcmp(mxmlGetElement(node), "Index") == 0 ? node : mxmlFindElement(node, node, "Index", NULL, NULL, MXML_DESCEND);
 
     if (index_node == NULL)
     {
@@ -1431,7 +1432,7 @@ DBOOL afs_toc_data_load_xml(afs_toc_data * toc_data, mxml_node_t * node)
 
     if (toc_data->version != NULL)
     {
-        boxing_string_free(toc_data->version);
+        free(toc_data->version);
     }
 
     toc_data->version = boxing_string_clone(mxmlElementGetAttr(index_node, "version"));
@@ -1441,7 +1442,7 @@ DBOOL afs_toc_data_load_xml(afs_toc_data * toc_data, mxml_node_t * node)
     {
         if (toc_data->index_type != NULL)
         {
-            boxing_string_free(toc_data->index_type);
+            free(toc_data->index_type);
         }
 
         toc_data->index_type = afs_xmlutils_get_node_text(index_type_node);
@@ -1452,7 +1453,7 @@ DBOOL afs_toc_data_load_xml(afs_toc_data * toc_data, mxml_node_t * node)
     {
         if (toc_data->job_id != NULL)
         {
-            boxing_string_free(toc_data->job_id);
+            free(toc_data->job_id);
         }
 
         toc_data->job_id = afs_xmlutils_get_node_text(job_id_node);
@@ -1463,7 +1464,7 @@ DBOOL afs_toc_data_load_xml(afs_toc_data * toc_data, mxml_node_t * node)
     {
         if (toc_data->reel_id != NULL)
         {
-            boxing_string_free(toc_data->reel_id);
+            free(toc_data->reel_id);
         }
 
         toc_data->reel_id = afs_xmlutils_get_node_text(reel_id_node);
@@ -1475,7 +1476,7 @@ DBOOL afs_toc_data_load_xml(afs_toc_data * toc_data, mxml_node_t * node)
 
     while (metadata_node != NULL)
     {
-        if (boxing_string_equal(metadata_node->parent->value.element.name, "Index") == DTRUE)
+        if (strcmp(metadata_node->parent->value.element.name, "Index") == 0)
         {
             afs_toc_metadata * load_toc_metadata = afs_toc_metadata_create();
             
@@ -1586,7 +1587,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
     parent_parent_name = (node->parent != NULL) ? mxmlGetElement(node->parent->parent) : NULL;
     parent_parent_parent_name = (parent_parent_name != NULL) ? mxmlGetElement(node->parent->parent->parent) : NULL;
 
-    if (boxing_string_equal("Index", name))
+    if (strcmp("Index", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1594,7 +1595,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("Index", parent_name))
+    if (strcmp("Index", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1602,7 +1603,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("indexType", name) || boxing_string_equal("jobId", name) || boxing_string_equal("reelId", name))
+    if (strcmp("indexType", name) == 0 || strcmp("jobId", name) == 0 || strcmp("reelId", name) == 0)
     {
         if (where == MXML_WS_AFTER_OPEN)
         {
@@ -1612,7 +1613,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
 
     // METADATA formatting
 
-    if (boxing_string_equal("metadata", name) && boxing_string_equal("Index", parent_name))
+    if (strcmp("metadata", name) == 0 && strcmp("Index", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1620,7 +1621,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("source", name) && boxing_string_equal("metadata", parent_name) && boxing_string_equal("Index", parent_parent_name))
+    if (strcmp("source", name) == 0 && strcmp("metadata", parent_name) == 0 && strcmp("Index", parent_parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1628,7 +1629,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("source", parent_name) && boxing_string_equal("metadata", parent_parent_name) && boxing_string_equal("Index", parent_parent_parent_name))
+    if (strcmp("source", parent_name) == 0 && strcmp("metadata", parent_parent_name) == 0 && strcmp("Index", parent_parent_parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1636,7 +1637,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if ((boxing_string_equal("data", name) || boxing_string_equal("tags", name)) && boxing_string_equal("metadata", parent_parent_name) && boxing_string_equal("Index", parent_parent_parent_name))
+    if ((strcmp("data", name) == 0 || strcmp("tags", name) == 0) && strcmp("metadata", parent_parent_name) == 0 && strcmp("Index", parent_parent_parent_name) == 0)
     {
         if (where == MXML_WS_AFTER_OPEN)
         {
@@ -1646,7 +1647,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
 
     // LAYOUT DEFINITIONS formatting
 
-    if (boxing_string_equal("layoutDefinitions", name))
+    if (strcmp("layoutDefinitions", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1654,7 +1655,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("previewLayout", name))
+    if (strcmp("previewLayout", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1662,7 +1663,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if ((boxing_string_equal("id", name) || boxing_string_equal("name", name) || boxing_string_equal("sections", name)) && boxing_string_equal("previewLayout", parent_name))
+    if ((strcmp("id", name) == 0 || strcmp("name", name) == 0 || strcmp("sections", name) == 0) && strcmp("previewLayout", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1670,7 +1671,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("sections", parent_name))
+    if (strcmp("sections", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1678,7 +1679,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if ((boxing_string_equal("id", name) || boxing_string_equal("name", name)) && boxing_string_equal("previewLayout", parent_name))
+    if ((strcmp("id", name) == 0 || strcmp("name", name) == 0) && strcmp("previewLayout", parent_name) == 0)
     {
         if (where == MXML_WS_AFTER_OPEN)
         {
@@ -1688,7 +1689,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
 
     // REELS formatting
 
-    if (boxing_string_equal("reel", name))
+    if (strcmp("reel", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1696,7 +1697,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("reel", parent_name) && boxing_string_equal("id", name))
+    if (strcmp("reel", parent_name) == 0 && strcmp("id", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1709,7 +1710,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("files", name))
+    if (strcmp("files", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1717,7 +1718,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("file", name))
+    if (strcmp("file", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1725,7 +1726,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("file", parent_name) && !boxing_string_equal("data", name) && !boxing_string_equal("preview", name) && !boxing_string_equal("metadata", name))
+    if (strcmp("file", parent_name) == 0 && strcmp("data", name) != 0 && strcmp("preview", name) != 0 && strcmp("metadata", name) != 0)
     {
         if (where == MXML_WS_BEFORE_OPEN)
         {
@@ -1743,7 +1744,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("preview", name))
+    if (strcmp("preview", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1751,7 +1752,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("metadata", name) && boxing_string_equal("file", parent_name))
+    if (strcmp("metadata", name) == 0 && strcmp("file", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1759,7 +1760,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("source", name) && boxing_string_equal("metadata", parent_name) && boxing_string_equal("file", parent_parent_name))
+    if (strcmp("source", name) == 0 && strcmp("metadata", parent_name) == 0 && strcmp("file", parent_parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1767,7 +1768,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("data", name) && boxing_string_equal("source", parent_name) && boxing_string_equal("metadata", parent_parent_name) && boxing_string_equal("file", parent_parent_parent_name))
+    if (strcmp("data", name) == 0 && strcmp("source", parent_name) == 0 && strcmp("metadata", parent_parent_name) == 0 && strcmp("file", parent_parent_parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1780,7 +1781,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("preview", parent_name))
+    if (strcmp("preview", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN)
         {

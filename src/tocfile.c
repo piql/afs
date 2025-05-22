@@ -21,6 +21,7 @@
 #include "mxml.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 //  DEFINES
 //
@@ -317,12 +318,12 @@ void afs_toc_file_free(afs_toc_file* toc_data_file)
 
     if (toc_data_file->reference_count <= 0)
     {
-        boxing_string_free(toc_data_file->name);
-        boxing_string_free(toc_data_file->date);
-        boxing_string_free(toc_data_file->checksum);
-        boxing_string_free(toc_data_file->unique_id);
+        free(toc_data_file->name);
+        free(toc_data_file->date);
+        free(toc_data_file->checksum);
+        free(toc_data_file->unique_id);
         afs_toc_file_preview_free(toc_data_file->preview);
-        boxing_string_free(toc_data_file->file_format);
+        free(toc_data_file->file_format);
         afs_toc_data_file_metadata_free(toc_data_file->metadata);
         free(toc_data_file);
     }
@@ -415,20 +416,20 @@ DBOOL afs_toc_file_equal(afs_toc_file * toc_data_file1, afs_toc_file * toc_data_
         return DFALSE;
     }
 
-    if (boxing_string_equal(toc_data_file1->name, toc_data_file2->name) &&
-        boxing_string_equal(toc_data_file1->date, toc_data_file2->date) &&
-        boxing_string_equal(toc_data_file1->checksum, toc_data_file2->checksum) &&
+    if (strcmp(toc_data_file1->name, toc_data_file2->name) == 0 &&
+        strcmp(toc_data_file1->date, toc_data_file2->date) == 0 &&
+        strcmp(toc_data_file1->checksum, toc_data_file2->checksum) == 0 &&
         toc_data_file1->size == toc_data_file2->size &&
         toc_data_file1->id == toc_data_file2->id &&
         toc_data_file1->start_frame == toc_data_file2->start_frame &&
         toc_data_file1->start_byte == toc_data_file2->start_byte &&
         toc_data_file1->end_frame == toc_data_file2->end_frame &&
         toc_data_file1->end_byte == toc_data_file2->end_byte &&
-        boxing_string_equal(toc_data_file1->unique_id, toc_data_file2->unique_id) &&
+        strcmp(toc_data_file1->unique_id, toc_data_file2->unique_id) == 0 &&
         toc_data_file1->parent_id == toc_data_file2->parent_id &&
         toc_data_file1->types == toc_data_file2->types &&
         afs_toc_file_preview_equal(toc_data_file1->preview, toc_data_file2->preview) &&
-        boxing_string_equal(toc_data_file1->file_format, toc_data_file2->file_format) &&
+        strcmp(toc_data_file1->file_format, toc_data_file2->file_format) == 0 &&
         afs_toc_data_file_metadata_equal(toc_data_file1->metadata, toc_data_file2->metadata))
     {
         return DTRUE;
@@ -525,7 +526,7 @@ void afs_toc_file_set_name(afs_toc_file * toc_data_file, const char * name)
 
     if (toc_data_file->name != NULL)
     {
-        boxing_string_free(toc_data_file->name);
+        free(toc_data_file->name);
     }
 
     toc_data_file->name = boxing_string_clone(name);
@@ -552,7 +553,7 @@ void afs_toc_file_set_date(afs_toc_file * toc_data_file, const char * date)
 
     if (toc_data_file->date != NULL)
     {
-        boxing_string_free(toc_data_file->date);
+        free(toc_data_file->date);
     }
 
     toc_data_file->date = boxing_string_clone(date);
@@ -579,7 +580,7 @@ void afs_toc_file_set_checksum(afs_toc_file * toc_data_file, const char * checks
 
     if (toc_data_file->checksum != NULL)
     {
-        boxing_string_free(toc_data_file->checksum);
+        free(toc_data_file->checksum);
     }
 
     toc_data_file->checksum = boxing_string_clone(checksum);
@@ -606,7 +607,7 @@ void afs_toc_file_set_unique_id(afs_toc_file * toc_data_file, const char * uniqu
 
     if (toc_data_file->unique_id != NULL)
     {
-        boxing_string_free(toc_data_file->unique_id);
+        free(toc_data_file->unique_id);
     }
 
     toc_data_file->unique_id = boxing_string_clone(unique_id);
@@ -633,7 +634,7 @@ void afs_toc_file_set_file_format(afs_toc_file * toc_data_file, const char * fil
 
     if (toc_data_file->file_format != NULL)
     {
-        boxing_string_free(toc_data_file->file_format);
+        free(toc_data_file->file_format);
     }
 
     toc_data_file->file_format = boxing_string_clone(file_format);
@@ -759,7 +760,7 @@ DBOOL afs_toc_file_load_file(afs_toc_file * toc_data_file, const char * file_nam
 DBOOL afs_toc_file_load_string(afs_toc_file * toc_data_file, const char * in)
 {
     // If input string pointer is NULL or TOC data file pointer is NULL return DFALSE
-    if (in == NULL|| boxing_string_equal(in, "") || toc_data_file == NULL)
+    if (in == NULL|| strlen(in) == 0 || toc_data_file == NULL)
     {
         return DFALSE;
     }
@@ -798,7 +799,7 @@ DBOOL afs_toc_file_load_xml(afs_toc_file * toc_data_file, mxml_node_t* node)
 
     mxml_node_t * file_node = NULL;
     
-    file_node = boxing_string_equal(mxmlGetElement(node), "file") == DTRUE ? node : mxmlFindElement(node, node, "file", NULL, NULL, MXML_DESCEND);
+    file_node = strcmp(mxmlGetElement(node), "file") == 0 ? node : mxmlFindElement(node, node, "file", NULL, NULL, MXML_DESCEND);
 
     if (file_node == NULL)
     {
@@ -872,7 +873,7 @@ DBOOL afs_toc_file_load_xml(afs_toc_file * toc_data_file, mxml_node_t* node)
     {
         mxml_node_t * parent_node = mxmlGetParent(data_node);
         const char * parent_name = mxmlGetElement(parent_node);
-        if (boxing_string_equal(parent_name, "file"))
+        if (strcmp(parent_name, "file") == 0)
         {
             break;
         }
@@ -938,7 +939,7 @@ DBOOL afs_toc_file_load_data_v1(afs_toc_file * toc_data_file, mxml_node_t* node)
     {
         char * node_text = afs_xmlutils_get_node_text_safe(size_node,"0");
         toc_data_file->size = STRING_TO_LONG_INT(node_text);
-        boxing_string_free(node_text);
+        free(node_text);
     }
 
     mxml_node_t * checksum_node = mxmlFindElement(node, node, "checksum", NULL, NULL, MXML_DESCEND);
@@ -986,7 +987,7 @@ DBOOL afs_toc_file_load_data_v2(afs_toc_file * toc_data_file, mxml_node_t* node)
     {
         char * node_text = afs_xmlutils_get_node_text_safe(size_node,"0");
         toc_data_file->size = STRING_TO_LONG_INT(node_text);
-        boxing_string_free(node_text);
+        free(node_text);
     }
 
     mxml_node_t * checksum_node = mxmlFindElement(node, node, "checksum", NULL, NULL, MXML_DESCEND);
@@ -1377,7 +1378,7 @@ DBOOL afs_toc_file_is_valid(const afs_toc_file * toc_data_file)
     }
 
     // Invalid TOC file, incorrect general elements
-    if (toc_data_file->name == NULL || boxing_string_equal(toc_data_file->name, "") || toc_data_file->date == NULL || boxing_string_equal(toc_data_file->date, ""))
+    if (toc_data_file->name == NULL || strlen(toc_data_file->name) == 0 || toc_data_file->date == NULL || strlen(toc_data_file->date) == 0)
     {
         return DFALSE;
     }
@@ -1532,7 +1533,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
     name = mxmlGetElement(node);
     parent_name = mxmlGetElement(node->parent);
 
-    if (boxing_string_equal("file", name))
+    if (strcmp("file", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1540,7 +1541,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("file", parent_name))
+    if (strcmp("file", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1548,15 +1549,15 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("file", parent_name) && !boxing_string_equal("start", name) && !boxing_string_equal("end", name) && !boxing_string_equal("preview", name))
+    if (strcmp("file", parent_name) == 0 && strcmp("start", name) != 0 && strcmp("end", name) != 0 && strcmp("preview", name) != 0)
     {
-        if (where == MXML_WS_AFTER_OPEN && !boxing_string_equal("data", name) && !boxing_string_equal("metadata", name))
+        if (where == MXML_WS_AFTER_OPEN && strcmp("data", name) != 0 && strcmp("metadata", name) != 0)
         {
             return ("\n        ");
         }
     }
 
-    if (boxing_string_equal("start", parent_name) || boxing_string_equal("end", parent_name))
+    if (strcmp("start", parent_name) == 0 || strcmp("end", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1569,7 +1570,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("pages", name))
+    if (strcmp("pages", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1577,28 +1578,28 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("data", parent_name))
+    if (strcmp("data", parent_name) == 0)
     {
-        if (boxing_string_equal("checksum", name) || boxing_string_equal("size", name) || boxing_string_equal("start", name) || boxing_string_equal("end", name))
+        if (strcmp("checksum", name) == 0 || strcmp("size", name) == 0 || strcmp("start", name) == 0 || strcmp("end", name) == 0)
         {
             if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
             {
                 return ("\n        ");
             }
 
-            if (where == MXML_WS_AFTER_OPEN && !boxing_string_equal("start", name) && !boxing_string_equal("end", name) && !boxing_string_equal("checksum", name))
+            if (where == MXML_WS_AFTER_OPEN && strcmp("start", name) != 0 && strcmp("end", name) != 0 && strcmp("checksum", name) != 0)
             {
                 return ("\n            ");
             }
 
-            if (where == MXML_WS_AFTER_OPEN && boxing_string_equal("checksum", name) && boxing_string_length(afs_xmlutils_get_node_text(node)) != 0)
+            if (where == MXML_WS_AFTER_OPEN && strcmp("checksum", name) == 0 && strlen(afs_xmlutils_get_node_text(node)) != 0)
             {
                 return ("\n            ");
             }
         }
     }
 
-    if (boxing_string_equal("metadata", parent_name))
+    if (strcmp("metadata", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1606,7 +1607,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("source", parent_name))
+    if (strcmp("source", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {

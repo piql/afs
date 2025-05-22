@@ -622,7 +622,7 @@ DBOOL afs_toc_preview_sections_load_file(afs_toc_preview_sections * toc_preview_
 DBOOL afs_toc_preview_sections_load_string(afs_toc_preview_sections * toc_preview_sections, const char * in)
 {
     // If input string pointer is NULL or TOC preview sections pointer is NULL return DFALSE
-    if (in == NULL || boxing_string_equal(in, "") || toc_preview_sections == NULL)
+    if (in == NULL || strlen(in) == 0 || toc_preview_sections == NULL)
     {
         return DFALSE;
     }
@@ -660,7 +660,7 @@ DBOOL afs_toc_preview_sections_load_xml(afs_toc_preview_sections * toc_preview_s
         return DFALSE;
     }
 
-    struct mxml_node_s * sections_node = boxing_string_equal(mxmlGetElement(input_node), "sections") == DTRUE ? input_node : mxmlFindElement(input_node, input_node, "sections", NULL, NULL, MXML_DESCEND);
+    struct mxml_node_s * sections_node = strcmp(mxmlGetElement(input_node), "sections") == 0 ? input_node : mxmlFindElement(input_node, input_node, "sections", NULL, NULL, MXML_DESCEND);
 
     if (sections_node == NULL)
     {
@@ -720,7 +720,7 @@ static const char * whitespace_cb(struct mxml_node_s *node, int where)
 
     name = mxmlGetElement(node);
 
-    if (boxing_string_equal("section", name))
+    if (strcmp("section", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN)
         {

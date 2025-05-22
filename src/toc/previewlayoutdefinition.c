@@ -19,6 +19,9 @@
 #include "xmlutils.h"
 #include "mxml.h"
 
+// SYSTEM INCLUDES
+#include <string.h>
+
 // PRIVATE INTERFACE
 //
 
@@ -205,8 +208,8 @@ void afs_toc_preview_layout_definition_free(afs_toc_preview_layout_definition * 
 
         if (toc_preview_layout_definition->reference_count == 0)
         {
-            boxing_string_free(toc_preview_layout_definition->id);
-            boxing_string_free(toc_preview_layout_definition->name);
+            free(toc_preview_layout_definition->id);
+            free(toc_preview_layout_definition->name);
             afs_toc_preview_sections_free(toc_preview_layout_definition->sections);
             free(toc_preview_layout_definition);
         }
@@ -293,8 +296,8 @@ DBOOL afs_toc_preview_layout_definition_equal(const afs_toc_preview_layout_defin
     DBOOL sections_identity = afs_toc_preview_sections_equal(toc_preview_layout_definition1->sections, toc_preview_layout_definition2->sections);
 
     if (sections_identity == DFALSE ||
-        boxing_string_equal(toc_preview_layout_definition1->id, toc_preview_layout_definition2->id) == DFALSE ||
-        boxing_string_equal(toc_preview_layout_definition1->name, toc_preview_layout_definition2->name) == DFALSE)
+        strcmp(toc_preview_layout_definition1->id, toc_preview_layout_definition2->id) != 0 ||
+        strcmp(toc_preview_layout_definition1->name, toc_preview_layout_definition2->name) != 0)
     {
         return DFALSE;
     }
@@ -322,8 +325,8 @@ DBOOL afs_toc_preview_layout_definition_is_valid(const afs_toc_preview_layout_de
         return DFALSE;
     }
 
-    if (toc_preview_layout_definition->id == NULL || boxing_string_equal(toc_preview_layout_definition->id, "") == DTRUE ||
-        (toc_preview_layout_definition->name == NULL || boxing_string_equal(toc_preview_layout_definition->name, "") == DTRUE) ||
+    if (toc_preview_layout_definition->id == NULL || strlen(toc_preview_layout_definition->id) == 0 ||
+        (toc_preview_layout_definition->name == NULL || strlen(toc_preview_layout_definition->name) == 0) ||
         afs_toc_preview_sections_is_valid(toc_preview_layout_definition->sections) == DFALSE)
     {
         return DFALSE;
@@ -664,7 +667,7 @@ DBOOL afs_toc_preview_layout_definition_load_file(afs_toc_preview_layout_definit
 DBOOL afs_toc_preview_layout_definition_load_string(afs_toc_preview_layout_definition * toc_preview_layout_definition, const char * in)
 {
     // If input string pointer is NULL or TOC preview layout definition pointer is NULL return DFALSE
-    if (in == NULL || boxing_string_equal(in, "") || toc_preview_layout_definition == NULL)
+    if (in == NULL || strlen(in) == 0 || toc_preview_layout_definition == NULL)
     {
         return DFALSE;
     }
@@ -704,7 +707,7 @@ DBOOL afs_toc_preview_layout_definition_load_xml(afs_toc_preview_layout_definiti
 
     mxml_node_t * preview_node;
 
-    if (boxing_string_equal(mxmlGetElement(node), "previewLayout") == DTRUE)
+    if (strcmp(mxmlGetElement(node), "previewLayout") == 0)
     {
         preview_node = node;
     }
@@ -753,7 +756,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
     name = mxmlGetElement(node);
     parent_name = mxmlGetElement(node->parent);
 
-    if (boxing_string_equal("previewLayout", name))
+    if (strcmp("previewLayout", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -761,7 +764,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("id", name) || boxing_string_equal("name", name) || boxing_string_equal("sections", name))
+    if (strcmp("id", name) == 0 || strcmp("name", name) == 0 || strcmp("sections", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -769,7 +772,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("sections", parent_name))
+    if (strcmp("sections", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -777,7 +780,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("id", name) || boxing_string_equal("name", name))
+    if (strcmp("id", name) == 0 || strcmp("name", name) == 0)
     {
         if (where == MXML_WS_AFTER_OPEN)
         {

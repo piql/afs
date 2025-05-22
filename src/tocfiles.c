@@ -906,7 +906,7 @@ DBOOL afs_toc_files_load_file(afs_toc_files * toc_files, const char * file_name)
 DBOOL afs_toc_files_load_string(afs_toc_files * toc_files, const char * in)
 {
     // If input string pointer is NULL or TOC files pointer is NULL return DFALSE
-    if (in == NULL || boxing_string_equal(in, "") || toc_files == NULL)
+    if (in == NULL || strlen(in) == 0 || toc_files == NULL)
     {
         return DFALSE;
     }
@@ -992,11 +992,11 @@ char * afs_toc_files_save_as_table(afs_toc_files * toc_files)
     size_t tocs_count = afs_toc_files_get_tocs_count(toc_files);
 
     const char * header = "<fileId> <uniqueId> <parentId> <formatId> <fileName>";
-    size_t header_length = boxing_string_length(header);
+    size_t header_length = strlen(header);
 
     if (tocs_count == 0)
     {
-        char * return_string = boxing_string_allocate(header_length + 2);
+        char * return_string = malloc(header_length + 2 + 1);
         sprintf(return_string, "%s\n\n", header);
         return return_string;
     }
@@ -1009,7 +1009,7 @@ char * afs_toc_files_save_as_table(afs_toc_files * toc_files)
         lengths.format_id_length + lengths.file_name_length + 5;
     size_t table1_length = header_length + table1_width * tocs_count + 1;
 
-    char * return_string = boxing_string_allocate(table1_length);
+    char * return_string = malloc(table1_length + 1);
     char * current_string = return_string;
     
     current_string += sprintf(current_string, "%s\n", header);
@@ -1033,7 +1033,7 @@ char * afs_toc_files_save_as_table(afs_toc_files * toc_files)
         }
 
         char file_format_string[255]; // Temporary string
-        if (boxing_string_length(toc_file->file_format) != 0)
+        if (strlen(toc_file->file_format) != 0)
         {
             sprintf(file_format_string, "%s", toc_file->file_format);
         }
@@ -1068,7 +1068,7 @@ char * afs_toc_files_save_as_location_table(afs_toc_files * toc_files)
 
     if (toc_files->tocs == NULL)
     {
-        char* empty = boxing_string_allocate(0);
+        char* empty = boxing_string_clone("");
         return empty;
     }
 
@@ -1084,10 +1084,10 @@ char * afs_toc_files_save_as_location_table(afs_toc_files * toc_files)
     toc_files_location_lengths lengths = get_max_toc_files_location_lenght(toc_files);
     size_t tocs_count = afs_toc_files_get_tocs_count(toc_files);
 
-    size_t newline_length = boxing_string_length("\n");
-    size_t digital_header_length = boxing_string_length(digital_header);
-    size_t digital_header2_length = boxing_string_length(digital_header2);
-    size_t visual_header_length = boxing_string_length(visual_header);
+    size_t newline_length = strlen("\n");
+    size_t digital_header_length = strlen(digital_header);
+    size_t digital_header2_length = strlen(digital_header2);
+    size_t visual_header_length = strlen(visual_header);
 
     size_t digital_table_width = lengths.digital_id_length + lengths.digital_start_frame_length + lengths.digital_start_byte_length +
         lengths.digital_end_frame_length + lengths.digital_end_byte_length + lengths.digital_size_length + lengths.digital_sha1_checksum_length + 6 + newline_length;
@@ -1097,7 +1097,7 @@ char * afs_toc_files_save_as_location_table(afs_toc_files * toc_files)
         lengths.visual_start_section_length + lengths.visual_section_count_length + lengths.visual_dimension_length + lengths.visual_overlap_length + 6 + newline_length;
     size_t visual_table_length = visual_header_length + visual_table_width * lengths.visual_pages_count;
 
-    char * return_string = boxing_string_allocate(digital_table_length + visual_table_length);
+    char * return_string = malloc(digital_table_length + visual_table_length + 1);
     char * current_string = return_string;
 
     DBOOL digital_header_done = DFALSE;
@@ -1170,7 +1170,7 @@ char * afs_toc_files_save_as_location_table(afs_toc_files * toc_files)
                 }
 
                 char layout_id_string[255]; // Temporary string
-                unsigned int layout_id_length = (unsigned int)boxing_string_length(toc_file_preview_page->layout_id);
+                unsigned int layout_id_length = (unsigned int)strlen(toc_file_preview_page->layout_id);
                 if (lengths.visual_layout_id_length > layout_id_length)
                 {
                     sprintf(layout_id_string, "%0*d%s", lengths.visual_layout_id_length - layout_id_length, 0, toc_file_preview_page->layout_id);
@@ -1228,12 +1228,12 @@ char * afs_toc_files_save_as_metadata_table(afs_toc_files * toc_files)
         "<fileId> <sourceFileId> <sourceId> <formatId> <data>\n";
     toc_files_metadata_lengths lengths = get_max_toc_files_metadata_lenght(toc_files);
 
-    unsigned int metadata_header_length = (unsigned int)(boxing_string_length(metadata_header) + boxing_string_length(metadata_columns));
+    unsigned int metadata_header_length = (unsigned int)(strlen(metadata_header) + strlen(metadata_columns));
     unsigned int metadata_table_width = lengths.file_id_length + lengths.id_length + lengths.source_file_id_length +
         lengths.source_id_length + lengths.source_format_id_length + lengths.source_data_length + (unsigned int)5 + (unsigned int)strlen("\n");
     unsigned int metadata_table_length = metadata_header_length + metadata_table_width * lengths.metadata_sources_count + 1;
 
-    char * return_string = boxing_string_allocate(metadata_table_length);
+    char * return_string = malloc(metadata_table_length + 1);
     char * current_string = return_string;
 
     DBOOL metadata_header_done = DFALSE;
@@ -1271,7 +1271,7 @@ char * afs_toc_files_save_as_metadata_table(afs_toc_files * toc_files)
                 #define MAX_DATA_LENGTH 55
 
                 char data[MAX_DATA_LENGTH];
-                unsigned int data_length = (unsigned int)boxing_string_length(metadata_source->data);
+                unsigned int data_length = (unsigned int)strlen(metadata_source->data);
                 
                 if (data_length >= MAX_DATA_LENGTH)
                 {
@@ -1286,7 +1286,7 @@ char * afs_toc_files_save_as_metadata_table(afs_toc_files * toc_files)
                 char source_id[32];
                 if ( lengths.source_id_length > sizeof(source_id))
                 {
-                    boxing_string_free(return_string);
+                    free(return_string);
                     return NULL;
                 }
                 
@@ -1356,14 +1356,14 @@ static toc_files_lengths get_max_toc_files_lenght(const afs_toc_files * toc_file
         afs_toc_file * toc_file = GVECTORN(toc_files->tocs, afs_toc_file *, i);
         
         SET_MAX_LENGTH(lengths.id_length, get_digits_count(toc_file->id));
-        SET_MAX_LENGTH(lengths.unique_id_length, (unsigned int)boxing_string_length(toc_file->unique_id));
+        SET_MAX_LENGTH(lengths.unique_id_length, (unsigned int)strlen(toc_file->unique_id));
 
         unsigned int current_parent_id_length = toc_file->parent_id != AFS_TOC_FILE_PARENT && toc_file->parent_id != AFS_TOC_FILE_NO_PARENT ? get_digits_count(toc_file->parent_id) : 1;
         SET_MAX_LENGTH(lengths.parent_id_length, current_parent_id_length);
 
-        unsigned int current_format_id_length = boxing_string_length(toc_file->file_format) == 0 ? 1 : (unsigned int)boxing_string_length(toc_file->file_format);
+        unsigned int current_format_id_length = strlen(toc_file->file_format) == 0 ? 1 : (unsigned int)strlen(toc_file->file_format);
         SET_MAX_LENGTH(lengths.format_id_length, current_format_id_length);
-        SET_MAX_LENGTH(lengths.file_name_length, (unsigned int)boxing_string_length(toc_file->name));
+        SET_MAX_LENGTH(lengths.file_name_length, (unsigned int)strlen(toc_file->name));
     }
 
     return lengths;
@@ -1417,7 +1417,7 @@ static toc_files_location_lengths get_max_toc_files_location_lenght(const afs_to
         SET_MAX_LENGTH(lengths.digital_end_frame_length, get_digits_count(toc_file->end_frame));
         SET_MAX_LENGTH(lengths.digital_end_byte_length, get_digits_count(toc_file->end_byte));
         SET_MAX_LENGTH(lengths.digital_size_length, get_digits_count_64(toc_file->size));
-        SET_MAX_LENGTH(lengths.digital_sha1_checksum_length, (unsigned int)boxing_string_length(toc_file->checksum));
+        SET_MAX_LENGTH(lengths.digital_sha1_checksum_length, (unsigned int)strlen(toc_file->checksum));
 
         afs_toc_file_preview * toc_file_preview = toc_file->preview;
 
@@ -1443,7 +1443,7 @@ static toc_files_location_lengths get_max_toc_files_location_lenght(const afs_to
             lengths.visual_pages_count++;
 
             SET_MAX_LENGTH(lengths.visual_id_length, get_digits_count(toc_file->id));
-            SET_MAX_LENGTH(lengths.visual_layout_id_length, (unsigned int)boxing_string_length(toc_file_preview_page->layout_id));
+            SET_MAX_LENGTH(lengths.visual_layout_id_length, (unsigned int)strlen(toc_file_preview_page->layout_id));
             SET_MAX_LENGTH(lengths.visual_start_frame_length, get_unsigned_digits_count(toc_file_preview_page->start_frame));
             SET_MAX_LENGTH(lengths.visual_start_section_length, get_unsigned_digits_count(toc_file_preview_page->start_section));
             SET_MAX_LENGTH(lengths.visual_section_count_length, get_unsigned_digits_count(toc_file_preview_page->section_count));
@@ -1462,12 +1462,12 @@ static toc_files_metadata_lengths get_max_toc_files_metadata_lenght(const afs_to
 {
     toc_files_metadata_lengths lengths;
 
-    lengths.file_id_length = 0; //(unsigned int)boxing_string_length("<fileId>");
-    lengths.id_length = 0; //(unsigned int)boxing_string_length("<id>");
-    lengths.source_file_id_length = 0; //(unsigned int)boxing_string_length("<fileId>");
-    lengths.source_id_length = 0; //(unsigned int)boxing_string_length("<sourceId>");
-    lengths.source_format_id_length = 0; //(unsigned int)boxing_string_length("<formatId>");
-    lengths.source_data_length = 0; //(unsigned int)boxing_string_length("<data>");
+    lengths.file_id_length = 0;
+    lengths.id_length = 0;
+    lengths.source_file_id_length = 0;
+    lengths.source_id_length = 0;
+    lengths.source_format_id_length = 0;
+    lengths.source_data_length = 0;
 
     lengths.metadata_sources_count = 0;
 
@@ -1518,10 +1518,10 @@ static toc_files_metadata_lengths get_max_toc_files_metadata_lenght(const afs_to
                 unsigned int current_source_id_length = get_digits_count(metadata_source->source_id);
                 SET_MAX_LENGTH(lengths.source_id_length, current_source_id_length);
 
-                unsigned int current_source_format_id_length = (unsigned int)boxing_string_length(metadata_source->format_id);
+                unsigned int current_source_format_id_length = (unsigned int)strlen(metadata_source->format_id);
                 SET_MAX_LENGTH(lengths.source_format_id_length, current_source_format_id_length);
 
-                unsigned int current_source_data_length = (unsigned int)boxing_string_length(metadata_source->data);
+                unsigned int current_source_data_length = (unsigned int)strlen(metadata_source->data);
                 SET_MAX_LENGTH(lengths.source_data_length, current_source_data_length);
             }
         }
@@ -1573,7 +1573,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
     name = mxmlGetElement(node);
     parent_name = mxmlGetElement(node->parent);
 
-    if (boxing_string_equal("files", name))
+    if (strcmp("files", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1581,7 +1581,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("file", name))
+    if (strcmp("file", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1589,7 +1589,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("file", parent_name) && !boxing_string_equal("data", name) && !boxing_string_equal("preview", name))
+    if (strcmp("file", parent_name) == 0 && strcmp("data", name) != 0 && strcmp("preview", name) != 0)
     {
         if (where == MXML_WS_BEFORE_OPEN)
         {
@@ -1607,7 +1607,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("data", name) || boxing_string_equal("preview", name))
+    if (strcmp("data", name) == 0 || strcmp("preview", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1615,19 +1615,19 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("data", parent_name))
+    if (strcmp("data", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
             return ("\n            ");
         }
-        if (where == MXML_WS_AFTER_OPEN && !boxing_string_equal("start", name) && !boxing_string_equal("end", name))
+        if (where == MXML_WS_AFTER_OPEN && strcmp("start", name) != 0 && strcmp("end", name) != 0)
         {
             return ("\n                ");
         }
     }
 
-    if (boxing_string_equal("preview", parent_name))
+    if (strcmp("preview", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN)
         {

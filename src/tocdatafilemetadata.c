@@ -557,11 +557,11 @@ char * afs_toc_data_file_metadata_save_as_table(const afs_toc_data_file_metadata
     toc_data_file_metadata_lengths lengths = get_max_toc_data_file_metadata_lenght(toc_data_file_metadata);
     unsigned int sources_count = afs_toc_data_file_metadata_get_sources_count(toc_data_file_metadata);
 
-    unsigned int header_length = (unsigned int)boxing_string_length(header);
+    unsigned int header_length = (unsigned int)strlen(header);
     unsigned int table_width = lengths.id_length + lengths.file_id_length + lengths.source_id_length + lengths.format_id_length + lengths.data_length + 4 + strlen("\n");
     unsigned int table_length = table_width * sources_count + 1;
 
-    char * return_string = boxing_string_allocate(header_length + table_length);
+    char * return_string = malloc(header_length + table_length + 1);
     char * current_string = return_string;
     current_string += sprintf(current_string, "%s", header);
 
@@ -687,7 +687,7 @@ DBOOL afs_toc_data_file_metadata_load_file(afs_toc_data_file_metadata * toc_data
 DBOOL afs_toc_data_file_metadata_load_string(afs_toc_data_file_metadata * toc_data_file_metadata, const char * in)
 {
     // If input string pointer is NULL or TOC data file metadata pointer is NULL return DFALSE
-    if (in == NULL || boxing_string_equal(in, "") || toc_data_file_metadata == NULL)
+    if (in == NULL || strlen(in) == 0 || toc_data_file_metadata == NULL)
     {
         return DFALSE;
     }
@@ -726,7 +726,7 @@ DBOOL afs_toc_data_file_metadata_load_xml(afs_toc_data_file_metadata * toc_data_
         return DFALSE;
     }
 
-    mxml_node_t * metadata_node = boxing_string_equal(mxmlGetElement(node), "metadata") == DTRUE ? node : mxmlFindElement(node, node, "metadata", NULL, NULL, MXML_DESCEND);
+    mxml_node_t * metadata_node = strcmp(mxmlGetElement(node), "metadata") == 0 ? node : mxmlFindElement(node, node, "metadata", NULL, NULL, MXML_DESCEND);
 
     if (metadata_node == NULL)
     {
@@ -790,7 +790,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
     name = mxmlGetElement(node);
     parent_name = mxmlGetElement(node->parent);
 
-    if (boxing_string_equal("metadata", name))
+    if (strcmp("metadata", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -798,7 +798,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("source", name))
+    if (strcmp("source", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -806,7 +806,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("source", parent_name))
+    if (strcmp("source", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -814,7 +814,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("data", name))
+    if (strcmp("data", name) == 0)
     {
         if (where == MXML_WS_AFTER_OPEN)
         {
@@ -830,11 +830,11 @@ static toc_data_file_metadata_lengths get_max_toc_data_file_metadata_lenght(cons
 {
     toc_data_file_metadata_lengths lengths;
 
-    lengths.id_length = 1; //(unsigned int)boxing_string_length("<id>");
-    lengths.file_id_length = 0;//(unsigned int)boxing_string_length("<fileId>");
-    lengths.source_id_length = 0;//(unsigned int)boxing_string_length("<sourceId>");
-    lengths.format_id_length = 0;//(unsigned int)boxing_string_length("<formatId>");
-    lengths.data_length = 0;//(unsigned int)boxing_string_length("<data>");
+    lengths.id_length = 1;
+    lengths.file_id_length = 0;
+    lengths.source_id_length = 0;
+    lengths.format_id_length = 0;
+    lengths.data_length = 0;
 
     if (toc_data_file_metadata == NULL)
     {
@@ -853,8 +853,8 @@ static toc_data_file_metadata_lengths get_max_toc_data_file_metadata_lenght(cons
         lengths.id_length = get_digits_count(i) > lengths.id_length ? get_digits_count(i) : lengths.id_length;
         lengths.file_id_length = get_digits_count(toc_data_file_metadata_source->file_id) > lengths.file_id_length ? get_digits_count(toc_data_file_metadata_source->file_id) : lengths.file_id_length;
         lengths.source_id_length = get_digits_count(toc_data_file_metadata_source->source_id) > lengths.source_id_length ? get_digits_count(toc_data_file_metadata_source->source_id) : lengths.source_id_length;
-        lengths.format_id_length = (unsigned int)boxing_string_length(toc_data_file_metadata_source->format_id) > lengths.format_id_length ? (unsigned int)boxing_string_length(toc_data_file_metadata_source->format_id) : lengths.format_id_length;
-        lengths.data_length = (unsigned int)boxing_string_length(toc_data_file_metadata_source->data) > lengths.data_length ? (unsigned int)boxing_string_length(toc_data_file_metadata_source->data) : lengths.data_length;
+        lengths.format_id_length = (unsigned int)strlen(toc_data_file_metadata_source->format_id) > lengths.format_id_length ? (unsigned int)strlen(toc_data_file_metadata_source->format_id) : lengths.format_id_length;
+        lengths.data_length = (unsigned int)strlen(toc_data_file_metadata_source->data) > lengths.data_length ? (unsigned int)strlen(toc_data_file_metadata_source->data) : lengths.data_length;
     }
 
     return lengths;

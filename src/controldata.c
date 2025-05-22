@@ -433,7 +433,7 @@ DBOOL afs_control_data_load_file(afs_control_data * control_data, const char * f
 DBOOL afs_control_data_load_string(afs_control_data * control_data, const char * in)
 {
     // If input string pointer is NULL or control data pointer is NULL return DFALSE
-    if (in == NULL || boxing_string_equal(in, "") || control_data == NULL)
+    if (in == NULL || strlen(in) == 0 || control_data == NULL)
     {
         return DFALSE;
     }
@@ -523,19 +523,19 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         {
             return NULL;
         }
-        if (boxing_string_equal(node->parent->value.element.name, "AdministrativeMetadata") == DTRUE || boxing_string_equal(node->parent->value.element.name, "TechnicalMetadata") == DTRUE)
+        if (strcmp(node->parent->value.element.name, "AdministrativeMetadata") == 0 || strcmp(node->parent->value.element.name, "TechnicalMetadata") == 0)
         {
             return "\n    ";
         }
-        if (boxing_string_equal(parent, "Tocs") == DTRUE || boxing_string_equal(name, "work") == DTRUE)
+        if (strcmp(parent, "Tocs") == 0 || strcmp(name, "work") == 0)
         {
             return "\n        ";
         }
-        if (boxing_string_equal(name, "class") == DTRUE || boxing_string_equal(parent, "file"))
+        if (strcmp(name, "class") == 0 || strcmp(parent, "file") == 0)
         {
             return "\n            ";
         }
-        if (boxing_string_equal(name, "property") == DTRUE || boxing_string_equal(parent, "data") || boxing_string_equal(parent, "preview"))
+        if (strcmp(name, "property") == 0 || strcmp(parent, "data") == 0 || strcmp(parent, "preview") == 0)
         {
             return "\n                ";
         }
@@ -545,33 +545,33 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         {
             return NULL;
         }
-        if (boxing_string_equal(node->parent->value.element.name, "AdministrativeMetadata") == DTRUE || boxing_string_equal(node->parent->value.element.name, "TechnicalMetadata") == DTRUE)
+        if (strcmp(node->parent->value.element.name, "AdministrativeMetadata") == 0 || strcmp(node->parent->value.element.name, "TechnicalMetadata") == 0)
         {
             return "\n        ";
         }
-        if (boxing_string_equal(parent, "file"))
+        if (strcmp(parent, "file") == 0)
         {
             return "\n                ";
         }
-        if (boxing_string_equal(parent, "data"))
+        if (strcmp(parent, "data") == 0)
         {
             return "\n                    ";
         }
         return NULL;
     case MXML_WS_BEFORE_CLOSE:
-        if (boxing_string_equal(node->parent->value.element.name, "AdministrativeMetadata") == DTRUE || boxing_string_equal(node->parent->value.element.name, "TechnicalMetadata") == DTRUE)
+        if (strcmp(node->parent->value.element.name, "AdministrativeMetadata") == 0 || strcmp(node->parent->value.element.name, "TechnicalMetadata") == 0)
         {
             return "\n    ";
         }
-        if (boxing_string_equal(parent, "Tocs") == DTRUE || boxing_string_equal(name, "work") == DTRUE)
+        if (strcmp(parent, "Tocs") == 0 || strcmp(name, "work") == 0)
         {
             return "\n        ";
         }
-        if (boxing_string_equal(name, "class") == DTRUE || boxing_string_equal(parent, "file"))
+        if (strcmp(name, "class") == 0 || strcmp(parent, "file") == 0)
         {
             return "\n            ";
         }
-        if (boxing_string_equal(parent, "data"))
+        if (strcmp(parent, "data") == 0)
         {
             return "\n                ";
         }

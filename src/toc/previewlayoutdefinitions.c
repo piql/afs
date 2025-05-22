@@ -356,7 +356,7 @@ afs_toc_preview_layout_definition * afs_toc_preview_layout_definitions_get_layou
 
 afs_toc_preview_layout_definition * afs_toc_preview_layout_definitions_get_layout_definition_by_id(const afs_toc_preview_layout_definitions * toc_preview_layout_definitions, const char * id)
 {
-    if (toc_preview_layout_definitions == NULL || id == NULL || boxing_string_length(id) == 0)
+    if (toc_preview_layout_definitions == NULL || id == NULL || strlen(id) == 0)
     {
         return NULL;
     }
@@ -375,7 +375,7 @@ afs_toc_preview_layout_definition * afs_toc_preview_layout_definitions_get_layou
     {
         afs_toc_preview_layout_definition * toc_preview_layout_definition = GVECTORN(toc_preview_layout_definitions->layout_definitions, afs_toc_preview_layout_definition *, i);
 
-        if (boxing_string_equal(toc_preview_layout_definition->id, id) == DTRUE)
+        if (strcmp(toc_preview_layout_definition->id, id) == 0)
         {
             return GVECTORN(toc_preview_layout_definitions->layout_definitions, afs_toc_preview_layout_definition *, i);
         }
@@ -398,7 +398,7 @@ afs_toc_preview_layout_definition * afs_toc_preview_layout_definitions_get_layou
 
 afs_toc_preview_layout_definition * afs_toc_preview_layout_definitions_get_layout_definition_by_name(const afs_toc_preview_layout_definitions * toc_preview_layout_definitions, const char * name)
 {
-    if (toc_preview_layout_definitions == NULL || name == NULL || boxing_string_length(name) == 0)
+    if (toc_preview_layout_definitions == NULL || name == NULL || strlen(name) == 0)
     {
         return NULL;
     }
@@ -417,7 +417,7 @@ afs_toc_preview_layout_definition * afs_toc_preview_layout_definitions_get_layou
     {
         afs_toc_preview_layout_definition * toc_preview_layout_definition = GVECTORN(toc_preview_layout_definitions->layout_definitions, afs_toc_preview_layout_definition *, i);
 
-        if (boxing_string_equal(toc_preview_layout_definition->name, name) == DTRUE)
+        if (strcmp(toc_preview_layout_definition->name, name) == 0)
         {
             return GVECTORN(toc_preview_layout_definitions->layout_definitions, afs_toc_preview_layout_definition *, i);
         }
@@ -484,7 +484,7 @@ DBOOL afs_toc_preview_layout_definitions_add_layout_definition(afs_toc_preview_l
 
 DBOOL afs_toc_preview_layout_definitions_has_layout_definition(afs_toc_preview_layout_definitions * toc_preview_layout_definitions, const char * id)
 {
-    if (toc_preview_layout_definitions == NULL || id == NULL || boxing_string_length(id) == 0)
+    if (toc_preview_layout_definitions == NULL || id == NULL || strlen(id) == 0)
     {
         return DFALSE;
     }
@@ -503,7 +503,7 @@ DBOOL afs_toc_preview_layout_definitions_has_layout_definition(afs_toc_preview_l
     {
         afs_toc_preview_layout_definition * toc_preview_layout_definition = GVECTORN(toc_preview_layout_definitions->layout_definitions, afs_toc_preview_layout_definition *, i);
 
-        if (boxing_string_equal(toc_preview_layout_definition->id, id) == DTRUE)
+        if (strcmp(toc_preview_layout_definition->id, id) == 0)
         {
             return DTRUE;
         }
@@ -646,14 +646,14 @@ char * afs_toc_preview_layout_definitions_save_as_table(const afs_toc_preview_la
     layout_definitions_lengths lengths = get_max_layout_id_lenght(toc_preview_layout_definitions);
     unsigned int definitions_count = afs_toc_preview_layout_definitions_get_count(toc_preview_layout_definitions);
 
-    unsigned int header_length = (unsigned int)boxing_string_length(header);
+    unsigned int header_length = (unsigned int)strlen(header);
     unsigned int table1_width =  lengths.layout_id_length + lengths.sections_length + lengths.name_length + 3;
     unsigned int table1_length = strlen(definition_columns) + table1_width * definitions_count + 1;
     unsigned int table2_width =  lengths.layout_id_length + lengths.section_id_length + lengths.x_length + lengths.y_length +
                                  lengths.width_length + lengths.height_length + lengths.rotation_length + 7;
     unsigned int table2_length = strlen(layout_columns) + table2_width * lengths.sections_count + 1;
 
-    char * return_string = boxing_string_allocate(header_length + table1_length + table2_length + strlen("\n"));
+    char * return_string = malloc(header_length + table1_length + table2_length + strlen("\n") + 1);
     char * current_string = return_string;
     current_string += sprintf(current_string, "%s%s", header, definition_columns);
 
@@ -662,7 +662,7 @@ char * afs_toc_preview_layout_definitions_save_as_table(const afs_toc_preview_la
         afs_toc_preview_layout_definition * toc_preview_layout_definition = afs_toc_preview_layout_definitions_get_layout_definition_by_index(toc_preview_layout_definitions, i);
         unsigned int sections_count = afs_toc_preview_layout_definition_get_section_count(toc_preview_layout_definition);
 
-        current_string += sprintf(current_string, "%.*s%s %0*u %s\n", (int)(lengths.layout_id_length - boxing_string_length(toc_preview_layout_definition->id)), string_id_pad, toc_preview_layout_definition->id, lengths.sections_length, sections_count, toc_preview_layout_definition->name);
+        current_string += sprintf(current_string, "%.*s%s %0*u %s\n", (int)(lengths.layout_id_length - strlen(toc_preview_layout_definition->id)), string_id_pad, toc_preview_layout_definition->id, lengths.sections_length, sections_count, toc_preview_layout_definition->name);
     }
 
     current_string += sprintf(current_string, layout_columns);
@@ -677,7 +677,7 @@ char * afs_toc_preview_layout_definitions_save_as_table(const afs_toc_preview_la
             afs_toc_preview_section * current_toc_preview_section = afs_toc_preview_layout_definition_get_section(toc_preview_layout_definition, j);
 
             current_string += sprintf(
-                current_string, "%.*s%s %0*u %0*u %0*u %0*u %0*u %0*u\n", (int)(lengths.layout_id_length - boxing_string_length(toc_preview_layout_definition->id)), string_id_pad, toc_preview_layout_definition->id, lengths.section_id_length, current_toc_preview_section->id, lengths.x_length, current_toc_preview_section->x, lengths.y_length, current_toc_preview_section->y, lengths.width_length, current_toc_preview_section->width, lengths.height_length, current_toc_preview_section->height, lengths.rotation_length, current_toc_preview_section->rotation);
+                current_string, "%.*s%s %0*u %0*u %0*u %0*u %0*u %0*u\n", (int)(lengths.layout_id_length - strlen(toc_preview_layout_definition->id)), string_id_pad, toc_preview_layout_definition->id, lengths.section_id_length, current_toc_preview_section->id, lengths.x_length, current_toc_preview_section->x, lengths.y_length, current_toc_preview_section->y, lengths.width_length, current_toc_preview_section->width, lengths.height_length, current_toc_preview_section->height, lengths.rotation_length, current_toc_preview_section->rotation);
         }
     }
 
@@ -791,7 +791,7 @@ DBOOL afs_toc_preview_layout_definitions_load_file(afs_toc_preview_layout_defini
 DBOOL afs_toc_preview_layout_definitions_load_string(afs_toc_preview_layout_definitions * toc_preview_layout_definitions, const char * in)
 {
     // If input string pointer is NULL or TOC preview layout definitions pointer is NULL return DFALSE
-    if (in == NULL || boxing_string_equal(in, "") || toc_preview_layout_definitions == NULL)
+    if (in == NULL || strlen(in) == 0 || toc_preview_layout_definitions == NULL)
     {
         return DFALSE;
     }
@@ -829,7 +829,7 @@ DBOOL afs_toc_preview_layout_definitions_load_xml(afs_toc_preview_layout_definit
         return DFALSE;
     }
 
-    mxml_node_t * definitions_node = boxing_string_equal(mxmlGetElement(input_node), "layoutDefinitions") == DTRUE ? input_node : mxmlFindElement(input_node, input_node, "layoutDefinitions", NULL, NULL, MXML_DESCEND);
+    mxml_node_t * definitions_node = strcmp(mxmlGetElement(input_node), "layoutDefinitions") == 0 ? input_node : mxmlFindElement(input_node, input_node, "layoutDefinitions", NULL, NULL, MXML_DESCEND);
 
     if (definitions_node == NULL)
     {
@@ -881,15 +881,15 @@ static layout_definitions_lengths get_max_layout_id_lenght(const afs_toc_preview
 {
     layout_definitions_lengths lengths;
 
-    lengths.layout_id_length = 0; //(unsigned int)boxing_string_length("<layoutId>");
-    lengths.sections_length = 0; //(unsigned int)boxing_string_length("<sections>");
-    lengths.name_length = 0; //(unsigned int)boxing_string_length("<name>");
-    lengths.section_id_length = 0; //(unsigned int)boxing_string_length("<sectionId>");
-    lengths.x_length = 0; //(unsigned int)boxing_string_length("<x>");
-    lengths.y_length = 0; //(unsigned int)boxing_string_length("<y>");
-    lengths.width_length = 0; //(unsigned int)boxing_string_length("<width>");
-    lengths.height_length = 0; //(unsigned int)boxing_string_length("<height>");
-    lengths.rotation_length = 3; //(unsigned int)boxing_string_length("<rotation>");
+    lengths.layout_id_length = 0;
+    lengths.sections_length = 0;
+    lengths.name_length = 0;
+    lengths.section_id_length = 0;
+    lengths.x_length = 0;
+    lengths.y_length = 0;
+    lengths.width_length = 0;
+    lengths.height_length = 0;
+    lengths.rotation_length = 3;
     lengths.sections_count = 0;
 
 
@@ -908,9 +908,9 @@ static layout_definitions_lengths get_max_layout_id_lenght(const afs_toc_preview
         afs_toc_preview_layout_definition * toc_preview_layout_definition = GVECTORN(toc_preview_layout_definitions->layout_definitions, afs_toc_preview_layout_definition *, i);
         unsigned int sections_count = afs_toc_preview_layout_definition_get_section_count(toc_preview_layout_definition);
 
-        lengths.layout_id_length = BOXING_MATH_MAX((unsigned int)boxing_string_length(toc_preview_layout_definition->id), lengths.layout_id_length);
+        lengths.layout_id_length = BOXING_MATH_MAX((unsigned int)strlen(toc_preview_layout_definition->id), lengths.layout_id_length);
         lengths.sections_length = BOXING_MATH_MAX(get_digits_count(sections_count), lengths.sections_length);
-        lengths.name_length = BOXING_MATH_MAX((unsigned int)boxing_string_length(toc_preview_layout_definition->name), lengths.name_length);
+        lengths.name_length = BOXING_MATH_MAX((unsigned int)strlen(toc_preview_layout_definition->name), lengths.name_length);
 
         for (unsigned int j = 0; j < sections_count; j++)
         {
@@ -949,7 +949,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
     name = mxmlGetElement(node);
     parent_name = mxmlGetElement(node->parent);
 
-    if (boxing_string_equal("layoutDefinitions", name))
+    if (strcmp("layoutDefinitions", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -957,7 +957,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("previewLayout", name))
+    if (strcmp("previewLayout", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -965,7 +965,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("id", name) || boxing_string_equal("name", name) || boxing_string_equal("sections", name))
+    if (strcmp("id", name) == 0 || strcmp("name", name) == 0 || strcmp("sections", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -973,7 +973,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("sections", parent_name))
+    if (strcmp("sections", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -981,7 +981,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("id", name) || boxing_string_equal("name", name))
+    if (strcmp("id", name) == 0 || strcmp("name", name) == 0)
     {
         if (where == MXML_WS_AFTER_OPEN)
         {

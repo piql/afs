@@ -273,7 +273,7 @@ DBOOL afs_boxing_format_equal(const afs_boxing_format * boxing_format1, const af
     }
 
     if (boxing_config_is_equal(boxing_format1->config, boxing_format2->config) == DTRUE &&
-        boxing_string_equal(boxing_format1->name, boxing_format2->name) == DTRUE &&
+        strcmp(boxing_format1->name, boxing_format2->name) == 0 &&
         boxing_format1->bytes_per_frame == boxing_format2->bytes_per_frame &&
         boxing_format1->data_bytes_per_frame == boxing_format2->data_bytes_per_frame &&
         boxing_format1->data_stripe_size == boxing_format2->data_stripe_size &&
@@ -689,7 +689,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
 
     name = mxmlGetElement(node);
 
-    if (boxing_string_equal("work", name))
+    if (strcmp("work", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -697,7 +697,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("class", name))
+    if (strcmp("class", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -705,7 +705,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("property", name))
+    if (strcmp("property", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -732,7 +732,7 @@ static const char * get_key_by_value(GHashTable * input_table, const char* value
 
     while (g_hash_table_iter_next(&i, &key, &value))
     {
-        if (boxing_string_equal((const char*)value, value_string) == DTRUE)
+        if (strcmp((const char*)value, value_string) == 0)
         {
             return (const char*)key;
         }
@@ -799,7 +799,7 @@ static DBOOL save_config_xml(mxml_node_t * out, boxing_config * config)
             gpointer property_name;
             while (g_hash_table_iter_next(&j, &property_name, &value))
             {
-                if (boxing_string_equal((const char*)property_name, CONFIG_XML_ATTR_VERSION))
+                if (strcmp((const char*)property_name, CONFIG_XML_ATTR_VERSION) == 0)
                 {
                     continue;
                 }

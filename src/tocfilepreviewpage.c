@@ -22,6 +22,9 @@
 #include "boxing/log.h"
 #include "mxml.h"
 
+// SYSTEM INCLUDES
+#include <string.h>
+
 //  DEFINES
 //
 
@@ -212,7 +215,7 @@ void afs_toc_file_preview_page_free(afs_toc_file_preview_page * toc_file_preview
 
     if (toc_file_preview_page->reference_count <= 0)
     {
-        boxing_string_free(toc_file_preview_page->layout_id);
+        free(toc_file_preview_page->layout_id);
         free(toc_file_preview_page);
     }
 }
@@ -297,7 +300,7 @@ DBOOL afs_toc_file_preview_page_equal(afs_toc_file_preview_page * toc_file_previ
         return DFALSE;
     }
 
-    if (boxing_string_equal(toc_file_preview_page1->layout_id, toc_file_preview_page2->layout_id) &&
+    if (strcmp(toc_file_preview_page1->layout_id, toc_file_preview_page2->layout_id) == 0 &&
         toc_file_preview_page1->start_frame == toc_file_preview_page2->start_frame &&
         toc_file_preview_page1->start_section == toc_file_preview_page2->start_section &&
         toc_file_preview_page1->section_count == toc_file_preview_page2->section_count &&
@@ -332,7 +335,7 @@ DBOOL afs_toc_file_preview_page_is_valid(afs_toc_file_preview_page * toc_file_pr
     }
 
     if (toc_file_preview_page->layout_id != NULL &&
-        boxing_string_length(toc_file_preview_page->layout_id) != 0 &&
+        strlen(toc_file_preview_page->layout_id) != 0 &&
         toc_file_preview_page->section_count != 0 &&
         toc_file_preview_page->overlap_x <= toc_file_preview_page->dimension_x &&
         toc_file_preview_page->overlap_y <= toc_file_preview_page->dimension_y)
@@ -665,7 +668,7 @@ DBOOL afs_toc_file_preview_page_load_file(afs_toc_file_preview_page * toc_file_p
 DBOOL afs_toc_file_preview_page_load_string(afs_toc_file_preview_page * toc_file_preview_page, const char * in)
 {
     // If input string pointer is NULL or TOC file preview page pointer is NULL return DFALSE
-    if (in == NULL || boxing_string_equal(in, "") || toc_file_preview_page == NULL)
+    if (in == NULL || strlen(in) == 0 || toc_file_preview_page == NULL)
     {
         return DFALSE;
     }
@@ -705,7 +708,7 @@ DBOOL afs_toc_file_preview_page_load_xml(afs_toc_file_preview_page * toc_file_pr
     
     mxml_node_t * file_node = NULL;
 
-    if (boxing_string_equal(mxmlGetElement(node), "pages") == DTRUE)
+    if (strcmp(mxmlGetElement(node), "pages") == 0)
     {
         file_node = node;
     }
@@ -758,7 +761,7 @@ static DBOOL extract_xy_from_string(unsigned int * x, unsigned int * y, const ch
         return DFALSE;
     }
 
-    if (text == NULL || !boxing_string_length(text))
+    if (text == NULL || strlen(text) == 0)
     {
         *x = 0;
         *y = 0;
@@ -793,7 +796,7 @@ static const char * whitespace_cb(mxml_node_t * node, int where)
     /// \todo warning: variable ‘parent_name’ set but not used [-Wunused-but-set-variable]
     (void) parent_name;
 
-    if (boxing_string_equal("pages", name))
+    if (strcmp("pages", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN)
         {

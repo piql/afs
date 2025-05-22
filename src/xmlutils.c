@@ -19,6 +19,9 @@
 #include "boxing/string.h"
 #include "mxml.h"
 
+// SYSTEM INCLUDES
+#include <string.h>
+
 
 // PUBLIC AFS XML UTILS FUNCTIONS
 //
@@ -58,10 +61,98 @@ void afs_xmlutils_set_node_text(const char* text, mxml_node_t* node)
         return;
     }
 
-    if (boxing_string_length(text) != 0)
+    if (strlen(text) != 0)
     {
         mxmlNewOpaque(node, text);
     }
+}
+
+//----------------------------------------------------------------------------
+/*! \brief Get substring
+ *
+ *  Reallocates string to substring given by start_index and end_index.
+ *
+ *  \param[in,out]  string       A pointer to a string pointer.
+ *  \param[in]      start_index  The index to which the function must be cut beginning of the string.
+ *  \param[in]      end_index    The index after which the function needs to truncate the end of the string.
+ */
+
+static void afs_xmlutils_string_cut(char** string, size_t start_index, size_t end_index)
+{
+    if (*string == NULL || start_index > end_index)
+    {
+        return;
+    }
+
+    if (start_index == end_index)
+    {
+        free(*string);
+        *string = boxing_string_clone("");
+        return;
+    }
+
+    size_t string_size = strlen(*string);
+    if (start_index >= string_size || end_index > string_size)
+    {
+        return;
+    }
+
+    if (start_index == 0 && end_index == string_size)
+    {
+        return;
+    }
+
+    size_t new_string_size = end_index - start_index + 1;
+    char* new_string = malloc(new_string_size + 1);
+    char* input_string = *string;
+
+    for (size_t i = 0; i < new_string_size - 1; i++)
+    {
+        new_string[i] = input_string[i + start_index];
+    }
+
+    new_string[new_string_size - 1] = '\0';
+
+    free(input_string);
+    *string = new_string;
+}
+
+
+//----------------------------------------------------------------------------
+/*! \brief Removes spaces at the beginning and end
+ *
+ *  Removes spaces at the beginning and end of the string.
+ *
+ *  \param[in,out]  string  A pointer to a string pointer.
+ */
+
+static void afs_xmlutils_string_trim(char** string)
+{
+    char* input_string_pointer = *string;
+
+    if (input_string_pointer == NULL)
+    {
+        return;
+    }
+
+    if (strlen(input_string_pointer) == 0)
+    {
+        return;
+    }
+
+    size_t start_index = 0;
+    while (input_string_pointer[start_index] == '\n' || input_string_pointer[start_index] == '\r' || input_string_pointer[start_index] == ' ')
+    {
+        start_index++;
+    }
+
+    size_t end_index = strlen(input_string_pointer);
+    while ((input_string_pointer[end_index - 1] == '\n' || input_string_pointer[end_index - 1] == '\r' || input_string_pointer[end_index - 1] == ' ') && end_index > 0 && end_index > start_index)
+    {
+        end_index--;
+    }
+
+    afs_xmlutils_string_cut(string, start_index, end_index);
 }
 
 
@@ -96,15 +187,15 @@ char* afs_xmlutils_get_node_text(mxml_node_t* node)
         return NULL;
     }
 
-    boxing_string_trim(&text);
+    afs_xmlutils_string_trim(&text);
 
-    if (boxing_string_length(text) != 0)
+    if (strlen(text) != 0)
     {
         return text;
     }
     else
     {
-        boxing_string_free(text);
+        free(text);
         return boxing_string_clone("");
     }
 }
@@ -308,7 +399,7 @@ DBOOL afs_xmlutils_get_integer_element(int* int_storage, mxml_node_t* node, cons
     }
 
     *int_storage = atoi(node_text);
-    boxing_string_free(node_text);
+    free(node_text);
 
     return DTRUE;
 }

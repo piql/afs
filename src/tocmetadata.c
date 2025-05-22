@@ -653,7 +653,7 @@ DBOOL afs_toc_metadata_load_file(afs_toc_metadata * toc_metadata, const char * f
 DBOOL afs_toc_metadata_load_string(afs_toc_metadata * toc_metadata, const char * in)
 {
     // If input string pointer is NULL or TOC metadata pointer is NULL return DFALSE
-    if (in == NULL || boxing_string_equal(in, "") || toc_metadata == NULL)
+    if (in == NULL || strlen(in) == 0 || toc_metadata == NULL)
     {
         return DFALSE;
     }
@@ -693,7 +693,7 @@ DBOOL afs_toc_metadata_load_xml(afs_toc_metadata * toc_metadata, mxml_node_t* no
 
     mxml_node_t * metadata_node;
 
-    if (boxing_string_equal(mxmlGetElement(node), "metadata") == DTRUE)
+    if (strcmp(mxmlGetElement(node), "metadata") == 0)
     {
         metadata_node = node;
     }
@@ -762,7 +762,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
     name = mxmlGetElement(node);
     parent_name = mxmlGetElement(node->parent);
 
-    if (boxing_string_equal("metadata", name))
+    if (strcmp("metadata", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -770,7 +770,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("source", name))
+    if (strcmp("source", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -778,7 +778,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("source", parent_name))
+    if (strcmp("source", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -786,7 +786,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("data", name) || boxing_string_equal("tags", name))
+    if (strcmp("data", name) == 0 || strcmp("tags", name) == 0)
     {
         if (where == MXML_WS_AFTER_OPEN)
         {

@@ -473,7 +473,7 @@ DBOOL afs_technical_metadata_load_file(afs_technical_metadata * technical_metada
 DBOOL afs_technical_metadata_load_string(afs_technical_metadata * technical_metadata, const char * in)
 {
     // If input string pointer is NULL or technical metadata pointer is NULL return DFALSE
-    if (in == NULL || boxing_string_equal(in, "") || technical_metadata == NULL)
+    if (in == NULL || strlen(in) == 0 || technical_metadata == NULL)
     {
         return DFALSE;
     }
@@ -593,7 +593,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
     name = mxmlGetElement(node);
     parent_name = mxmlGetElement(node->parent);
 
-    if (boxing_string_equal("TechnicalMetadata", name))
+    if (strcmp("TechnicalMetadata", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -601,7 +601,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("work", name))
+    if (strcmp("work", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -609,7 +609,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("class", name))
+    if (strcmp("class", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -617,7 +617,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("class", parent_name))
+    if (strcmp("class", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -625,7 +625,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("BoxerFormat", name) || boxing_string_equal("Tocs", name) || boxing_string_equal("Applications", name))
+    if (strcmp("BoxerFormat", name) == 0 || strcmp("Tocs", name) == 0 || strcmp("Applications", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -633,7 +633,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("files", name))
+    if (strcmp("files", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -641,7 +641,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("file", name))
+    if (strcmp("file", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -649,7 +649,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("file", parent_name) && !boxing_string_equal("data", name) && !boxing_string_equal("preview", name) && !boxing_string_equal("metadata", name))
+    if (strcmp("file", parent_name) == 0 && strcmp("data", name) != 0 && strcmp("preview", name) != 0 && strcmp("metadata", name) != 0)
     {
         if (where == MXML_WS_BEFORE_OPEN)
         {
@@ -667,7 +667,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("data", name) && boxing_string_equal("file", parent_name))
+    if (strcmp("data", name) == 0 && strcmp("file", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -675,20 +675,20 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("data", parent_name) && boxing_string_equal("file", mxmlGetElement(node->parent->parent)))
+    if (strcmp("data", parent_name) == 0 && strcmp("file", mxmlGetElement(node->parent->parent)) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
             return ("\n                    ");
         }
 
-        if (where == MXML_WS_AFTER_OPEN && !boxing_string_equal("start", name) && !boxing_string_equal("end", name))
+        if (where == MXML_WS_AFTER_OPEN && !strcmp("start", name) == 0 && !strcmp("end", name) == 0)
         {
             return ("\n                        ");
         }
     }
 
-    if (boxing_string_equal("preview", name) && boxing_string_equal("file", parent_name))
+    if (strcmp("preview", name) == 0 && strcmp("file", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -696,7 +696,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("preview", parent_name))
+    if (strcmp("preview", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN)
         {
@@ -704,7 +704,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("metadata", name) && boxing_string_equal("file", parent_name))
+    if (strcmp("metadata", name) == 0 && strcmp("file", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -712,7 +712,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("metadata", parent_name))
+    if (strcmp("metadata", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -720,7 +720,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("source", parent_name))
+    if (strcmp("source", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -728,7 +728,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("data", parent_name) && boxing_string_equal("source", mxmlGetElement(node->parent->parent)))
+    if (strcmp("data", parent_name) == 0 && strcmp("source", mxmlGetElement(node->parent->parent)) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN)
         {

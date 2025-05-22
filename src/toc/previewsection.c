@@ -552,7 +552,7 @@ DBOOL afs_toc_preview_section_load_file(afs_toc_preview_section * toc_preview_se
 DBOOL afs_toc_preview_section_load_string(afs_toc_preview_section * toc_preview_section, const char * in)
 {
     // If input string pointer is NULL or TOC preview section pointer is NULL return DFALSE
-    if (in == NULL || boxing_string_equal(in, "") || toc_preview_section == NULL)
+    if (in == NULL || strlen(in) == 0 || toc_preview_section == NULL)
     {
         return DFALSE;
     }
@@ -592,7 +592,7 @@ DBOOL afs_toc_preview_section_load_xml(afs_toc_preview_section * toc_preview_sec
 
     mxml_node_t * section_node = NULL;
 
-    if (boxing_string_equal(mxmlGetElement(input_node), "section") == DTRUE)
+    if (strcmp(mxmlGetElement(input_node), "section") == 0)
     {
         section_node = input_node;
     }
@@ -656,7 +656,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
 
     name = mxmlGetElement(node);
     
-    if (boxing_string_equal("section", name))
+    if (strcmp("section", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN)
         {

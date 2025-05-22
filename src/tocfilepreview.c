@@ -793,7 +793,7 @@ DBOOL afs_toc_file_preview_load_file(afs_toc_file_preview * toc_file_preview, co
 DBOOL afs_toc_file_preview_load_string(afs_toc_file_preview * toc_file_preview, const char * in)
 {
     // If input string pointer is NULL or TOC file preview pointer is NULL return DFALSE
-    if (in == NULL || boxing_string_equal(in, "") == DTRUE || toc_file_preview == NULL)
+    if (in == NULL || strlen(in) == 0 || toc_file_preview == NULL)
     {
         return DFALSE;
     }
@@ -833,7 +833,7 @@ DBOOL afs_toc_file_preview_load_xml(afs_toc_file_preview * toc_file_preview, mxm
 
     mxml_node_t * preview_node = NULL;
 
-    if (boxing_string_equal(mxmlGetElement(node), "preview") == DTRUE)
+    if (strcmp(mxmlGetElement(node), "preview") == 0)
     {
         preview_node = node;
     }
@@ -857,7 +857,7 @@ DBOOL afs_toc_file_preview_load_xml(afs_toc_file_preview * toc_file_preview, mxm
         {
             const char * clave = mxmlGetElement(page_node);
             
-            if (boxing_string_equal(clave, "pages") == DTRUE)
+            if (strcmp(clave, "pages") == 0)
             {
                 afs_toc_file_preview_page * toc_file_preview_page = afs_toc_file_preview_page_create();
                 
@@ -911,7 +911,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
     /// \todo warning: variable ‘parent_name’ set but not used [-Wunused-but-set-variable]
     (void) parent_name;
 
-    if (boxing_string_equal("preview", name))
+    if (strcmp("preview", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -919,7 +919,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (boxing_string_equal("pages", name) || boxing_string_equal("dpi", name))
+    if (strcmp("pages", name) == 0 || strcmp("dpi", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN)
         {

@@ -19,6 +19,9 @@
 #include "xmlutils.h"
 #include "mxml.h"
 
+// SYSTEM INCLUDES
+#include <string.h>
+
 //  DEFINES
 //
 #define AFS_ADMINISTRATIVE_METADATA_TAG_COUNT 6
@@ -238,12 +241,12 @@ DBOOL afs_administrative_metadata_equal(const afs_administrative_metadata * admi
         return DFALSE;
     }
 
-    if (boxing_string_equal(administrative_metadata1->reel_id, administrative_metadata2->reel_id) &&
-        boxing_string_equal(administrative_metadata1->print_reel_id, administrative_metadata2->print_reel_id) &&
-        boxing_string_equal(administrative_metadata1->title, administrative_metadata2->title) &&
-        boxing_string_equal(administrative_metadata1->description, administrative_metadata2->description) &&
-        boxing_string_equal(administrative_metadata1->creator, administrative_metadata2->creator) &&
-        boxing_string_equal(administrative_metadata1->creation_date, administrative_metadata2->creation_date))
+    if (strcmp(administrative_metadata1->reel_id, administrative_metadata2->reel_id) == 0 &&
+        strcmp(administrative_metadata1->print_reel_id, administrative_metadata2->print_reel_id) == 0 &&
+        strcmp(administrative_metadata1->title, administrative_metadata2->title) == 0 &&
+        strcmp(administrative_metadata1->description, administrative_metadata2->description) == 0 &&
+        strcmp(administrative_metadata1->creator, administrative_metadata2->creator) == 0 &&
+        strcmp(administrative_metadata1->creation_date, administrative_metadata2->creation_date) == 0)
     {
         return DTRUE;
     }
@@ -272,7 +275,7 @@ void afs_administrative_metadata_set_reel_id(afs_administrative_metadata * admin
 
     if (administrative_metadata->reel_id != NULL)
     {
-        boxing_string_free(administrative_metadata->reel_id);
+        free(administrative_metadata->reel_id);
     }
 
     administrative_metadata->reel_id = boxing_string_clone(reel_id);
@@ -299,7 +302,7 @@ void afs_administrative_metadata_set_print_reel_id(afs_administrative_metadata *
 
     if (administrative_metadata->print_reel_id != NULL)
     {
-        boxing_string_free(administrative_metadata->print_reel_id);
+        free(administrative_metadata->print_reel_id);
     }
 
     administrative_metadata->print_reel_id = boxing_string_clone(print_reel_id);
@@ -326,7 +329,7 @@ void afs_administrative_metadata_set_title(afs_administrative_metadata * adminis
 
     if (administrative_metadata->title != NULL)
     {
-        boxing_string_free(administrative_metadata->title);
+        free(administrative_metadata->title);
     }
 
     administrative_metadata->title = boxing_string_clone(title);
@@ -353,7 +356,7 @@ void afs_administrative_metadata_set_description(afs_administrative_metadata * a
 
     if (administrative_metadata->description != NULL)
     {
-        boxing_string_free(administrative_metadata->description);
+        free(administrative_metadata->description);
     }
 
     administrative_metadata->description = boxing_string_clone(description);
@@ -380,7 +383,7 @@ void afs_administrative_metadata_set_creator(afs_administrative_metadata * admin
 
     if (administrative_metadata->creator != NULL)
     {
-        boxing_string_free(administrative_metadata->creator);
+        free(administrative_metadata->creator);
     }
 
     administrative_metadata->creator = boxing_string_clone(creator);
@@ -407,7 +410,7 @@ void afs_administrative_metadata_set_creation_date(afs_administrative_metadata *
 
     if (administrative_metadata->creation_date != NULL)
     {
-        boxing_string_free(administrative_metadata->creation_date);
+        free(administrative_metadata->creation_date);
     }
 
     administrative_metadata->creation_date = boxing_string_clone(creation_date);
@@ -623,7 +626,7 @@ DBOOL afs_administrative_metadata_load_file(afs_administrative_metadata * admini
 DBOOL afs_administrative_metadata_load_string(afs_administrative_metadata * administrative_metadata, const char * in)
 {
     // If input string pointer is NULL or TOC data reel pointer is NULL return DFALSE
-    if (in == NULL || boxing_string_equal(in, "") || administrative_metadata == NULL)
+    if (in == NULL || strlen(in) == 0 || administrative_metadata == NULL)
     {
         return DFALSE;
     }
@@ -741,7 +744,7 @@ static const char * whitespace_cb(mxml_node_t * node, int where)
     name = mxmlGetElement(node);
     parent_name = mxmlGetElement(node->parent);
 
-    if (boxing_string_equal("AdministrativeMetadata", name))
+    if (strcmp("AdministrativeMetadata", name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -749,7 +752,7 @@ static const char * whitespace_cb(mxml_node_t * node, int where)
         }
     }
 
-    if (boxing_string_equal("AdministrativeMetadata", parent_name))
+    if (strcmp("AdministrativeMetadata", parent_name) == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
