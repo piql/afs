@@ -1,0 +1,194 @@
+<?xml version="1.0" ?>
+<work version="1.0.0.0">
+<class key="FormatInfo">
+  <property key="name" value="4k-controlframe-v2"/>
+</class>
+<!-- First the geometrical values. These can result in general definition files -->
+<class key="FrameBuilder">
+  <property key="dimensions" value="1024,540"/> <!-- Mod1: width, height -->
+  <property key="fileFormat" value="RAW"/>
+</class>
+
+<class key="ImageRaw"  version="1.0.0.0">
+  <property key="adjustLen" value="0"/>
+  <property key="crcMode" value="64ISO" />
+  <property key="rawVersion" value="1" />
+  <property key="crcOverAllData" value="true" />
+  <property key="holes" value="3" />
+</class>
+
+
+<!-- Note: The frame unbuilder inherits the values from the FrameBuilder 
+     through the alias property -->
+<class key="FrameUnbuilder" version="1.0.0.0">
+  <property key="alias" value="FrameBuilder"/>
+</class>
+
+<!-- Frame coding scheme -->
+    <class key="CodecDispatcher" version="1.0.0.0">
+        <!-- The order the encoder process is specified, default value: encode -->
+        <property key="order" value="decode"/>
+        <!-- symbol alignment default: bit -->
+        <property key="symbolAlignment" value="byte"/>       
+		<property key="process" value="Modulator,Cipher,Interleaving2,ReedSolomon2,Interleaving1,ReedSolomon1"/>
+        <property key="MetedataCodingScheme" value="MetaData_Modulator,MetaData_ReedSolomon1"/>
+    </class>
+    <class key="ReedSolomon1" version="1.0.0.0">
+        <property key="codec" value="ReedSolomon"/>
+        <property key="byteParityNumber" value="20"/>
+        <property key="messageSize" value="174"/>
+    </class>
+    <class key="Interleaving1" version="1.0.0.0">
+        <property key="codec" value="Interleaving"/>
+        <property key="distance" value="194"/>
+        <!-- interleaving symboltype; block, frame -->
+        <property key="interleavingtype" value="block"/>
+        <!-- interleaving symboltype; byte,bit -->
+        <property key="symboltype" value="byte"/>
+    </class>
+    <class key="ReedSolomon2" version="1.0.0.0">
+        <property key="codec" value="ReedSolomon"/>
+        <property key="byteParityNumber" value="16"/>
+        <property key="messageSize" value="194"/>
+    </class>
+    <class key="Interleaving2" version="1.0.0.0">
+        <property key="codec" value="Interleaving"/>
+        <property key="distance" value="32"/>
+        <property key="interleavingtype" value="block"/>
+        <!-- interleaving symboltype; byte,bit -->
+        <property key="symboltype" value="byte"/>
+    </class>
+	<class key="Cipher" version="1.0.0.0">
+        <property key="codec" value="Cipher"/>
+        <!-- chipher key ; 'auto' , 'any number supported by the chiper class' -->
+        <property key="key" value="auto"/>
+    </class>
+    <class key="Modulator" version="1.0.0.0">
+        <property key="codec" value="Modulator"/>
+        <!-- NumBitsPerPixel; auto - any supported color depth -->
+        <property key="NumBitsPerPixel" value="auto"/>
+    </class>
+    <class key="MetaData_ReedSolomon1" version="1.0.0.0">
+        <property key="codec" value="ReedSolomon"/>
+        <property key="byteParityNumber" value="20"/>
+        <property key="messageSize" value="100"/>
+    </class>
+    <class key="MetaData_Modulator" version="1.0.0.0">
+        <property key="codec" value="Modulator"/>
+        <!-- NumBitsPerPixel; auto - any supported color depth -->
+        <property key="NumBitsPerPixel" value="auto"/>
+    </class>
+<class key="BaseBuilder">
+  <!-- property key="forceTraced" value="false"/ -->
+  <property key="blockSize" value="1"/>
+  <property key="scalingFactor" value="4"/>
+  <property key="colorDepth" value="1"/>
+<!-- Mask color components tells us that we have to use to encode the elements.
+     0000 0001  (1) ==>  Use B component only (R = G = 0)
+     0000 0010  (2) ==>  Use G component only (R = B = 0)
+     0000 0100  (4) ==>  Use R component only (G = B = 0)
+     0000 0011  (3) ==>  Use GB components (R = 0)
+     0000 0101  (5) ==>  Use RB components (G = 0)
+     0000 0110  (6) ==>  Use RG components (B = 0)
+     0000 0111  (7) ==>  Use RGB components
+     0000 1000  (8)  ==>  gray (same in R, G and B component)
+     0000 1001  (9)  |
+     0000 1010  (10) |
+     0000 1011  (11) |
+     0000 1100  (12) |    If first bit is on, assume gray model
+     0000 1101  (13) |
+     0000 1110  (14) |
+     0000 1111  (15) ==>
+     xxxx 0000  (0  or > 15) ==>  ERROR -->
+  <property key="componentMask" value="8"/>
+</class>
+<class key="DataFrame" version="1.0.0.0">
+<property key="insertPoint" value="32,32"/>
+<property key="dimensions" value="960,476"/> <!-- Mod2: width - 64, height - 64 -->
+  <!--property key="holeInsertPoint" value="92,92"/>
+  <property key="holeDimensions" value="16,16"/-->
+  <property key="subPixelsFactor" value="1"/>
+  <property key="interpolationSize" value="0"/>
+</class>
+<class key="MetaDataFrame" version="1.0.0.0">
+  <property key="insertPoint" value="32,524"/> <!-- Mod3: 32, height - 16 -->
+  <property key="dimensions" value="960,16"/> <!-- Mod4: width - 64, 16 -->
+  <property key="bitPixelsSize" value="4"/>
+  <property key="subPixelsFactor" value="100"/>
+  <property key="interpolationSize" value="0"/>
+  <property key="recordingDensities" value="40,40,40"/>
+  <property key="filmType" value="4210752"/>
+  <property key="linLog" value="1052688"/>
+  <!-- The values are:
+      center - restore the pixel color from the center whit interpolation
+      boxed  - restore the pixel color from the interpolation of the transformer box -->
+  <property key="restoreType" value="center"/>
+  <property key="valuesInOrder" value="frameNumber,fileSize,fileId,dataSize,dataCrc,symbolsperpixel,contentType,cipherKey"/>
+  <property key="codeingScheme" value="MetedataCodingScheme"/>
+</class>
+<class key="CalibrationBarFrame" version="1.0.0.0">
+  <property key="insertPoint" value="32,0"/>
+  <property key="dimensions" value="960,16"/> <!-- Mod5: width - 64, 16 -->
+</class>
+<class key="ReferenceMarkFrame" version="1.0.0.0">
+  <property key="dimensions" value="32,32"/>
+  <property key="insertPointTL" value="0,0"/>
+  <property key="fileTL" value="etc/resources/reference_mark.png"/>
+  <property key="insertPointTR" value="992,0"/>  <!-- Mod6: width - 32, 0 -->
+  <property key="fileTR" value="etc/resources/reference_mark.png"/>
+  <property key="insertPointBL" value="0,508"/> <!-- Mod7: 0, height - 32 -->
+  <property key="fileBL" value="etc/resources/reference_mark.png"/>
+  <property key="insertPointBR" value="992,508"/> <!-- Mod8: width - 32, height - 32 -->
+  <property key="fileBR" value="etc/resources/reference_mark.png"/>
+  <!--property key="insertPointCT" value="92,92"/>
+  <property key="fileCT" value="/home/jmcruz/Archivator/pics/reference_pattern_1_1.png"/-->
+</class>
+<!-- Secondly, the specific values of work -->
+<class key="FrameBuilder">
+<!-- How to is the distribution colors:
+equalSpacing: homogeneous distribution
+mostSignificantBits: set the bits data in the most significant of colour -->
+  <property key="colorsDistribution" value="equalSpacing"/>
+</class>
+<class key="DataFrame" version="1.0.0.0">
+<!-- accepted values are: pattern, file (with fileName property in FileDataFrameSource class) and random -->
+  <property key="dataFrameSourceType" value="file"/>
+  <!-- The values are:
+      center - restore the pixel color from the center whit interpolation
+      boxed  - restore the pixel color from the interpolation of the transformer box -->
+  <property key="restoreType" value="center"/>
+</class>
+<!-- http://www.seas.upenn.edu/~bensapp/opencvdocs/ref/opencvref_cv.htm -->
+<class key="LocateReference" version="1.0.0.0">
+    <!-- Values for Canny Algorithm:
+         Min and max values for thres hold      threshHold1 and threshHold2 0/50
+         Aperture size for Sobel Operator       apertureSobel               5
+
+         http://en.wikipedia.org/wiki/Canny_edge_detector -->
+    <property key="thresHold1" value="0"/>
+    <property key="thresHold2" value="50"/>
+    <!-- The aperture size for Sobel must be 1, 3, 5 or 7 -->
+    <property key="apertureSobel" value="5"/>
+    <!-- Steps process Min value is 2 -->
+    <property key="steps" value="10"/>
+    <property key="jump" value="5"/>
+    <property key="maxProcess" value="20"/>
+    <!-- Min and Max values for area of squares
+         In this case the area of square is 16x16 = 256
+         The scale factor is from 2.5 to 3.5, and so
+         minArea = 256 * (3 - .5) * (3 - .5) = 1600.0
+         maxArea = 256 * (3 + .5) * (3 + .5) = 3136.0 -->
+    <property key="minArea" value="500.0"/>
+    <property key="maxArea" value="3136.0"/>
+    <!-- Max value for cosine of 90º angle
+         Approx. rectangular angle -->
+    <property key="cosineLimit" value="0.1"/>
+    <!-- Min distance for duplication erase  based in gravity center
+        This value is aprox to (6 + 0.5) / 2.0 -->
+    <property key="minDistanceCOG" value="3.25"/>
+</class>
+<class key="crc64">
+    <property key="POLY64REV" value="0x42F0E1EBA9EA3693"/>
+    <property key="INITIALCRC" value="0x0000000000000000"/>
+</class>
+</work>

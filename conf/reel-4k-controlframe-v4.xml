@@ -1,0 +1,143 @@
+<?xml version="1.0" ?>
+<work version="1.0.0.0">
+    <class key="FormatInfo">
+        <property key="name" value="4k-controlframe-v4"/>
+        <property key="shortDescription" value="4k control data frame format"/>
+        <property key="description" value="Frames are generated using the Generic Preservation Format v1.0 printed on a 4096x2160 raster"/>
+    </class>
+
+    <class key="FrameFormat">
+        <property key="type" value="GPFv1.0"/>
+        <property key="width" value="1024"/>
+        <property key="height" value="540"/>
+        <property key="border" value="1"/>
+        <property key="borderGap" value="1"/>
+        <property key="cornerMarkSize" value="32"/>
+        <property key="cornerMarkGap" value="1"/>
+        <property key="tilesPerColumn" value="4"/>
+        <!-- color dept = log2(levelsPerSymbol) -->
+        <property key="maxLevelsPerSymbol" value="2"/> 
+    </class>
+
+    <!-- First the geometrical values. These can result in general definition files -->
+    <class key="FrameBuilder"> <!-- builder spesific -->
+        <!-- <property key="dimensions" value="4096,2160"/> -->
+        <!-- The type is: TIF, RAW, BMP, PNG -->
+        <property key="fileFormat" value="RAW"/>
+    </class>
+    
+    <class key="ImageRaw"  version="1.0.0.0"> <!-- builder spesific -->
+        <property key="rawVersion" value="1" />
+        <property key="holes" value="3" />
+    </class>
+    
+    <!-- Note: The frame unbuilder inherits the values from the FrameBuilder 
+       through the alias property -->
+    <class key="FrameUnbuilder" version="1.0.0.0"> <!-- builder spesific -->
+        <property key="alias" value="FrameBuilder"/>
+    </class>
+    
+    <!-- Frame coding scheme -->
+    <class key="CodecDispatcher">
+        <!-- The order the encoder process is specified, default value: encode -->
+        <property key="order" value="decode"/>
+        <!-- symbol alignment default: bit -->
+        <property key="symbolAlignment" value="byte"/>
+
+        <!-- <property key="process" value="SyncPointInserter,Modulator,Cipher,Interleaving2,ReedSolomon2,Interleaving1,ReedSolomon1"/> -->
+        <property key="DataCodingScheme" value="SyncPointInserter,Modulator,Cipher,Interleaving2,ReedSolomon2,Interleaving1,ReedSolomon1"/>
+        <property key="MetadataCodingScheme" value="MetaData_Modulator,MetaData_Cipher,MetaData_ReedSolomon1"/>
+
+    </class>
+    <class key="ReedSolomon1">
+        <property key="codec" value="ReedSolomon"/>
+        <property key="byteParityNumber" value="20"/>
+        <property key="messageSize" value="172"/>
+    </class>
+    <class key="Interleaving1">
+        <property key="codec" value="Interleaving"/>
+        <property key="distance" value="192"/>
+        <!-- interleaving symboltype; block, frame -->
+        <property key="interleavingtype" value="block"/>
+        <!-- interleaving symboltype; byte,bit -->
+        <property key="symboltype" value="byte"/>
+    </class>
+    <class key="ReedSolomon2">
+        <property key="codec" value="ReedSolomon"/>
+        <property key="byteParityNumber" value="16"/>
+        <property key="messageSize" value="192"/>
+    </class>
+    <class key="Interleaving2">
+        <property key="codec" value="Interleaving"/>
+        <property key="distance" value="239"/>
+        <property key="interleavingtype" value="block"/>
+        <!-- interleaving symboltype; byte,bit -->
+        <property key="symboltype" value="byte"/>
+    </class>
+    <class key="Cipher">
+        <property key="codec" value="Cipher"/>
+        <!-- chipher key ; 'auto' , 'any number supported by the chiper class' -->
+        <property key="key" value="auto"/>
+    </class>
+    <class key="Modulator">
+        <property key="codec" value="Modulator"/>
+        <!-- NumBitsPerPixel; auto - any supported color depth -->
+        <property key="NumBitsPerPixel" value="auto"/>
+    </class>
+    <class key="SyncPointInserter">
+        <property key="codec" value="SyncPointInserter"/>
+        <property key="SyncPointDistancePixel" value="100"/>
+        <property key="SyncPointRadiusPixel" value="2"/>
+        <property key="DataOrientation" value="1"/>
+        <!-- NumBitsPerPixel; auto - any supported color depth -->
+        <property key="NumBitsPerPixel" value="auto"/>
+    </class>
+    <class key="MetaData_ReedSolomon1">
+        <property key="codec" value="ReedSolomon"/>
+        <property key="byteParityNumber" value="20"/>
+        <property key="messageSize" value="99"/>
+        <!--<property key="messageSize" value="32"/> -->
+    </class>
+   <class key="MetaData_Modulator">
+        <property key="codec" value="Modulator"/>
+        <!-- NumBitsPerPixel; auto - any supported color depth -->
+        <property key="NumBitsPerPixel" value="auto"/>
+    </class>
+        <class key="MetaData_Cipher">
+        <property key="codec" value="Cipher"/>
+        <!-- chipher key ; 'auto' , 'any number supported by the chiper class' -->
+        <property key="key" value="1"/>
+    </class>
+	
+    <!-- Note: The frame unbuilder inherits the values from the FrameBuilder 
+       through the alias property -->
+    <class key="FrameUnbuilder" version="1.0.0.0">
+        <property key="alias" value="FrameBuilder"/>
+    </class>
+    
+    <class key="BaseBuilder">
+      <!-- property key="forceTraced" value="false"/ -->
+      <property key="blockSize" value="1"/>
+      <property key="scalingFactor" value="4"/>
+    </class>
+
+    
+    <!-- First the geometrical values. These can result in general definition files -->
+    <class key="FrameBuilder">
+        <property key="dimensions" value="4092,2156"/>
+        <!-- The type is: TIF, RAW, BMP, PNG -->
+        <property key="fileFormat" value="TIF"/>
+    </class>
+
+    <class key="crc64"> <!-- this can be optional -->
+        <property key="POLY64REV" value="0x42F0E1EBA9EA3693"/>
+        <property key="INITIALCRC" value="0x0000000000000000"/>
+    </class>
+    <class key="crc32"> <!-- used by metadata --> <!-- this can be optional -->
+        <property key="POLY32REV" value="0x42F0E1EBA9EA3693"/>
+        <property key="INITIALCRC" value="0x0000000000000000"/>
+    </class>
+</work>
+
+
+

@@ -1,0 +1,118 @@
+<?xml version="1.0" ?>
+<work version="1.0.0.0">
+    <class key="FormatInfo">
+        <property key="name" value="4k-controlframe-v6"/>
+        <property key="shortDescription" value="4k control data frame format"/>
+        <property key="description" value="Frames are generated using the Generic Preservation Format v1.0 printed on a 4096x2160 raster"/>
+    </class>
+    <class key="FrameFormat">
+        <property key="type" value="GPFv1.0"/>
+        <property key="width" value="1024"/>
+        <property key="height" value="540"/>
+        <property key="border" value="1"/>
+        <property key="borderGap" value="1"/>
+        <property key="cornerMarkSize" value="32"/>
+        <property key="cornerMarkGap" value="1"/>
+        <property key="tilesPerColumn" value="4"/>
+		<property key="refBarSyncDistance" value="32"/>
+		<property key="refBarSyncOffset" value="16"/>
+        <!-- color dept = log2(maxLevelsPerSymbol) -->
+        <property key="maxLevelsPerSymbol" value="2"/> 
+    </class>
+	<class key="FrameRaster">
+        <property key="width" value="4096"/>
+        <property key="height" value="2160"/>
+		<property key="scalingFactor" value="4"/> 
+	</class>
+    <class key="CodecDispatcher"><!-- Frame coding scheme -->
+		<property key="version" value="1.0"/>
+        <!-- The order the encoder process is specified, default value: encode -->
+        <property key="order" value="decode"/>
+        <!-- symbol alignment default: bit -->
+        <property key="symbolAlignment" value="byte"/>
+        <property key="DataCodingScheme" value="SyncPointInserter,Modulator,Cipher,FInterleave,RS_inner,XInterleave,RS_outer,CRC,PacketHeader"/>
+        <property key="MetadataCodingScheme" value="MetaData_Modulator,MetaData_Cipher,MetaData_XInterleave,MetaData_ReedSolomon,MetaData_CRC,PacketHeader"/>
+    </class>
+    <class key="PacketHeader">
+        <property key="codec" value="PacketHeader"/>    
+	</class>
+	<class key="CRC">
+        <property key="codec" value="CRC64"/>
+        <property key="polynom" value="0x42F0E1EBA9EA3693"/>
+        <property key="seed" value="0x0000000000000000"/>
+    </class>
+    <class key="RS_outer">
+        <property key="codec" value="ReedSolomon"/>
+        <property key="byteParityNumber" value="20"/>
+        <property key="messageSize" value="172"/>
+    </class>
+    <class key="XInterleave">
+        <property key="codec" value="Interleaving"/>
+        <property key="distance" value="192"/>
+        <!-- interleaving symboltype; block, frame -->
+        <property key="interleavingtype" value="block"/>
+        <!-- interleaving symboltype; byte, bit -->
+        <property key="symboltype" value="byte"/>
+    </class>
+    <class key="RS_inner">
+        <property key="codec" value="ReedSolomon"/>
+        <property key="byteParityNumber" value="16"/>
+        <property key="messageSize" value="192"/>
+    </class>
+    <class key="FInterleave">
+        <property key="codec" value="Interleaving"/>
+        <property key="distance" value="239"/>
+        <property key="interleavingtype" value="block"/>
+        <!-- interleaving symboltype; byte, bit -->
+        <property key="symboltype" value="byte"/>
+    </class>
+    <class key="Cipher">
+        <property key="codec" value="Cipher"/>
+        <!-- chipher key ; 'auto' , 'any number supported by the chiper class' -->
+        <property key="key" value="auto"/>
+    </class>
+    <class key="Modulator">
+        <property key="codec" value="Modulator"/>
+        <!-- NumBitsPerPixel; auto - any supported color depth -->
+        <property key="NumBitsPerPixel" value="auto"/>
+    </class>
+    <class key="SyncPointInserter">
+        <property key="codec" value="SyncPointInserter"/>
+        <property key="SyncPointDistancePixel" value="100"/>
+        <property key="SyncPointRadiusPixel" value="2"/>
+        <property key="DataOrientation" value="1"/>
+        <!-- NumBitsPerPixel; auto - any supported color depth -->
+        <property key="NumBitsPerPixel" value="auto"/>
+    </class>
+	<class key="MetaData_CRC">
+        <property key="codec" value="CRC32"/>
+        <property key="polynom" value="0x1EDC6F41"/>
+        <property key="seed" value="0x00000000"/>
+    </class>
+    <class key="MetaData_ReedSolomon">
+        <property key="codec" value="ReedSolomon"/>
+        <property key="byteParityNumber" value="20"/>
+        <property key="messageSize" value="99"/>
+    </class>
+    <class key="MetaData_XInterleave">
+        <property key="codec" value="Interleaving"/>
+        <property key="distance" value="247"/>
+        <!-- interleaving symboltype; block, frame -->
+        <property key="interleavingtype" value="block"/>
+        <!-- interleaving symboltype; byte,bit -->
+        <property key="symboltype" value="byte"/>
+    </class>
+	<class key="MetaData_Modulator">
+        <property key="codec" value="Modulator"/>
+        <!-- NumBitsPerPixel; auto - any supported color depth -->
+        <property key="NumBitsPerPixel" value="auto"/>
+    </class>
+	<class key="MetaData_Cipher">
+        <property key="codec" value="Cipher"/>
+        <!-- chipher key ; 'auto' , 'any number supported by the chiper class' -->
+        <property key="key" value="1"/>
+    </class>	
+</work>
+
+
+
