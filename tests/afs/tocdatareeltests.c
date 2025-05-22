@@ -5,6 +5,8 @@
 #include "boxing/utils.h"
 #include "mxml.h"
 
+#include <string.h>
+
 #if defined ( D_OS_WIN32 )
 #define DFSEEK _fseeki64
 #define DFTELL _ftelli64
@@ -102,7 +104,7 @@ afs_toc_data_reel * get_afs_toc_data_reel_instance6(const char * id, unsigned in
 static void test_afs_toc_data_reel(afs_toc_data_reel * toc_data_reel, const char * id, const size_t files_count)
 {
     BOXING_ASSERT(toc_data_reel != NULL);
-    BOXING_ASSERT(boxing_string_equal(id, toc_data_reel->id) == DTRUE);
+    BOXING_ASSERT(strcmp(id, toc_data_reel->id) == 0);
     BOXING_ASSERT(afs_toc_files_get_tocs_count(toc_data_reel->files) == files_count);
 
     for (size_t i = 0; i < files_count; i++)
@@ -152,7 +154,7 @@ static char * read_xml_toc_data_reel(const char * file_name)
     }
 
     // Creates a vector vor the input data
-    char * xml_string = boxing_string_allocate((size_t)size + 1);
+    char * xml_string = malloc((size_t)size + 1);
 
     // Reads the data from the input file
     if (1 != fread(xml_string, (size_t)size, 1, file))
@@ -434,7 +436,7 @@ BOXING_START_TEST(afs_toc_data_reel_get_new_reference_test2)
 
     afs_toc_data_reel_set_id(toc_data_reel1, "Some reel id");
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_reel2->id, "Some reel id") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_reel2->id, "Some reel id") == 0);
 
     afs_toc_data_reel_free(toc_data_reel1);
     afs_toc_data_reel_free(toc_data_reel1);
@@ -461,7 +463,7 @@ BOXING_START_TEST(afs_toc_data_reel_get_new_reference_test3)
 
     afs_toc_data_reel_set_id(toc_data_reel1, "Some reel id");
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_reel2->id, "Some reel id") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_reel2->id, "Some reel id") == 0);
 
     afs_toc_data_reel_free(toc_data_reel1);
     afs_toc_data_reel_free(toc_data_reel1);
@@ -486,7 +488,7 @@ BOXING_START_TEST(afs_toc_data_reel_get_new_reference_test4)
 
     afs_toc_data_reel_set_id(toc_data_reel1, "Some other reel id");
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_reel2->id, "Some other reel id") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_reel2->id, "Some other reel id") == 0);
 
     afs_toc_data_reel_free(toc_data_reel1);
     afs_toc_data_reel_free(toc_data_reel1);
@@ -782,7 +784,7 @@ BOXING_START_TEST(afs_toc_data_reel_set_id_test2)
     afs_toc_data_reel_set_id(toc_data_reel, id);
 
     BOXING_ASSERT(toc_data_reel == NULL);
-    BOXING_ASSERT(boxing_string_equal(id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(id, "") == 0);
 }
 END_TEST
 
@@ -796,7 +798,7 @@ BOXING_START_TEST(afs_toc_data_reel_set_id_test3)
     afs_toc_data_reel_set_id(toc_data_reel, id);
 
     BOXING_ASSERT(toc_data_reel == NULL);
-    BOXING_ASSERT(boxing_string_equal(id, "some id string") == DTRUE);
+    BOXING_ASSERT(strcmp(id, "some id string") == 0);
 }
 END_TEST
 
@@ -826,7 +828,7 @@ BOXING_START_TEST(afs_toc_data_reel_set_id_test5)
 
     afs_toc_data_reel_set_id(toc_data_reel, id);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_reel->id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_reel->id, "") == 0);
 
     afs_toc_data_reel_free(toc_data_reel);
 }
@@ -843,7 +845,7 @@ BOXING_START_TEST(afs_toc_data_reel_set_id_test6)
 
     afs_toc_data_reel_set_id(toc_data_reel, id);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_reel->id, "some id string") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_reel->id, "some id string") == 0);
 
     afs_toc_data_reel_free(toc_data_reel);
 }
@@ -854,7 +856,7 @@ END_TEST
 BOXING_START_TEST(afs_toc_data_reel_set_id_test7)
 {
     afs_toc_data_reel * toc_data_reel = get_afs_toc_data_reel_instance6("some id string", 5);
-    BOXING_ASSERT(boxing_string_equal(toc_data_reel->id, "some id string") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_reel->id, "some id string") == 0);
 
     const char * id = NULL;
 
@@ -871,13 +873,13 @@ END_TEST
 BOXING_START_TEST(afs_toc_data_reel_set_id_test8)
 {
     afs_toc_data_reel * toc_data_reel = get_afs_toc_data_reel_instance6("some id string", 5);
-    BOXING_ASSERT(boxing_string_equal(toc_data_reel->id, "some id string") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_reel->id, "some id string") == 0);
 
     const char * id = "";
 
     afs_toc_data_reel_set_id(toc_data_reel, id);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_reel->id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_reel->id, "") == 0);
 
     afs_toc_data_reel_free(toc_data_reel);
 }
@@ -888,13 +890,13 @@ END_TEST
 BOXING_START_TEST(afs_toc_data_reel_set_id_test9)
 {
     afs_toc_data_reel * toc_data_reel = get_afs_toc_data_reel_instance6("some id string", 5);
-    BOXING_ASSERT(boxing_string_equal(toc_data_reel->id, "some id string") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_reel->id, "some id string") == 0);
 
     const char * id = "some other id string";
 
     afs_toc_data_reel_set_id(toc_data_reel, id);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_reel->id, "some other id string") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_reel->id, "some other id string") == 0);
 
     afs_toc_data_reel_free(toc_data_reel);
 }
@@ -1304,7 +1306,7 @@ BOXING_START_TEST(afs_toc_data_reel_get_file_by_unique_id_test2)
 
     BOXING_ASSERT(toc_data_reel == NULL);
     BOXING_ASSERT(toc_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(unique_id_string, "") == DTRUE);
+    BOXING_ASSERT(strcmp(unique_id_string, "") == 0);
 }
 END_TEST
 
@@ -1318,7 +1320,7 @@ BOXING_START_TEST(afs_toc_data_reel_get_file_by_unique_id_test3)
 
     BOXING_ASSERT(toc_data_reel == NULL);
     BOXING_ASSERT(toc_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(unique_id_string, "id 0") == DTRUE);
+    BOXING_ASSERT(strcmp(unique_id_string, "id 0") == 0);
 }
 END_TEST
 
@@ -1348,7 +1350,7 @@ BOXING_START_TEST(afs_toc_data_reel_get_file_by_unique_id_test5)
 
     test_afs_toc_data_reel(toc_data_reel, NULL, 0);
     BOXING_ASSERT(toc_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(unique_id_string, "") == DTRUE);
+    BOXING_ASSERT(strcmp(unique_id_string, "") == 0);
 
     afs_toc_data_reel_free(toc_data_reel);
 }
@@ -1364,7 +1366,7 @@ BOXING_START_TEST(afs_toc_data_reel_get_file_by_unique_id_test6)
 
     test_afs_toc_data_reel(toc_data_reel, NULL, 0);
     BOXING_ASSERT(toc_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(unique_id_string, "id 0") == DTRUE);
+    BOXING_ASSERT(strcmp(unique_id_string, "id 0") == 0);
 
     afs_toc_data_reel_free(toc_data_reel);
 }
@@ -1396,7 +1398,7 @@ BOXING_START_TEST(afs_toc_data_reel_get_file_by_unique_id_test8)
 
     test_afs_toc_data_reel(toc_data_reel, "Some reel id string!", 2);
     BOXING_ASSERT(toc_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(unique_id_string, "") == DTRUE);
+    BOXING_ASSERT(strcmp(unique_id_string, "") == 0);
 
     afs_toc_data_reel_free(toc_data_reel);
 }
@@ -1412,7 +1414,7 @@ BOXING_START_TEST(afs_toc_data_reel_get_file_by_unique_id_test9)
 
     test_afs_toc_data_reel(toc_data_reel, "Some reel id string!", 2);
     BOXING_ASSERT(toc_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(unique_id_string, "Some unique id!") == DTRUE);
+    BOXING_ASSERT(strcmp(unique_id_string, "Some unique id!") == 0);
 
     afs_toc_data_reel_free(toc_data_reel);
 }
@@ -4417,10 +4419,10 @@ BOXING_START_TEST(afs_toc_data_reel_save_string_test3)
     char * result = afs_toc_data_reel_save_string(toc_data_reel, DTRUE);
 
     BOXING_ASSERT(toc_data_reel != NULL);
-    BOXING_ASSERT(boxing_string_equal(test_string, result) == DTRUE);
+    BOXING_ASSERT(strcmp(test_string, result) == 0);
 
     afs_toc_data_reel_free(toc_data_reel);
-    boxing_string_free(result);
+    free(result);
 }
 END_TEST
 
@@ -4435,10 +4437,10 @@ BOXING_START_TEST(afs_toc_data_reel_save_string_test4)
     char * result = afs_toc_data_reel_save_string(toc_data_reel, DTRUE);
 
     BOXING_ASSERT(toc_data_reel != NULL);
-    BOXING_ASSERT(boxing_string_equal(test_string, result) == DTRUE);
+    BOXING_ASSERT(strcmp(test_string, result) == 0);
 
     afs_toc_data_reel_free(toc_data_reel);
-    boxing_string_free(result);
+    free(result);
 }
 END_TEST
 
@@ -4469,11 +4471,11 @@ BOXING_START_TEST(afs_toc_data_reel_save_string_test6)
 
     BOXING_ASSERT(toc_data_reel != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_data_reel_free(toc_data_reel);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -4489,11 +4491,11 @@ BOXING_START_TEST(afs_toc_data_reel_save_string_test7)
 
     BOXING_ASSERT(toc_data_reel != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_data_reel_free(toc_data_reel);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -4810,7 +4812,7 @@ BOXING_START_TEST(afs_toc_data_reel_load_string_test3)
     BOXING_ASSERT(toc_data_reel == NULL);
     BOXING_ASSERT(result == DFALSE);
 
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -4849,7 +4851,7 @@ BOXING_START_TEST(afs_toc_data_reel_load_string_test5)
     BOXING_ASSERT(toc_data_reel->files == NULL);
 
     afs_toc_data_reel_free(toc_data_reel);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -4870,7 +4872,7 @@ BOXING_START_TEST(afs_toc_data_reel_load_string_test6)
     BOXING_ASSERT(toc_data_reel->files != NULL);
 
     afs_toc_data_reel_free(toc_data_reel);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -4890,7 +4892,7 @@ BOXING_START_TEST(afs_toc_data_reel_load_string_test7)
     test_afs_toc_data_reel(toc_data_reel, "some id string", 6);
 
     afs_toc_data_reel_free(toc_data_reel);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -4910,7 +4912,7 @@ BOXING_START_TEST(afs_toc_data_reel_load_string_test8)
     test_afs_toc_data_reel(toc_data_reel, "some id string", 6);
 
     afs_toc_data_reel_free(toc_data_reel);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 

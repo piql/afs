@@ -5,6 +5,8 @@
 #include "boxing/utils.h"
 #include "mxml.h"
 
+#include <string.h>
+
 #if defined ( D_OS_WIN32 )
 #define DFSEEK _fseeki64
 #define DFTELL _ftelli64
@@ -250,7 +252,7 @@ static char * read_xml_tocs_file(const char* file_name)
     }
 
     // Creates a vector vor the input data
-    char * xml_string = boxing_string_allocate((size_t)size + 1);
+    char * xml_string = malloc((size_t)size + 1);
 
     // Reads the data from the input file
     if (1 != fread(xml_string, (size_t)size, 1, file))
@@ -2649,7 +2651,7 @@ BOXING_START_TEST(afs_toc_files_save_string_test2)
     BOXING_ASSERT_STR_EQ(test_string, result);
 
     afs_toc_files_free(toc_files);
-    boxing_string_free(result);
+    free(result);
 }
 END_TEST
 
@@ -2668,7 +2670,7 @@ BOXING_START_TEST(afs_toc_files_save_string_test3)
     BOXING_ASSERT_STR_EQ(test_string, result);
 
     afs_toc_files_free(toc_files);
-    boxing_string_free(result);
+    free(result);
 }
 END_TEST
 
@@ -2707,8 +2709,8 @@ BOXING_START_TEST(afs_toc_files_save_string_test5)
     BOXING_ASSERT_STR_EQ(result, test_string);
 
     afs_toc_files_free(toc_files);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -2728,8 +2730,8 @@ BOXING_START_TEST(afs_toc_files_save_string_test6)
     BOXING_ASSERT_STR_EQ(result, test_string);
 
     afs_toc_files_free(toc_files);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -2994,7 +2996,7 @@ BOXING_START_TEST(afs_toc_files_load_string_test3)
     BOXING_ASSERT(toc_files == NULL);
     BOXING_ASSERT(result == DFALSE);
 
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -3032,7 +3034,7 @@ BOXING_START_TEST(afs_toc_files_load_string_test5)
     test_not_empty_afs_toc_files(toc_files, 3);
 
     afs_toc_files_free(toc_files);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -3052,7 +3054,7 @@ BOXING_START_TEST(afs_toc_files_load_string_test6)
     test_not_empty_afs_toc_files(toc_files, 3);
 
     afs_toc_files_free(toc_files);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -3175,7 +3177,7 @@ BOXING_START_TEST(afs_toc_files_save_as_table_test1)
 
     BOXING_ASSERT(toc_files == NULL);
     BOXING_ASSERT_STR_EQ(table_string, test_string);
-    boxing_string_free(table_string);
+    free(table_string);
 }
 END_TEST
 
@@ -3192,7 +3194,7 @@ BOXING_START_TEST(afs_toc_files_save_as_table_test2)
     BOXING_ASSERT_STR_EQ(table_string, test_string);
 
     afs_toc_files_free(toc_files);
-    boxing_string_free(table_string);
+    free(table_string);
 }
 END_TEST
 
@@ -3220,7 +3222,7 @@ BOXING_START_TEST(afs_toc_files_save_as_table_test3)
     BOXING_ASSERT_STR_EQ(table_string, test_string);
 
     afs_toc_files_free(toc_files);
-    boxing_string_free(table_string);
+    free(table_string);
 }
 END_TEST
 
@@ -3246,7 +3248,7 @@ BOXING_START_TEST(afs_toc_files_save_as_table_test4)
     BOXING_ASSERT(table_string != NULL);
 
     afs_toc_files_free(toc_files);
-    boxing_string_free(table_string);
+    free(table_string);
 }
 END_TEST
 
@@ -3275,7 +3277,7 @@ BOXING_START_TEST(afs_toc_files_save_as_table_test5)
     BOXING_ASSERT(table_string != NULL);
 
     afs_toc_files_free(toc_files);
-    boxing_string_free(table_string);
+    free(table_string);
 }
 END_TEST
 
@@ -3301,7 +3303,7 @@ BOXING_START_TEST(afs_toc_files_save_as_table_test6)
     BOXING_ASSERT(table_string != NULL);
 
     afs_toc_files_free(toc_files);
-    boxing_string_free(table_string);
+    free(table_string);
 }
 END_TEST
 
@@ -3325,10 +3327,10 @@ BOXING_START_TEST(afs_toc_files_save_as_location_table_test2)
     char * table_string = afs_toc_files_save_as_location_table(toc_files);
 
     test_null_afs_toc_files(toc_files);
-    BOXING_ASSERT(boxing_string_equal(table_string, "") == DTRUE);
+    BOXING_ASSERT(strcmp(table_string, "") == 0);
 
     afs_toc_files_free(toc_files);
-    boxing_string_free(table_string);
+    free(table_string);
 }
 END_TEST
 
@@ -3344,12 +3346,12 @@ BOXING_START_TEST(afs_toc_files_save_as_location_table_test3)
     GVECTORN(tocs, afs_toc_file *, 1)->end_frame = -2123456789;
     GVECTORN(tocs, afs_toc_file *, 1)->end_byte = -2123456789;
     GVECTORN(tocs, afs_toc_file *, 1)->size = 9223372036854775807;
-    boxing_string_free(GVECTORN(tocs, afs_toc_file *, 1)->checksum);
+    free(GVECTORN(tocs, afs_toc_file *, 1)->checksum);
     GVECTORN(tocs, afs_toc_file *, 1)->checksum = boxing_string_clone("long long long file checksum string................");
 
     afs_toc_file_preview_page * toc_file_preview_page = afs_toc_file_preview_get_page(GVECTORN(tocs, afs_toc_file *, 1)->preview, 1);
 
-    boxing_string_free(toc_file_preview_page->layout_id);
+    free(toc_file_preview_page->layout_id);
     toc_file_preview_page->layout_id = boxing_string_clone("long long long layout id string..........................");
     toc_file_preview_page->start_frame = 4294967295;
     toc_file_preview_page->start_section = 4294967295;
@@ -3386,7 +3388,7 @@ BOXING_START_TEST(afs_toc_files_save_as_location_table_test3)
     BOXING_ASSERT(table_string != NULL);
 
     afs_toc_files_free(toc_files);
-    boxing_string_free(table_string);
+    free(table_string);
 }
 END_TEST
 
@@ -3429,7 +3431,7 @@ BOXING_START_TEST(afs_toc_files_save_as_location_table_test4)
 
     afs_toc_file_preview_page * toc_file_preview_page = afs_toc_file_preview_get_page(toc_file_preview, 0);
 
-    boxing_string_free(toc_file_preview_page->layout_id);
+    free(toc_file_preview_page->layout_id);
     toc_file_preview_page->layout_id = boxing_string_clone("h");
     toc_file_preview_page->start_frame = 0;
     toc_file_preview_page->start_section = 0;
@@ -3456,7 +3458,7 @@ BOXING_START_TEST(afs_toc_files_save_as_location_table_test4)
     BOXING_ASSERT(table_string != NULL);
 
     afs_toc_files_free(toc_files);
-    boxing_string_free(table_string);
+    free(table_string);
 }
 END_TEST
 
@@ -3500,9 +3502,9 @@ BOXING_START_TEST(afs_toc_files_save_as_metadata_table_test3)
 
     metadata_source->file_id = -2123456789;
     metadata_source->source_id = -2123456789;
-    boxing_string_free(metadata_source->format_id);
+    free(metadata_source->format_id);
     metadata_source->format_id = boxing_string_clone("long long long format id string................");
-    boxing_string_free(metadata_source->data);
+    free(metadata_source->data);
     metadata_source->data = boxing_string_clone("long long long data string...................");
 
     char * table_string = afs_toc_files_save_as_metadata_table(toc_files);
@@ -3531,7 +3533,7 @@ BOXING_START_TEST(afs_toc_files_save_as_metadata_table_test3)
     BOXING_ASSERT(table_string != NULL);
 
     afs_toc_files_free(toc_files);
-    boxing_string_free(table_string);
+    free(table_string);
 }
 END_TEST
 
@@ -3571,9 +3573,9 @@ BOXING_START_TEST(afs_toc_files_save_as_metadata_table_test4)
 
     metadata_source->file_id = 0;
     metadata_source->source_id = 0;
-    boxing_string_free(metadata_source->format_id);
+    free(metadata_source->format_id);
     metadata_source->format_id = boxing_string_clone("s");
-    boxing_string_free(metadata_source->data);
+    free(metadata_source->data);
     metadata_source->data = boxing_string_clone("h");
 
     char * table_string = afs_toc_files_save_as_metadata_table(toc_files);
@@ -3588,7 +3590,7 @@ BOXING_START_TEST(afs_toc_files_save_as_metadata_table_test4)
     BOXING_ASSERT(table_string != NULL);
 
     afs_toc_files_free(toc_files);
-    boxing_string_free(table_string);
+    free(table_string);
 }
 END_TEST
 

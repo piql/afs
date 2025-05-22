@@ -52,7 +52,7 @@ BOXING_START_TEST(afs_sha1_sum1_test2)
     remove(file_name);
 
     BOXING_ASSERT(hash2 != NULL);
-    BOXING_ASSERT(boxing_string_equal(hash1, hash2) == DTRUE);
+    BOXING_ASSERT(strcmp(hash1, hash2) == 0);
 
     free(hash2);
 }
@@ -101,7 +101,7 @@ BOXING_START_TEST(afs_sha1_sum1_test4)
     remove(file_name);
 
     BOXING_ASSERT(hash2 != NULL);
-    BOXING_ASSERT(boxing_string_equal(hash1, hash2) == DTRUE);
+    BOXING_ASSERT(strcmp(hash1, hash2) == 0);
 
     free(hash2);
 }
@@ -151,7 +151,7 @@ BOXING_START_TEST(afs_sha1_sum2_test3)
     remove(file_name);
 
     BOXING_ASSERT(hash2 != NULL);
-    BOXING_ASSERT(boxing_string_equal(hash1, hash2) == DTRUE);
+    BOXING_ASSERT(strcmp(hash1, hash2) == 0);
 
     free(hash2);
 }

@@ -3,6 +3,7 @@
 #include "unittests.h"
 #include "controldata.h"
 #include <stdio.h>
+#include <string.h>
 #include "boxing_config.h"
 #include "boxing/utils.h"
 #include "mxml.h"
@@ -118,17 +119,17 @@ static void test_strings_afs_administrative_metadata(
 {
     BOXING_ASSERT(administrative_metadata != NULL);
     BOXING_ASSERT(administrative_metadata->creation_date != NULL);
-    BOXING_ASSERT(boxing_string_equal(creation_date, administrative_metadata->creation_date) == DTRUE);
+    BOXING_ASSERT(strcmp(creation_date, administrative_metadata->creation_date) == 0);
     BOXING_ASSERT(administrative_metadata->creator != NULL);
-    BOXING_ASSERT(boxing_string_equal(creator, administrative_metadata->creator) == DTRUE);
+    BOXING_ASSERT(strcmp(creator, administrative_metadata->creator) == 0);
     BOXING_ASSERT(administrative_metadata->description != NULL);
-    BOXING_ASSERT(boxing_string_equal(description, administrative_metadata->description) == DTRUE);
+    BOXING_ASSERT(strcmp(description, administrative_metadata->description) == 0);
     BOXING_ASSERT(administrative_metadata->print_reel_id != NULL);
-    BOXING_ASSERT(boxing_string_equal(print_reel_id, administrative_metadata->print_reel_id) == DTRUE);
+    BOXING_ASSERT(strcmp(print_reel_id, administrative_metadata->print_reel_id) == 0);
     BOXING_ASSERT(administrative_metadata->reel_id != NULL);
-    BOXING_ASSERT(boxing_string_equal(reel_id, administrative_metadata->reel_id) == DTRUE);
+    BOXING_ASSERT(strcmp(reel_id, administrative_metadata->reel_id) == 0);
     BOXING_ASSERT(administrative_metadata->title != NULL);
-    BOXING_ASSERT(boxing_string_equal(title, administrative_metadata->title) == DTRUE);
+    BOXING_ASSERT(strcmp(title, administrative_metadata->title) == 0);
 }
 
 
@@ -387,7 +388,7 @@ static char * read_xml_control_data(const char * file_name)
     }
 
     // Creates a vector vor the input data
-    char * xml_string = boxing_string_allocate((size_t)size + 1);
+    char * xml_string = malloc((size_t)size + 1);
 
     // Reads the data from the input file
     if (1 != fread(xml_string, (size_t)size, 1, file))
@@ -579,7 +580,7 @@ BOXING_START_TEST(afs_administrative_metadata_get_new_reference_test2)
 
     administrative_metadata1->creator = boxing_string_clone("Some other creator!");
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata2->creator, "Some other creator!") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata2->creator, "Some other creator!") == 0);
 
     afs_administrative_metadata_free(administrative_metadata1);
     afs_administrative_metadata_free(administrative_metadata2);
@@ -602,10 +603,10 @@ BOXING_START_TEST(afs_administrative_metadata_get_new_reference_test3)
     BOXING_ASSERT(administrative_metadata2->reference_count == 2);
     BOXING_ASSERT(administrative_metadata1 == administrative_metadata2);
 
-    boxing_string_free(administrative_metadata1->creator);
+    free(administrative_metadata1->creator);
     administrative_metadata1->creator = boxing_string_clone("Some other creator!");
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata2->creator, "Some other creator!") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata2->creator, "Some other creator!") == 0);
 
     afs_administrative_metadata_free(administrative_metadata1);
     afs_administrative_metadata_free(administrative_metadata2);
@@ -628,10 +629,10 @@ BOXING_START_TEST(afs_administrative_metadata_get_new_reference_test4)
     BOXING_ASSERT(administrative_metadata2->reference_count == 2);
     BOXING_ASSERT(administrative_metadata1 == administrative_metadata2);
 
-    boxing_string_free(administrative_metadata1->creator);
+    free(administrative_metadata1->creator);
     administrative_metadata1->creator = boxing_string_clone("Some other creator!");
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata2->creator, "Some other creator!") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata2->creator, "Some other creator!") == 0);
 
     afs_administrative_metadata_free(administrative_metadata1);
     afs_administrative_metadata_free(administrative_metadata2);
@@ -921,7 +922,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_reel_id_test2)
     afs_administrative_metadata_set_reel_id(administrative_metadata, reel_id);
 
     BOXING_ASSERT(administrative_metadata == NULL);
-    BOXING_ASSERT(boxing_string_equal(reel_id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(reel_id, "") == 0);
 }
 END_TEST
 
@@ -935,7 +936,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_reel_id_test3)
     afs_administrative_metadata_set_reel_id(administrative_metadata, reel_id);
 
     BOXING_ASSERT(administrative_metadata == NULL);
-    BOXING_ASSERT(boxing_string_equal(reel_id, "some reel id") == DTRUE);
+    BOXING_ASSERT(strcmp(reel_id, "some reel id") == 0);
 }
 END_TEST
 
@@ -965,7 +966,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_reel_id_test5)
 
     afs_administrative_metadata_set_reel_id(administrative_metadata, reel_id);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->reel_id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->reel_id, "") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -982,7 +983,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_reel_id_test6)
 
     afs_administrative_metadata_set_reel_id(administrative_metadata, reel_id);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->reel_id, "some reel id") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->reel_id, "some reel id") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -993,7 +994,7 @@ END_TEST
 BOXING_START_TEST(afs_administrative_metadata_set_reel_id_test7)
 {
     afs_administrative_metadata * administrative_metadata = afs_administrative_metadata_create2("reel id", "print reel id", "title", "description", "creator", "creation date");
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->reel_id, "reel id") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->reel_id, "reel id") == 0);
 
     const char * reel_id = NULL;
 
@@ -1010,13 +1011,13 @@ END_TEST
 BOXING_START_TEST(afs_administrative_metadata_set_reel_id_test8)
 {
     afs_administrative_metadata * administrative_metadata = afs_administrative_metadata_create2("reel id", "print reel id", "title", "description", "creator", "creation date");
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->reel_id, "reel id") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->reel_id, "reel id") == 0);
 
     const char * reel_id = "";
 
     afs_administrative_metadata_set_reel_id(administrative_metadata, reel_id);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->reel_id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->reel_id, "") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1027,13 +1028,13 @@ END_TEST
 BOXING_START_TEST(afs_administrative_metadata_set_reel_id_test9)
 {
     afs_administrative_metadata * administrative_metadata = afs_administrative_metadata_create2("reel id", "print reel id", "title", "description", "creator", "creation date");
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->reel_id, "reel id") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->reel_id, "reel id") == 0);
 
     const char * reel_id = "some other reel id";
 
     afs_administrative_metadata_set_reel_id(administrative_metadata, reel_id);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->reel_id, "some other reel id") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->reel_id, "some other reel id") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1063,7 +1064,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_print_reel_id_test2)
     afs_administrative_metadata_set_print_reel_id(administrative_metadata, print_reel_id);
 
     BOXING_ASSERT(administrative_metadata == NULL);
-    BOXING_ASSERT(boxing_string_equal(print_reel_id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(print_reel_id, "") == 0);
 }
 END_TEST
 
@@ -1077,7 +1078,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_print_reel_id_test3)
     afs_administrative_metadata_set_print_reel_id(administrative_metadata, print_reel_id);
 
     BOXING_ASSERT(administrative_metadata == NULL);
-    BOXING_ASSERT(boxing_string_equal(print_reel_id, "some print reel id") == DTRUE);
+    BOXING_ASSERT(strcmp(print_reel_id, "some print reel id") == 0);
 }
 END_TEST
 
@@ -1107,7 +1108,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_print_reel_id_test5)
 
     afs_administrative_metadata_set_print_reel_id(administrative_metadata, print_reel_id);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->print_reel_id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->print_reel_id, "") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1124,7 +1125,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_print_reel_id_test6)
 
     afs_administrative_metadata_set_print_reel_id(administrative_metadata, print_reel_id);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->print_reel_id, "some print reel id") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->print_reel_id, "some print reel id") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1135,7 +1136,7 @@ END_TEST
 BOXING_START_TEST(afs_administrative_metadata_set_print_reel_id_test7)
 {
     afs_administrative_metadata * administrative_metadata = afs_administrative_metadata_create2("reel id", "print reel id", "title", "description", "creator", "creation date");
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->print_reel_id, "print reel id") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->print_reel_id, "print reel id") == 0);
 
     const char * print_reel_id = NULL;
 
@@ -1152,13 +1153,13 @@ END_TEST
 BOXING_START_TEST(afs_administrative_metadata_set_print_reel_id_test8)
 {
     afs_administrative_metadata * administrative_metadata = afs_administrative_metadata_create2("reel id", "print reel id", "title", "description", "creator", "creation date");
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->print_reel_id, "print reel id") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->print_reel_id, "print reel id") == 0);
 
     const char * print_reel_id = "";
 
     afs_administrative_metadata_set_print_reel_id(administrative_metadata, print_reel_id);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->print_reel_id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->print_reel_id, "") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1169,13 +1170,13 @@ END_TEST
 BOXING_START_TEST(afs_administrative_metadata_set_print_reel_id_test9)
 {
     afs_administrative_metadata * administrative_metadata = afs_administrative_metadata_create2("reel id", "print reel id", "title", "description", "creator", "creation date");
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->print_reel_id, "print reel id") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->print_reel_id, "print reel id") == 0);
 
     const char * print_reel_id = "some other print reel id";
 
     afs_administrative_metadata_set_print_reel_id(administrative_metadata, print_reel_id);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->print_reel_id, "some other print reel id") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->print_reel_id, "some other print reel id") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1205,7 +1206,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_title_test2)
     afs_administrative_metadata_set_title(administrative_metadata, title);
 
     BOXING_ASSERT(administrative_metadata == NULL);
-    BOXING_ASSERT(boxing_string_equal(title, "") == DTRUE);
+    BOXING_ASSERT(strcmp(title, "") == 0);
 }
 END_TEST
 
@@ -1219,7 +1220,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_title_test3)
     afs_administrative_metadata_set_title(administrative_metadata, title);
 
     BOXING_ASSERT(administrative_metadata == NULL);
-    BOXING_ASSERT(boxing_string_equal(title, "some title") == DTRUE);
+    BOXING_ASSERT(strcmp(title, "some title") == 0);
 }
 END_TEST
 
@@ -1249,7 +1250,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_title_test5)
 
     afs_administrative_metadata_set_title(administrative_metadata, title);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->title, "") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->title, "") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1266,7 +1267,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_title_test6)
 
     afs_administrative_metadata_set_title(administrative_metadata, title);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->title, "some title") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->title, "some title") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1277,7 +1278,7 @@ END_TEST
 BOXING_START_TEST(afs_administrative_metadata_set_title_test7)
 {
     afs_administrative_metadata * administrative_metadata = afs_administrative_metadata_create2("reel id", "print reel id", "title", "description", "creator", "creation date");
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->title, "title") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->title, "title") == 0);
 
     const char * title = NULL;
 
@@ -1294,13 +1295,13 @@ END_TEST
 BOXING_START_TEST(afs_administrative_metadata_set_title_test8)
 {
     afs_administrative_metadata * administrative_metadata = afs_administrative_metadata_create2("reel id", "print reel id", "title", "description", "creator", "creation date");
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->title, "title") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->title, "title") == 0);
 
     const char * title = "";
 
     afs_administrative_metadata_set_title(administrative_metadata, title);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->title, "") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->title, "") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1311,13 +1312,13 @@ END_TEST
 BOXING_START_TEST(afs_administrative_metadata_set_title_test9)
 {
     afs_administrative_metadata * administrative_metadata = afs_administrative_metadata_create2("reel id", "print reel id", "title", "description", "creator", "creation date");
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->title, "title") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->title, "title") == 0);
 
     const char * title = "some other title";
 
     afs_administrative_metadata_set_title(administrative_metadata, title);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->title, "some other title") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->title, "some other title") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1347,7 +1348,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_description_test2)
     afs_administrative_metadata_set_description(administrative_metadata, description);
 
     BOXING_ASSERT(administrative_metadata == NULL);
-    BOXING_ASSERT(boxing_string_equal(description, "") == DTRUE);
+    BOXING_ASSERT(strcmp(description, "") == 0);
 }
 END_TEST
 
@@ -1361,7 +1362,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_description_test3)
     afs_administrative_metadata_set_description(administrative_metadata, description);
 
     BOXING_ASSERT(administrative_metadata == NULL);
-    BOXING_ASSERT(boxing_string_equal(description, "some description") == DTRUE);
+    BOXING_ASSERT(strcmp(description, "some description") == 0);
 }
 END_TEST
 
@@ -1391,7 +1392,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_description_test5)
 
     afs_administrative_metadata_set_description(administrative_metadata, description);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->description, "") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->description, "") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1408,7 +1409,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_description_test6)
 
     afs_administrative_metadata_set_description(administrative_metadata, description);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->description, "some description") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->description, "some description") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1419,7 +1420,7 @@ END_TEST
 BOXING_START_TEST(afs_administrative_metadata_set_description_test7)
 {
     afs_administrative_metadata * administrative_metadata = afs_administrative_metadata_create2("reel id", "print reel id", "title", "description", "creator", "creation date");
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->description, "description") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->description, "description") == 0);
 
     const char * description = NULL;
 
@@ -1436,13 +1437,13 @@ END_TEST
 BOXING_START_TEST(afs_administrative_metadata_set_description_test8)
 {
     afs_administrative_metadata * administrative_metadata = afs_administrative_metadata_create2("reel id", "print reel id", "title", "description", "creator", "creation date");
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->description, "description") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->description, "description") == 0);
 
     const char * description = "";
 
     afs_administrative_metadata_set_description(administrative_metadata, description);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->description, "") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->description, "") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1453,13 +1454,13 @@ END_TEST
 BOXING_START_TEST(afs_administrative_metadata_set_description_test9)
 {
     afs_administrative_metadata * administrative_metadata = afs_administrative_metadata_create2("reel id", "print reel id", "title", "description", "creator", "creation date");
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->description, "description") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->description, "description") == 0);
 
     const char * description = "some other description";
 
     afs_administrative_metadata_set_description(administrative_metadata, description);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->description, "some other description") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->description, "some other description") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1489,7 +1490,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_creator_test2)
     afs_administrative_metadata_set_creator(administrative_metadata, creator);
 
     BOXING_ASSERT(administrative_metadata == NULL);
-    BOXING_ASSERT(boxing_string_equal(creator, "") == DTRUE);
+    BOXING_ASSERT(strcmp(creator, "") == 0);
 }
 END_TEST
 
@@ -1503,7 +1504,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_creator_test3)
     afs_administrative_metadata_set_creator(administrative_metadata, creator);
 
     BOXING_ASSERT(administrative_metadata == NULL);
-    BOXING_ASSERT(boxing_string_equal(creator, "some creator") == DTRUE);
+    BOXING_ASSERT(strcmp(creator, "some creator") == 0);
 }
 END_TEST
 
@@ -1533,7 +1534,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_creator_test5)
 
     afs_administrative_metadata_set_creator(administrative_metadata, creator);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->creator, "") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->creator, "") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1550,7 +1551,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_creator_test6)
 
     afs_administrative_metadata_set_creator(administrative_metadata, creator);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->creator, "some creator") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->creator, "some creator") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1561,7 +1562,7 @@ END_TEST
 BOXING_START_TEST(afs_administrative_metadata_set_creator_test7)
 {
     afs_administrative_metadata * administrative_metadata = afs_administrative_metadata_create2("reel id", "print reel id", "title", "description", "creator", "creation date");
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->creator, "creator") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->creator, "creator") == 0);
 
     const char * creator = NULL;
 
@@ -1578,13 +1579,13 @@ END_TEST
 BOXING_START_TEST(afs_administrative_metadata_set_creator_test8)
 {
     afs_administrative_metadata * administrative_metadata = afs_administrative_metadata_create2("reel id", "print reel id", "title", "description", "creator", "creation date");
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->creator, "creator") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->creator, "creator") == 0);
 
     const char * creator = "";
 
     afs_administrative_metadata_set_creator(administrative_metadata, creator);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->creator, "") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->creator, "") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1595,13 +1596,13 @@ END_TEST
 BOXING_START_TEST(afs_administrative_metadata_set_creator_test9)
 {
     afs_administrative_metadata * administrative_metadata = afs_administrative_metadata_create2("reel id", "print reel id", "title", "description", "creator", "creation date");
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->creator, "creator") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->creator, "creator") == 0);
 
     const char * creator = "some other creator";
 
     afs_administrative_metadata_set_creator(administrative_metadata, creator);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->creator, "some other creator") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->creator, "some other creator") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1631,7 +1632,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_creation_date_test2)
     afs_administrative_metadata_set_creation_date(administrative_metadata, creation_date);
 
     BOXING_ASSERT(administrative_metadata == NULL);
-    BOXING_ASSERT(boxing_string_equal(creation_date, "") == DTRUE);
+    BOXING_ASSERT(strcmp(creation_date, "") == 0);
 }
 END_TEST
 
@@ -1645,7 +1646,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_creation_date_test3)
     afs_administrative_metadata_set_creation_date(administrative_metadata, creation_date);
 
     BOXING_ASSERT(administrative_metadata == NULL);
-    BOXING_ASSERT(boxing_string_equal(creation_date, "some creation date") == DTRUE);
+    BOXING_ASSERT(strcmp(creation_date, "some creation date") == 0);
 }
 END_TEST
 
@@ -1675,7 +1676,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_creation_date_test5)
 
     afs_administrative_metadata_set_creation_date(administrative_metadata, creation_date);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->creation_date, "") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->creation_date, "") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1692,7 +1693,7 @@ BOXING_START_TEST(afs_administrative_metadata_set_creation_date_test6)
 
     afs_administrative_metadata_set_creation_date(administrative_metadata, creation_date);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->creation_date, "some creation date") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->creation_date, "some creation date") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1703,7 +1704,7 @@ END_TEST
 BOXING_START_TEST(afs_administrative_metadata_set_creation_date_test7)
 {
     afs_administrative_metadata * administrative_metadata = afs_administrative_metadata_create2("reel id", "print reel id", "title", "description", "creator", "creation date");
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->creation_date, "creation date") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->creation_date, "creation date") == 0);
 
     const char * creation_date = NULL;
 
@@ -1720,13 +1721,13 @@ END_TEST
 BOXING_START_TEST(afs_administrative_metadata_set_creation_date_test8)
 {
     afs_administrative_metadata * administrative_metadata = afs_administrative_metadata_create2("reel id", "print reel id", "title", "description", "creator", "creation date");
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->creation_date, "creation date") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->creation_date, "creation date") == 0);
 
     const char * creation_date = "";
 
     afs_administrative_metadata_set_creation_date(administrative_metadata, creation_date);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->creation_date, "") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->creation_date, "") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1737,13 +1738,13 @@ END_TEST
 BOXING_START_TEST(afs_administrative_metadata_set_creation_date_test9)
 {
     afs_administrative_metadata * administrative_metadata = afs_administrative_metadata_create2("reel id", "print reel id", "title", "description", "creator", "creation date");
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->creation_date, "creation date") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->creation_date, "creation date") == 0);
 
     const char * creation_date = "some other creation date";
 
     afs_administrative_metadata_set_creation_date(administrative_metadata, creation_date);
 
-    BOXING_ASSERT(boxing_string_equal(administrative_metadata->creation_date, "some other creation date") == DTRUE);
+    BOXING_ASSERT(strcmp(administrative_metadata->creation_date, "some other creation date") == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
 }
@@ -1925,11 +1926,11 @@ BOXING_START_TEST(afs_administrative_metadata_save_string_test2)
     char * result = afs_administrative_metadata_save_string(administrative_metadata, DTRUE);
 
     BOXING_ASSERT(administrative_metadata != NULL);
-    BOXING_ASSERT(boxing_string_equal(test_string, result) == DTRUE);
+    BOXING_ASSERT(strcmp(test_string, result) == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1944,11 +1945,11 @@ BOXING_START_TEST(afs_administrative_metadata_save_string_test3)
     char * result = afs_administrative_metadata_save_string(administrative_metadata, DFALSE);
 
     BOXING_ASSERT(administrative_metadata != NULL);
-    BOXING_ASSERT(boxing_string_equal(test_string, result) == DTRUE);
+    BOXING_ASSERT(strcmp(test_string, result) == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1963,11 +1964,11 @@ BOXING_START_TEST(afs_administrative_metadata_save_string_test4)
     char * result = afs_administrative_metadata_save_string(administrative_metadata, DTRUE);
 
     BOXING_ASSERT(administrative_metadata != NULL);
-    BOXING_ASSERT(boxing_string_equal(test_string, result) == DTRUE);
+    BOXING_ASSERT(strcmp(test_string, result) == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1982,11 +1983,11 @@ BOXING_START_TEST(afs_administrative_metadata_save_string_test5)
     char * result = afs_administrative_metadata_save_string(administrative_metadata, DFALSE);
 
     BOXING_ASSERT(administrative_metadata != NULL);
-    BOXING_ASSERT(boxing_string_equal(test_string, result) == DTRUE);
+    BOXING_ASSERT(strcmp(test_string, result) == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -2001,11 +2002,11 @@ BOXING_START_TEST(afs_administrative_metadata_save_string_test6)
     char * result = afs_administrative_metadata_save_string(administrative_metadata, DTRUE);
 
     BOXING_ASSERT(administrative_metadata != NULL);
-    BOXING_ASSERT(boxing_string_equal(test_string, result) == DTRUE);
+    BOXING_ASSERT(strcmp(test_string, result) == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -2020,11 +2021,11 @@ BOXING_START_TEST(afs_administrative_metadata_save_string_test7)
     char * result = afs_administrative_metadata_save_string(administrative_metadata, DFALSE);
 
     BOXING_ASSERT(administrative_metadata != NULL);
-    BOXING_ASSERT(boxing_string_equal(test_string, result) == DTRUE);
+    BOXING_ASSERT(strcmp(test_string, result) == 0);
 
     afs_administrative_metadata_free(administrative_metadata);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -2335,7 +2336,7 @@ BOXING_START_TEST(afs_administrative_metadata_load_string_test3)
     BOXING_ASSERT(administrative_metadata == NULL);
     BOXING_ASSERT(result == DFALSE);
 
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -2373,7 +2374,7 @@ BOXING_START_TEST(afs_administrative_metadata_load_string_test5)
     test_empty_afs_administrative_metadata(administrative_metadata);
 
     afs_administrative_metadata_free(administrative_metadata);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -2393,7 +2394,7 @@ BOXING_START_TEST(afs_administrative_metadata_load_string_test6)
     test_empty_afs_administrative_metadata(administrative_metadata);
 
     afs_administrative_metadata_free(administrative_metadata);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -2413,7 +2414,7 @@ BOXING_START_TEST(afs_administrative_metadata_load_string_test7)
     test_strings_afs_administrative_metadata(administrative_metadata, "", "", "", "", "", "");
 
     afs_administrative_metadata_free(administrative_metadata);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -2433,7 +2434,7 @@ BOXING_START_TEST(afs_administrative_metadata_load_string_test8)
     test_strings_afs_administrative_metadata(administrative_metadata, "", "", "", "", "", "");
 
     afs_administrative_metadata_free(administrative_metadata);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -2453,7 +2454,7 @@ BOXING_START_TEST(afs_administrative_metadata_load_string_test9)
     test_strings_afs_administrative_metadata(administrative_metadata, "reel id", "print reel id", "title", "description", "creator", "creation date");
 
     afs_administrative_metadata_free(administrative_metadata);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -2473,7 +2474,7 @@ BOXING_START_TEST(afs_administrative_metadata_load_string_test10)
     test_strings_afs_administrative_metadata(administrative_metadata, "reel id", "print reel id", "title", "description", "creator", "creation date");
 
     afs_administrative_metadata_free(administrative_metadata);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -3858,11 +3859,11 @@ BOXING_START_TEST(afs_technical_metadata_save_string_test5)
     char * result = afs_technical_metadata_save_string(technical_metadata, DTRUE);
 
     BOXING_ASSERT(technical_metadata != NULL);
-    BOXING_ASSERT(boxing_string_equal(test_string, result) == DTRUE);
+    BOXING_ASSERT(strcmp(test_string, result) == 0);
 
     afs_technical_metadata_free(technical_metadata);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -3877,11 +3878,11 @@ BOXING_START_TEST(afs_technical_metadata_save_string_test6)
     char * result = afs_technical_metadata_save_string(technical_metadata, DFALSE);
 
     BOXING_ASSERT(technical_metadata != NULL);
-    BOXING_ASSERT(boxing_string_equal(test_string, result) == DTRUE);
+    BOXING_ASSERT(strcmp(test_string, result) == 0);
 
     afs_technical_metadata_free(technical_metadata);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -3896,11 +3897,11 @@ BOXING_START_TEST(afs_technical_metadata_save_string_test7)
     char * result = afs_technical_metadata_save_string(technical_metadata, DTRUE);
 
     BOXING_ASSERT(technical_metadata != NULL);
-    BOXING_ASSERT(boxing_string_equal(test_string, result) == DTRUE);
+    BOXING_ASSERT(strcmp(test_string, result) == 0);
 
     afs_technical_metadata_free(technical_metadata);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -3915,11 +3916,11 @@ BOXING_START_TEST(afs_technical_metadata_save_string_test8)
     char * result = afs_technical_metadata_save_string(technical_metadata, DFALSE);
 
     BOXING_ASSERT(technical_metadata != NULL);
-    BOXING_ASSERT(boxing_string_equal(test_string, result) == DTRUE);
+    BOXING_ASSERT(strcmp(test_string, result) == 0);
 
     afs_technical_metadata_free(technical_metadata);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -4243,7 +4244,7 @@ BOXING_START_TEST(afs_technical_metadata_load_string_test3)
     BOXING_ASSERT(technical_metadata == NULL);
     BOXING_ASSERT(result == DFALSE);
 
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -4281,7 +4282,7 @@ BOXING_START_TEST(afs_technical_metadata_load_string_test5)
     test_afs_technical_metadata(technical_metadata, 0, 0);
 
     afs_technical_metadata_free(technical_metadata);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -4301,7 +4302,7 @@ BOXING_START_TEST(afs_technical_metadata_load_string_test6)
     test_afs_technical_metadata(technical_metadata, 0, 0);
 
     afs_technical_metadata_free(technical_metadata);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -4321,7 +4322,7 @@ BOXING_START_TEST(afs_technical_metadata_load_string_test7)
     test_afs_technical_metadata(technical_metadata, 1, 3);
 
     afs_technical_metadata_free(technical_metadata);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -4341,7 +4342,7 @@ BOXING_START_TEST(afs_technical_metadata_load_string_test8)
     test_afs_technical_metadata(technical_metadata, 1, 3);
 
     afs_technical_metadata_free(technical_metadata);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -5019,7 +5020,7 @@ BOXING_START_TEST(afs_control_data_get_new_reference_test5)
 
     control_data1->administrative_metadata->creator = boxing_string_clone("Some other creator!");
 
-    BOXING_ASSERT(boxing_string_equal(control_data2->administrative_metadata->creator, "Some other creator!") == DTRUE);
+    BOXING_ASSERT(strcmp(control_data2->administrative_metadata->creator, "Some other creator!") == 0);
 
     afs_control_data_free(control_data1);
     afs_control_data_free(control_data2);
@@ -5044,7 +5045,7 @@ BOXING_START_TEST(afs_control_data_get_new_reference_test6)
 
     control_data1->administrative_metadata->creator = boxing_string_clone("Some other creator!");
 
-    BOXING_ASSERT(boxing_string_equal(control_data2->administrative_metadata->creator, "Some other creator!") == DTRUE);
+    BOXING_ASSERT(strcmp(control_data2->administrative_metadata->creator, "Some other creator!") == 0);
 
     afs_control_data_free(control_data1);
     afs_control_data_free(control_data2);
@@ -5069,7 +5070,7 @@ BOXING_START_TEST(afs_control_data_get_new_reference_test7)
 
     control_data1->administrative_metadata->creator = boxing_string_clone("Some other creator!");
 
-    BOXING_ASSERT(boxing_string_equal(control_data2->administrative_metadata->creator, "Some other creator!") == DTRUE);
+    BOXING_ASSERT(strcmp(control_data2->administrative_metadata->creator, "Some other creator!") == 0);
 
     afs_control_data_free(control_data1);
     afs_control_data_free(control_data2);
@@ -5092,10 +5093,10 @@ BOXING_START_TEST(afs_control_data_get_new_reference_test8)
     BOXING_ASSERT(control_data2->reference_count == 2);
     BOXING_ASSERT(control_data1 == control_data2);
 
-    boxing_string_free(control_data1->administrative_metadata->creator);
+    free(control_data1->administrative_metadata->creator);
     control_data1->administrative_metadata->creator = boxing_string_clone("Some other creator!");
 
-    BOXING_ASSERT(boxing_string_equal(control_data2->administrative_metadata->creator, "Some other creator!") == DTRUE);
+    BOXING_ASSERT(strcmp(control_data2->administrative_metadata->creator, "Some other creator!") == 0);
 
     afs_control_data_free(control_data1);
     afs_control_data_free(control_data2);
@@ -5118,10 +5119,10 @@ BOXING_START_TEST(afs_control_data_get_new_reference_test9)
     BOXING_ASSERT(control_data2->reference_count == 2);
     BOXING_ASSERT(control_data1 == control_data2);
 
-    boxing_string_free(control_data1->administrative_metadata->creator);
+    free(control_data1->administrative_metadata->creator);
     control_data1->administrative_metadata->creator = boxing_string_clone("Some other creator!");
 
-    BOXING_ASSERT(boxing_string_equal(control_data2->administrative_metadata->creator, "Some other creator!") == DTRUE);
+    BOXING_ASSERT(strcmp(control_data2->administrative_metadata->creator, "Some other creator!") == 0);
 
     afs_control_data_free(control_data1);
     afs_control_data_free(control_data2);
@@ -5144,10 +5145,10 @@ BOXING_START_TEST(afs_control_data_get_new_reference_test10)
     BOXING_ASSERT(control_data2->reference_count == 2);
     BOXING_ASSERT(control_data1 == control_data2);
 
-    boxing_string_free(control_data1->administrative_metadata->creator);
+    free(control_data1->administrative_metadata->creator);
     control_data1->administrative_metadata->creator = boxing_string_clone("Some other creator!");
 
-    BOXING_ASSERT(boxing_string_equal(control_data2->administrative_metadata->creator, "Some other creator!") == DTRUE);
+    BOXING_ASSERT(strcmp(control_data2->administrative_metadata->creator, "Some other creator!") == 0);
 
     afs_control_data_free(control_data1);
     afs_control_data_free(control_data2);
@@ -5666,11 +5667,11 @@ BOXING_START_TEST(afs_control_data_save_string_test7)
     char * result = afs_control_data_save_string(control_data, DTRUE);
 
     BOXING_ASSERT(control_data != NULL);
-    BOXING_ASSERT(boxing_string_equal(test_string, result) == DTRUE);
+    BOXING_ASSERT(strcmp(test_string, result) == 0);
 
     afs_control_data_free(control_data);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -5685,11 +5686,11 @@ BOXING_START_TEST(afs_control_data_save_string_test8)
     char * result = afs_control_data_save_string(control_data, DFALSE);
 
     BOXING_ASSERT(control_data != NULL);
-    BOXING_ASSERT(boxing_string_equal(test_string, result) == DTRUE);
+    BOXING_ASSERT(strcmp(test_string, result) == 0);
 
     afs_control_data_free(control_data);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -5975,7 +5976,7 @@ BOXING_START_TEST(afs_control_data_load_string_test3)
     BOXING_ASSERT(control_data == NULL);
     BOXING_ASSERT(result == DFALSE);
 
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -6013,7 +6014,7 @@ BOXING_START_TEST(afs_control_data_load_string_test5)
     test_afs_control_data(control_data, 1, 1);
 
     afs_control_data_free(control_data);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -6033,7 +6034,7 @@ BOXING_START_TEST(afs_control_data_load_string_test6)
     test_afs_control_data(control_data, 1, 1);
 
     afs_control_data_free(control_data);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 

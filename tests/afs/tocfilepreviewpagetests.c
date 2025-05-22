@@ -7,6 +7,8 @@
 #include "boxing/string.h"
 #include "mxml.h"
 
+#include <string.h>
+
 #if defined ( D_OS_WIN32 )
 #define DFSEEK _fseeki64
 #define DFTELL _ftelli64
@@ -32,7 +34,7 @@ static void test_empty_afs_toc_file_preview_page(afs_toc_file_preview_page * toc
 static void test_not_empty_afs_toc_file_preview_page(afs_toc_file_preview_page * toc_file_preview_page)
 {
     BOXING_ASSERT(toc_file_preview_page != NULL);
-    BOXING_ASSERT(boxing_string_equal(toc_file_preview_page->layout_id, "Some layout ID") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_file_preview_page->layout_id, "Some layout ID") == 0);
     BOXING_ASSERT(toc_file_preview_page->start_frame == 9);
     BOXING_ASSERT(toc_file_preview_page->start_section == 8);
     BOXING_ASSERT(toc_file_preview_page->section_count == 7);
@@ -81,7 +83,7 @@ static char * read_xml_preview_page_file(const char* file_name)
     }
 
     // Creates a vector vor the input data
-    char * xml_string = boxing_string_allocate((size_t)size + 1);
+    char * xml_string = malloc((size_t)size + 1);
 
     // Reads the data from the input file
     if (1 != fread(xml_string, (size_t)size, 1, file))
@@ -259,7 +261,7 @@ BOXING_START_TEST(afs_toc_file_preview_page_init2_test3)
 
     test_not_empty_afs_toc_file_preview_page(toc_file_preview_page);
 
-    boxing_string_free(toc_file_preview_page->layout_id);
+    free(toc_file_preview_page->layout_id);
     afs_toc_file_preview_page_init2(toc_file_preview_page, NULL, 0, 0, 0, 0, 0, 0, 0);
 
     test_empty_afs_toc_file_preview_page(toc_file_preview_page);
@@ -1556,10 +1558,10 @@ BOXING_START_TEST(afs_toc_file_preview_page_save_string_test2)
 
     BOXING_ASSERT(toc_file_preview_page != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, "<?xml version=\"1.0\" encoding=\"utf-8\"?><pages frame=\"0\" section=\"0\" count=\"0\" />\n"));
+    BOXING_ASSERT(strcmp(result, "<?xml version=\"1.0\" encoding=\"utf-8\"?><pages frame=\"0\" section=\"0\" count=\"0\" />\n") == 0);
 
     afs_toc_file_preview_page_free(toc_file_preview_page);
-    boxing_string_free(result);
+    free(result);
 }
 END_TEST
 
@@ -1575,11 +1577,11 @@ BOXING_START_TEST(afs_toc_file_preview_page_save_string_test3)
 
     BOXING_ASSERT(toc_file_preview_page != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_file_preview_page_free(toc_file_preview_page);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1595,11 +1597,11 @@ BOXING_START_TEST(afs_toc_file_preview_page_save_string_test4)
 
     BOXING_ASSERT(toc_file_preview_page != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_file_preview_page_free(toc_file_preview_page);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1859,7 +1861,7 @@ BOXING_START_TEST(afs_toc_file_preview_page_load_string_test3)
     BOXING_ASSERT(toc_file_preview_page == NULL);
     BOXING_ASSERT(result == DFALSE);
 
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -1897,7 +1899,7 @@ BOXING_START_TEST(afs_toc_file_preview_page_load_string_test5)
     test_empty_afs_toc_file_preview_page(toc_file_preview_page);
 
     afs_toc_file_preview_page_free(toc_file_preview_page);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -1917,7 +1919,7 @@ BOXING_START_TEST(afs_toc_file_preview_page_load_string_test6)
     test_not_empty_afs_toc_file_preview_page(toc_file_preview_page);
 
     afs_toc_file_preview_page_free(toc_file_preview_page);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -1937,7 +1939,7 @@ BOXING_START_TEST(afs_toc_file_preview_page_load_string_test7)
     test_not_empty_afs_toc_file_preview_page(toc_file_preview_page);
 
     afs_toc_file_preview_page_free(toc_file_preview_page);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 

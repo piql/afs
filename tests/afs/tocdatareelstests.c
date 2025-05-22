@@ -5,6 +5,8 @@
 #include "boxing/utils.h"
 #include "mxml.h"
 
+#include <string.h>
+
 #if defined ( D_OS_WIN32 )
 #define DFSEEK _fseeki64
 #define DFTELL _ftelli64
@@ -118,7 +120,7 @@ afs_toc_data_reels * get_afs_toc_data_reels_instance7(unsigned int reels_count)
 static void test_afs_toc_data_reel(afs_toc_data_reel * toc_data_reel, const char * id, const size_t files_count)
 {
     BOXING_ASSERT(toc_data_reel != NULL);
-    BOXING_ASSERT(boxing_string_equal(id, toc_data_reel->id) == DTRUE);
+    BOXING_ASSERT(strcmp(id, toc_data_reel->id) == 0);
     BOXING_ASSERT(afs_toc_files_get_tocs_count(toc_data_reel->files) == files_count);
 
     for (size_t i = 0; i < files_count; i++)
@@ -185,7 +187,7 @@ static char * read_xml_toc_data_reels(const char * file_name)
     }
 
     // Creates a vector vor the input data
-    char * xml_string = boxing_string_allocate((size_t)size + 1);
+    char * xml_string = malloc((size_t)size + 1);
 
     // Reads the data from the input file
     if (1 != fread(xml_string, (size_t)size, 1, file))
@@ -1326,11 +1328,11 @@ BOXING_START_TEST(afs_toc_data_reels_save_string_test2)
 
     BOXING_ASSERT(toc_data_reels != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_data_reels_free(toc_data_reels);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1346,11 +1348,11 @@ BOXING_START_TEST(afs_toc_data_reels_save_string_test3)
 
     BOXING_ASSERT(toc_data_reels != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_data_reels_free(toc_data_reels);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1367,11 +1369,11 @@ BOXING_START_TEST(afs_toc_data_reels_save_string_test4)
 
     BOXING_ASSERT(toc_data_reels != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_data_reels_free(toc_data_reels);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1388,11 +1390,11 @@ BOXING_START_TEST(afs_toc_data_reels_save_string_test5)
 
     BOXING_ASSERT(toc_data_reels != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_data_reels_free(toc_data_reels);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1424,11 +1426,11 @@ BOXING_START_TEST(afs_toc_data_reels_save_string_test7)
 
     BOXING_ASSERT(toc_data_reels != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_data_reels_free(toc_data_reels);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1444,11 +1446,11 @@ BOXING_START_TEST(afs_toc_data_reels_save_string_test8)
 
     BOXING_ASSERT(toc_data_reels != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_data_reels_free(toc_data_reels);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1784,7 +1786,7 @@ BOXING_START_TEST(afs_toc_data_reels_load_string_test3)
     BOXING_ASSERT(toc_data_reels == NULL);
     BOXING_ASSERT(result == DFALSE);
 
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -1822,7 +1824,7 @@ BOXING_START_TEST(afs_toc_data_reels_load_string_test5)
     test_afs_toc_data_reels(toc_data_reels, 0);
 
     afs_toc_data_reels_free(toc_data_reels);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -1842,7 +1844,7 @@ BOXING_START_TEST(afs_toc_data_reels_load_string_test6)
     test_afs_toc_data_reels(toc_data_reels, 0);
 
     afs_toc_data_reels_free(toc_data_reels);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -1862,7 +1864,7 @@ BOXING_START_TEST(afs_toc_data_reels_load_string_test7)
     test_afs_toc_data_reels(toc_data_reels, 0);
 
     afs_toc_data_reels_free(toc_data_reels);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -1882,7 +1884,7 @@ BOXING_START_TEST(afs_toc_data_reels_load_string_test8)
     test_afs_toc_data_reels(toc_data_reels, 0);
 
     afs_toc_data_reels_free(toc_data_reels);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -1902,7 +1904,7 @@ BOXING_START_TEST(afs_toc_data_reels_load_string_test9)
     test_afs_toc_data_reels(toc_data_reels, 3);
 
     afs_toc_data_reels_free(toc_data_reels);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -1922,7 +1924,7 @@ BOXING_START_TEST(afs_toc_data_reels_load_string_test10)
     test_afs_toc_data_reels(toc_data_reels, 3);
 
     afs_toc_data_reels_free(toc_data_reels);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 

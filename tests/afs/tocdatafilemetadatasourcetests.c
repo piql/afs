@@ -6,6 +6,8 @@
 #include "boxing/utils.h"
 #include "mxml.h"
 
+#include <string.h>
+
 #if defined ( D_OS_WIN32 )
 #define DFSEEK _fseeki64
 #define DFTELL _ftelli64
@@ -52,7 +54,7 @@ static char * read_xml_toc_data_file_metadata_source_file(const char* file_name)
     }
 
     // Creates a vector vor the input data
-    char * xml_string = boxing_string_allocate((size_t)size + 1);
+    char * xml_string = malloc((size_t)size + 1);
 
     // Reads the data from the input file
     if (1 != fread(xml_string, (size_t)size, 1, file))
@@ -103,8 +105,8 @@ static void test_empty_afs_toc_data_file_metadata_source(afs_toc_data_file_metad
 static void test_not_empty_afs_toc_data_file_metadata_source(afs_toc_data_file_metadata_source * toc_data_file_metadata_source, const char * data, const char * format_id, int file_id, int source_id)
 {
     BOXING_ASSERT(toc_data_file_metadata_source != NULL);
-    BOXING_ASSERT(boxing_string_equal(toc_data_file_metadata_source->data, data) == DTRUE);
-    BOXING_ASSERT(boxing_string_equal(toc_data_file_metadata_source->format_id, format_id) == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file_metadata_source->data, data) == 0);
+    BOXING_ASSERT(strcmp(toc_data_file_metadata_source->format_id, format_id) == 0);
 
     BOXING_ASSERT(toc_data_file_metadata_source->file_id == file_id);
     BOXING_ASSERT(toc_data_file_metadata_source->source_id == source_id);
@@ -749,7 +751,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_source_set_data_test2)
     afs_toc_data_file_metadata_source_set_data(toc_data_file_metadata_source, data);
 
     BOXING_ASSERT(toc_data_file_metadata_source == NULL);
-    BOXING_ASSERT(boxing_string_equal(data, "") == DTRUE);
+    BOXING_ASSERT(strcmp(data, "") == 0);
 }
 END_TEST
 
@@ -763,7 +765,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_source_set_data_test3)
     afs_toc_data_file_metadata_source_set_data(toc_data_file_metadata_source, data);
 
     BOXING_ASSERT(toc_data_file_metadata_source == NULL);
-    BOXING_ASSERT(boxing_string_equal(data, "some xml data") == DTRUE);
+    BOXING_ASSERT(strcmp(data, "some xml data") == 0);
 }
 END_TEST
 
@@ -797,7 +799,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_source_set_data_test5)
     afs_toc_data_file_metadata_source_set_data(toc_data_file_metadata_source, data);
 
     test_empty_afs_toc_data_file_metadata_source(toc_data_file_metadata_source);
-    BOXING_ASSERT(boxing_string_equal(data, "") == DTRUE);
+    BOXING_ASSERT(strcmp(data, "") == 0);
 
     afs_toc_data_file_metadata_source_free(toc_data_file_metadata_source);
 }
@@ -815,7 +817,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_source_set_data_test6)
     afs_toc_data_file_metadata_source_set_data(toc_data_file_metadata_source, data);
 
     test_not_empty_afs_toc_data_file_metadata_source(toc_data_file_metadata_source, "some xml data", NULL, -1, -1);
-    BOXING_ASSERT(boxing_string_equal(data, "some xml data") == DTRUE);
+    BOXING_ASSERT(strcmp(data, "some xml data") == 0);
 
     afs_toc_data_file_metadata_source_free(toc_data_file_metadata_source);
 }
@@ -851,7 +853,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_source_set_data_test8)
     afs_toc_data_file_metadata_source_set_data(toc_data_file_metadata_source, data);
 
     test_not_empty_afs_toc_data_file_metadata_source(toc_data_file_metadata_source, "some xml data", "afs/metadata-csv", 6, 7);
-    BOXING_ASSERT(boxing_string_equal(data, "") == DTRUE);
+    BOXING_ASSERT(strcmp(data, "") == 0);
 
     afs_toc_data_file_metadata_source_free(toc_data_file_metadata_source);
 }
@@ -869,7 +871,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_source_set_data_test9)
     afs_toc_data_file_metadata_source_set_data(toc_data_file_metadata_source, data);
 
     test_not_empty_afs_toc_data_file_metadata_source(toc_data_file_metadata_source, "some other xml data", "afs/metadata-csv", 6, 7);
-    BOXING_ASSERT(boxing_string_equal(data, "some other xml data") == DTRUE);
+    BOXING_ASSERT(strcmp(data, "some other xml data") == 0);
 
     afs_toc_data_file_metadata_source_free(toc_data_file_metadata_source);
 }
@@ -899,7 +901,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_source_set_format_id_test2)
     afs_toc_data_file_metadata_source_set_format_id(toc_data_file_metadata_source, format_id);
 
     BOXING_ASSERT(toc_data_file_metadata_source == NULL);
-    BOXING_ASSERT(boxing_string_equal(format_id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(format_id, "") == 0);
 }
 END_TEST
 
@@ -913,7 +915,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_source_set_format_id_test3)
     afs_toc_data_file_metadata_source_set_format_id(toc_data_file_metadata_source, format_id);
 
     BOXING_ASSERT(toc_data_file_metadata_source == NULL);
-    BOXING_ASSERT(boxing_string_equal(format_id, "afs/metadata-csv") == DTRUE);
+    BOXING_ASSERT(strcmp(format_id, "afs/metadata-csv") == 0);
 }
 END_TEST
 
@@ -947,7 +949,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_source_set_format_id_test5)
     afs_toc_data_file_metadata_source_set_format_id(toc_data_file_metadata_source, format_id);
 
     test_empty_afs_toc_data_file_metadata_source(toc_data_file_metadata_source);
-    BOXING_ASSERT(boxing_string_equal(format_id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(format_id, "") == 0);
 
     afs_toc_data_file_metadata_source_free(toc_data_file_metadata_source);
 }
@@ -965,7 +967,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_source_set_format_id_test6)
     afs_toc_data_file_metadata_source_set_format_id(toc_data_file_metadata_source, format_id);
 
     test_not_empty_afs_toc_data_file_metadata_source(toc_data_file_metadata_source, NULL, "afs/metadata-csv", -1, -1);
-    BOXING_ASSERT(boxing_string_equal(format_id, "afs/metadata-csv") == DTRUE);
+    BOXING_ASSERT(strcmp(format_id, "afs/metadata-csv") == 0);
 
     afs_toc_data_file_metadata_source_free(toc_data_file_metadata_source);
 }
@@ -1001,7 +1003,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_source_set_format_id_test8)
     afs_toc_data_file_metadata_source_set_format_id(toc_data_file_metadata_source, format_id);
 
     test_not_empty_afs_toc_data_file_metadata_source(toc_data_file_metadata_source, "some xml data", "afs/metadata-csv", 6, 7);
-    BOXING_ASSERT(boxing_string_equal(format_id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(format_id, "") == 0);
 
     afs_toc_data_file_metadata_source_free(toc_data_file_metadata_source);
 }
@@ -1019,7 +1021,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_source_set_format_id_test9)
     afs_toc_data_file_metadata_source_set_format_id(toc_data_file_metadata_source, format_id);
 
     test_not_empty_afs_toc_data_file_metadata_source(toc_data_file_metadata_source, "some xml data", "other afs/metadata-csv", 6, 7);
-    BOXING_ASSERT(boxing_string_equal(format_id, "other afs/metadata-csv") == DTRUE);
+    BOXING_ASSERT(strcmp(format_id, "other afs/metadata-csv") == 0);
 
     afs_toc_data_file_metadata_source_free(toc_data_file_metadata_source);
 }
@@ -1252,11 +1254,11 @@ BOXING_START_TEST(afs_toc_data_file_metadata_source_save_string_test4)
 
     BOXING_ASSERT(toc_data_file_metadata_source != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_data_file_metadata_source_free(toc_data_file_metadata_source);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1272,11 +1274,11 @@ BOXING_START_TEST(afs_toc_data_file_metadata_source_save_string_test5)
 
     BOXING_ASSERT(toc_data_file_metadata_source != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_data_file_metadata_source_free(toc_data_file_metadata_source);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1538,7 +1540,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_source_load_string_test3)
     BOXING_ASSERT(toc_data_file_metadata_source == NULL);
     BOXING_ASSERT(result == DFALSE);
 
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -1576,7 +1578,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_source_load_string_test5)
     test_not_empty_afs_toc_data_file_metadata_source(toc_data_file_metadata_source, "some xml data", "afs/metadata-csv", 6, 7);
 
     afs_toc_data_file_metadata_source_free(toc_data_file_metadata_source);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -1596,7 +1598,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_source_load_string_test6)
     test_not_empty_afs_toc_data_file_metadata_source(toc_data_file_metadata_source, "some xml data", "afs/metadata-csv", 6, 7);
 
     afs_toc_data_file_metadata_source_free(toc_data_file_metadata_source);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 

@@ -54,7 +54,7 @@ static char * read_xml_toc_preview_layout_definitions_file(const char* file_name
     }
 
     // Creates a vector vor the input data
-    char * xml_string = boxing_string_allocate((size_t)size + 1);
+    char * xml_string = malloc((size_t)size + 1);
 
     // Reads the data from the input file
     if (1 != fread(xml_string, (size_t)size, 1, file))
@@ -65,10 +65,10 @@ static char * read_xml_toc_preview_layout_definitions_file(const char* file_name
 
     xml_string[size] = '\0';
 
-    size_t xml_header_size = boxing_string_length("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+    size_t xml_header_size = strlen("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
     char * xml_string_wh = boxing_string_clone(xml_string + xml_header_size);
 
-    boxing_string_free(xml_string);
+    free(xml_string);
 
     fclose(file);
     return xml_string_wh;
@@ -590,7 +590,7 @@ BOXING_START_TEST(afs_toc_preview_layout_definitions_is_valid_test3)
 
     test_not_empty_afs_toc_preview_layout_definitions(toc_preview_layout_definitions, 3);
 
-    boxing_string_free(GVECTORN(toc_preview_layout_definitions->layout_definitions, afs_toc_preview_layout_definition *, 1)->id);
+    free(GVECTORN(toc_preview_layout_definitions->layout_definitions, afs_toc_preview_layout_definition *, 1)->id);
     GVECTORN(toc_preview_layout_definitions->layout_definitions, afs_toc_preview_layout_definition *, 1)->id = NULL;
 
     DBOOL result = afs_toc_preview_layout_definitions_is_valid(toc_preview_layout_definitions);
@@ -1444,7 +1444,7 @@ BOXING_START_TEST(afs_toc_preview_layout_definitions_save_file_test5)
     afs_toc_preview_layout_definitions * toc_preview_layout_definitions = get_afs_toc_preview_layout_definitions_instance(5);
 
     afs_toc_preview_layout_definition * toc_preview_layout_definition = afs_toc_preview_layout_definitions_get_layout_definition_by_index(toc_preview_layout_definitions, 0);
-    boxing_string_free(toc_preview_layout_definition->id);
+    free(toc_preview_layout_definition->id);
     toc_preview_layout_definition->id = NULL;
     
     DBOOL result = afs_toc_preview_layout_definitions_save_file(toc_preview_layout_definitions, file_name, DTRUE);
@@ -1521,8 +1521,8 @@ BOXING_START_TEST(afs_toc_preview_layout_definitions_save_string_test2)
     BOXING_ASSERT_STR_EQ(result, test_string);
 
     afs_toc_preview_layout_definitions_free(toc_preview_layout_definitions);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1533,7 +1533,7 @@ BOXING_START_TEST(afs_toc_preview_layout_definitions_save_string_test3)
     afs_toc_preview_layout_definitions * toc_preview_layout_definitions = get_afs_toc_preview_layout_definitions_instance(5);
 
     afs_toc_preview_layout_definition * toc_preview_layout_definition = afs_toc_preview_layout_definitions_get_layout_definition_by_index(toc_preview_layout_definitions, 0);
-    boxing_string_free(toc_preview_layout_definition->id);
+    free(toc_preview_layout_definition->id);
     toc_preview_layout_definition->id = NULL;
 
     char * result = afs_toc_preview_layout_definitions_save_string(toc_preview_layout_definitions, DTRUE);
@@ -1560,8 +1560,8 @@ BOXING_START_TEST(afs_toc_preview_layout_definitions_save_string_test4)
     BOXING_ASSERT_STR_EQ(result, test_string);
 
     afs_toc_preview_layout_definitions_free(toc_preview_layout_definitions);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1580,8 +1580,8 @@ BOXING_START_TEST(afs_toc_preview_layout_definitions_save_string_test5)
     BOXING_ASSERT_STR_EQ(result, test_string);
 
     afs_toc_preview_layout_definitions_free(toc_preview_layout_definitions);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1616,7 +1616,7 @@ BOXING_START_TEST(afs_toc_preview_layout_definitions_save_as_table_test2)
     BOXING_ASSERT_STR_EQ(table_string, test_string);
     
     afs_toc_preview_layout_definitions_free(toc_preview_layout_definitions);
-    boxing_string_free(table_string);
+    free(table_string);
 }
 END_TEST
 
@@ -1658,7 +1658,7 @@ BOXING_START_TEST(afs_toc_preview_layout_definitions_save_as_table_test3)
     BOXING_ASSERT_STR_EQ(table_string, test_string);
 
     afs_toc_preview_layout_definitions_free(toc_preview_layout_definitions);
-    boxing_string_free(table_string);
+    free(table_string);
 }
 END_TEST
 
@@ -1738,7 +1738,7 @@ BOXING_START_TEST(afs_toc_preview_layout_definitions_save_xml_test5)
     afs_toc_preview_layout_definitions * toc_preview_layout_definitions = get_afs_toc_preview_layout_definitions_instance(3);
 
     afs_toc_preview_layout_definition * toc_preview_layout_definition = afs_toc_preview_layout_definitions_get_layout_definition_by_index(toc_preview_layout_definitions, 0);
-    boxing_string_free(toc_preview_layout_definition->id);
+    free(toc_preview_layout_definition->id);
     toc_preview_layout_definition->id = NULL;
 
     DBOOL result = afs_toc_preview_layout_definitions_save_xml(toc_preview_layout_definitions, tree);
@@ -1919,7 +1919,7 @@ BOXING_START_TEST(afs_toc_preview_layout_definitions_load_string_test3)
     BOXING_ASSERT(toc_preview_layout_definitions == NULL);
     BOXING_ASSERT(result == DFALSE);
 
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -1957,7 +1957,7 @@ BOXING_START_TEST(afs_toc_preview_layout_definitions_load_string_test5)
     test_not_empty_afs_toc_preview_layout_definitions(toc_preview_layout_definitions, 5);
 
     afs_toc_preview_layout_definitions_free(toc_preview_layout_definitions);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -1977,7 +1977,7 @@ BOXING_START_TEST(afs_toc_preview_layout_definitions_load_string_test6)
     test_not_empty_afs_toc_preview_layout_definitions(toc_preview_layout_definitions, 5);
 
     afs_toc_preview_layout_definitions_free(toc_preview_layout_definitions);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 

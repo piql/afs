@@ -33,6 +33,7 @@ void  afs_xmlutils_add_new_text_node(struct mxml_node_s* parent_node, const char
 void  afs_xmlutils_add_new_int_node(struct mxml_node_s* parent_node, const char * node_name, int node_value);
 void  afs_xmlutils_add_new_uint64_node(struct mxml_node_s* parent_node, const char * node_name, boxing_int64 node_value);
 DBOOL afs_xmlutils_get_integer_element(int* int_storage, struct mxml_node_s* node, const char * name);
+void afs_xmlutils_string_cut(char** string, size_t start_index, size_t end_index);
 
 #ifdef __cplusplus
 } /* extern "C" */

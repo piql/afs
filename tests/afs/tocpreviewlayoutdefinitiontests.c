@@ -7,6 +7,8 @@
 #include "boxing/string.h"
 #include "mxml.h"
 
+#include <string.h>
+
 #if defined ( D_OS_WIN32 )
 #define DFSEEK _fseeki64
 #define DFTELL _ftelli64
@@ -54,7 +56,7 @@ static char * read_xml_toc_preview_layout_definition_file(const char* file_name)
     }
 
     // Creates a vector vor the input data
-    char * xml_string = boxing_string_allocate((size_t)size + 1);
+    char * xml_string = malloc((size_t)size + 1);
 
     // Reads the data from the input file
     if (1 != fread(xml_string, (size_t)size, 1, file))
@@ -135,8 +137,8 @@ static void test_not_empty_afs_toc_preview_sections(afs_toc_preview_sections * t
 static void test_not_empty_afs_toc_preview_layout_definition(afs_toc_preview_layout_definition * toc_preview_layout_definition, const char * id, const char * name, unsigned int sections_count, DBOOL sections_is_null)
 {
     BOXING_ASSERT(toc_preview_layout_definition != NULL);
-    BOXING_ASSERT(boxing_string_equal(toc_preview_layout_definition->id, id) == DTRUE);
-    BOXING_ASSERT(boxing_string_equal(toc_preview_layout_definition->name, name) == DTRUE);
+    BOXING_ASSERT(strcmp(toc_preview_layout_definition->id, id) == 0);
+    BOXING_ASSERT(strcmp(toc_preview_layout_definition->name, name) == 0);
 
     if (sections_is_null == DTRUE)
     {
@@ -152,8 +154,8 @@ static void test_not_empty_afs_toc_preview_layout_definition(afs_toc_preview_lay
 static void test_empty_sections_afs_toc_preview_layout_definition(afs_toc_preview_layout_definition * toc_preview_layout_definition, const char * id, const char * name)
 {
     BOXING_ASSERT(toc_preview_layout_definition != NULL);
-    BOXING_ASSERT(boxing_string_equal(toc_preview_layout_definition->id, id) == DTRUE);
-    BOXING_ASSERT(boxing_string_equal(toc_preview_layout_definition->name, name) == DTRUE);
+    BOXING_ASSERT(strcmp(toc_preview_layout_definition->id, id) == 0);
+    BOXING_ASSERT(strcmp(toc_preview_layout_definition->name, name) == 0);
 
     BOXING_ASSERT(toc_preview_layout_definition->sections != NULL);
     BOXING_ASSERT(toc_preview_layout_definition->sections->sections == NULL);
@@ -724,7 +726,7 @@ BOXING_START_TEST(afs_toc_preview_layout_definition_get_new_reference_test2)
 
     toc_preview_layout_definition1->name = boxing_string_clone("Some other name!");
 
-    BOXING_ASSERT(boxing_string_equal(toc_preview_layout_definition2->name, "Some other name!") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_preview_layout_definition2->name, "Some other name!") == 0);
 
     afs_toc_preview_layout_definition_free(toc_preview_layout_definition1);
     afs_toc_preview_layout_definition_free(toc_preview_layout_definition1);
@@ -749,7 +751,7 @@ BOXING_START_TEST(afs_toc_preview_layout_definition_get_new_reference_test3)
 
     toc_preview_layout_definition1->name = boxing_string_clone("Some other name!");
 
-    BOXING_ASSERT(boxing_string_equal(toc_preview_layout_definition2->name, "Some other name!") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_preview_layout_definition2->name, "Some other name!") == 0);
 
     afs_toc_preview_layout_definition_free(toc_preview_layout_definition1);
     afs_toc_preview_layout_definition_free(toc_preview_layout_definition1);
@@ -772,10 +774,10 @@ BOXING_START_TEST(afs_toc_preview_layout_definition_get_new_reference_test4)
     BOXING_ASSERT(toc_preview_layout_definition2->reference_count == 2);
     BOXING_ASSERT(toc_preview_layout_definition1 == toc_preview_layout_definition2);
 
-    boxing_string_free(toc_preview_layout_definition1->name);
+    free(toc_preview_layout_definition1->name);
     toc_preview_layout_definition1->name = boxing_string_clone("Some other name!");
 
-    BOXING_ASSERT(boxing_string_equal(toc_preview_layout_definition2->name, "Some other name!") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_preview_layout_definition2->name, "Some other name!") == 0);
 
     afs_toc_preview_layout_definition_free(toc_preview_layout_definition1);
     afs_toc_preview_layout_definition_free(toc_preview_layout_definition1);
@@ -810,7 +812,7 @@ BOXING_START_TEST(afs_toc_preview_layout_definition_get_new_reference_test5)
 
     toc_preview_layout_definition1->name = boxing_string_clone("Some other name!");
 
-    BOXING_ASSERT(boxing_string_equal(toc_preview_layout_definition2->name, "Some other name!") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_preview_layout_definition2->name, "Some other name!") == 0);
 
     afs_toc_preview_layout_definition_free(toc_preview_layout_definition1);
     afs_toc_preview_layout_definition_free(toc_preview_layout_definition1);
@@ -836,7 +838,7 @@ BOXING_START_TEST(afs_toc_preview_layout_definition_get_new_reference_test6)
 
     toc_preview_layout_definition1->name = boxing_string_clone("Some other name!");
 
-    BOXING_ASSERT(boxing_string_equal(toc_preview_layout_definition2->name, "Some other name!") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_preview_layout_definition2->name, "Some other name!") == 0);
 
     afs_toc_preview_layout_definition_free(toc_preview_layout_definition1);
     afs_toc_preview_layout_definition_free(toc_preview_layout_definition1);
@@ -860,10 +862,10 @@ BOXING_START_TEST(afs_toc_preview_layout_definition_get_new_reference_test7)
     BOXING_ASSERT(toc_preview_layout_definition2->reference_count == 2);
     BOXING_ASSERT(toc_preview_layout_definition1 == toc_preview_layout_definition2);
 
-    boxing_string_free(toc_preview_layout_definition1->name);
+    free(toc_preview_layout_definition1->name);
     toc_preview_layout_definition1->name = boxing_string_clone("Some other name!");
 
-    BOXING_ASSERT(boxing_string_equal(toc_preview_layout_definition2->name, "Some other name!") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_preview_layout_definition2->name, "Some other name!") == 0);
 
     afs_toc_preview_layout_definition_free(toc_preview_layout_definition1);
     afs_toc_preview_layout_definition_free(toc_preview_layout_definition1);
@@ -1939,11 +1941,11 @@ BOXING_START_TEST(afs_toc_preview_layout_definition_save_string_test4)
 
     BOXING_ASSERT(toc_preview_layout_definition != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_preview_layout_definition_free(toc_preview_layout_definition);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1959,11 +1961,11 @@ BOXING_START_TEST(afs_toc_preview_layout_definition_save_string_test5)
 
     BOXING_ASSERT(toc_preview_layout_definition != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_preview_layout_definition_free(toc_preview_layout_definition);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -2220,7 +2222,7 @@ BOXING_START_TEST(afs_toc_preview_layout_definition_load_string_test3)
     BOXING_ASSERT(toc_preview_layout_definition == NULL);
     BOXING_ASSERT(result == DFALSE);
 
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -2258,7 +2260,7 @@ BOXING_START_TEST(afs_toc_preview_layout_definition_load_string_test5)
     test_not_empty_afs_toc_preview_layout_definition(toc_preview_layout_definition, "some id", "some name", 5, DFALSE);
 
     afs_toc_preview_layout_definition_free(toc_preview_layout_definition);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -2278,7 +2280,7 @@ BOXING_START_TEST(afs_toc_preview_layout_definition_load_string_test6)
     test_not_empty_afs_toc_preview_layout_definition(toc_preview_layout_definition, "some id", "some name", 5, DFALSE);
 
     afs_toc_preview_layout_definition_free(toc_preview_layout_definition);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 

@@ -5,6 +5,8 @@
 #include "boxing/utils.h"
 #include "mxml.h"
 
+#include <string.h>
+
 
 #if defined ( D_OS_WIN32 )
 #define DFSEEK _fseeki64
@@ -39,7 +41,7 @@ static void test_empty_afs_toc_file(afs_toc_file* toc_data_file)
 static void test_not_empty_afs_toc_file_preview_page3(afs_toc_file_preview_page * toc_file_preview_page, unsigned int page_number)
 {
     BOXING_ASSERT(toc_file_preview_page != NULL);
-    BOXING_ASSERT(boxing_string_equal(toc_file_preview_page->layout_id, "Some layout ID") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_file_preview_page->layout_id, "Some layout ID") == 0);
     BOXING_ASSERT(toc_file_preview_page->start_frame == 9 + page_number);
     BOXING_ASSERT(toc_file_preview_page->start_section == 8 + page_number);
     BOXING_ASSERT(toc_file_preview_page->section_count == 7 + page_number);
@@ -73,8 +75,8 @@ static void test_null_afs_toc_data_file_metadata2(afs_toc_data_file_metadata * t
 static void test_afs_toc_data_file_metadata_source2(afs_toc_data_file_metadata_source * toc_data_file_metadata_source, const char * data, const char * format_id, int file_id, int source_id)
 {
     BOXING_ASSERT(toc_data_file_metadata_source != NULL);
-    BOXING_ASSERT(boxing_string_equal(toc_data_file_metadata_source->data, data) == DTRUE);
-    BOXING_ASSERT(boxing_string_equal(toc_data_file_metadata_source->format_id, format_id) == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file_metadata_source->data, data) == 0);
+    BOXING_ASSERT(strcmp(toc_data_file_metadata_source->format_id, format_id) == 0);
 
     BOXING_ASSERT(toc_data_file_metadata_source->file_id == file_id);
     BOXING_ASSERT(toc_data_file_metadata_source->source_id == source_id);
@@ -99,12 +101,12 @@ static void test_not_empty_afs_toc_data_file_metadata2(afs_toc_data_file_metadat
 static void test_not_empty_afs_toc_file(afs_toc_file* toc_data_file)
 {
     BOXING_ASSERT(toc_data_file != NULL);
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->name, "input-toc.xml") == DTRUE);
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->date, "2016-11-22 09:07:11") == DTRUE);
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->checksum, "f2eb0d6c6964d206012695a10ea6cd877c95c340") == DTRUE);
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->unique_id, "38A0AAAB-16B2-640C-5353-6DB8AE4367B9") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->name, "input-toc.xml") == 0);
+    BOXING_ASSERT(strcmp(toc_data_file->date, "2016-11-22 09:07:11") == 0);
+    BOXING_ASSERT(strcmp(toc_data_file->checksum, "f2eb0d6c6964d206012695a10ea6cd877c95c340") == 0);
+    BOXING_ASSERT(strcmp(toc_data_file->unique_id, "38A0AAAB-16B2-640C-5353-6DB8AE4367B9") == 0);
     test_not_empty_afs_toc_file_preview3(toc_data_file->preview, 3);
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->file_format, "file_format") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->file_format, "file_format") == 0);
     test_not_empty_afs_toc_data_file_metadata2(toc_data_file->metadata, 5);
 
     BOXING_ASSERT(toc_data_file->size == 29672);
@@ -217,7 +219,7 @@ static char * read_xml_toc_file(const char* file_name)
     }
 
     // Creates a vector vor the input data
-    char * xml_string = boxing_string_allocate((size_t)size + 1);
+    char * xml_string = malloc((size_t)size + 1);
 
     // Reads the data from the input file
     if (1 != fread(xml_string, (size_t)size, 1, file))
@@ -228,10 +230,10 @@ static char * read_xml_toc_file(const char* file_name)
 
     xml_string[size] = '\0';
 
-    size_t xml_header_size = boxing_string_length("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+    size_t xml_header_size = strlen("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
     char * xml_string_wh = boxing_string_clone(xml_string + xml_header_size);
 
-    boxing_string_free(xml_string);
+    free(xml_string);
 
     fclose(file);
     return xml_string_wh;
@@ -476,11 +478,11 @@ BOXING_START_TEST(afs_toc_file_init2_test3)
 
     test_not_empty_afs_toc_file(toc_data_file);
 
-    boxing_string_free(toc_data_file->name);
-    boxing_string_free(toc_data_file->date);
-    boxing_string_free(toc_data_file->checksum);
-    boxing_string_free(toc_data_file->unique_id);
-    boxing_string_free(toc_data_file->file_format);
+    free(toc_data_file->name);
+    free(toc_data_file->date);
+    free(toc_data_file->checksum);
+    free(toc_data_file->unique_id);
+    free(toc_data_file->file_format);
 
     afs_toc_file_init2(
         toc_data_file,
@@ -1619,7 +1621,7 @@ BOXING_START_TEST(afs_toc_file_set_name_test2)
     afs_toc_file_set_name(toc_data_file, name);
 
     BOXING_ASSERT(toc_data_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(name, "") == DTRUE);
+    BOXING_ASSERT(strcmp(name, "") == 0);
 }
 END_TEST
 
@@ -1633,7 +1635,7 @@ BOXING_START_TEST(afs_toc_file_set_name_test3)
     afs_toc_file_set_name(toc_data_file, name);
 
     BOXING_ASSERT(toc_data_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(name, "some name") == DTRUE);
+    BOXING_ASSERT(strcmp(name, "some name") == 0);
 }
 END_TEST
 
@@ -1663,7 +1665,7 @@ BOXING_START_TEST(afs_toc_file_set_name_test5)
 
     afs_toc_file_set_name(toc_data_file, name);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->name, "") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->name, "") == 0);
 
     afs_toc_file_free(toc_data_file);
 }
@@ -1680,7 +1682,7 @@ BOXING_START_TEST(afs_toc_file_set_name_test6)
 
     afs_toc_file_set_name(toc_data_file, name);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->name, "some name") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->name, "some name") == 0);
 
     afs_toc_file_free(toc_data_file);
 }
@@ -1691,7 +1693,7 @@ END_TEST
 BOXING_START_TEST(afs_toc_file_set_name_test7)
 {
     afs_toc_file * toc_data_file = get_afs_toc_file_instance();
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->name, "input-toc.xml") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->name, "input-toc.xml") == 0);
 
     const char * name = NULL;
 
@@ -1708,13 +1710,13 @@ END_TEST
 BOXING_START_TEST(afs_toc_file_set_name_test8)
 {
     afs_toc_file * toc_data_file = get_afs_toc_file_instance();
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->name, "input-toc.xml") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->name, "input-toc.xml") == 0);
 
     const char * name = "";
 
     afs_toc_file_set_name(toc_data_file, name);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->name, "") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->name, "") == 0);
 
     afs_toc_file_free(toc_data_file);
 }
@@ -1725,13 +1727,13 @@ END_TEST
 BOXING_START_TEST(afs_toc_file_set_name_test9)
 {
     afs_toc_file * toc_data_file = get_afs_toc_file_instance();
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->name, "input-toc.xml") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->name, "input-toc.xml") == 0);
 
     const char * name = "some name";
 
     afs_toc_file_set_name(toc_data_file, name);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->name, "some name") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->name, "some name") == 0);
 
     afs_toc_file_free(toc_data_file);
 }
@@ -1761,7 +1763,7 @@ BOXING_START_TEST(afs_toc_file_set_date_test2)
     afs_toc_file_set_date(toc_data_file, date);
 
     BOXING_ASSERT(toc_data_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(date, "") == DTRUE);
+    BOXING_ASSERT(strcmp(date, "") == 0);
 }
 END_TEST
 
@@ -1775,7 +1777,7 @@ BOXING_START_TEST(afs_toc_file_set_date_test3)
     afs_toc_file_set_date(toc_data_file, date);
 
     BOXING_ASSERT(toc_data_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(date, "some date") == DTRUE);
+    BOXING_ASSERT(strcmp(date, "some date") == 0);
 }
 END_TEST
 
@@ -1805,7 +1807,7 @@ BOXING_START_TEST(afs_toc_file_set_date_test5)
 
     afs_toc_file_set_date(toc_data_file, date);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->date, "") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->date, "") == 0);
 
     afs_toc_file_free(toc_data_file);
 }
@@ -1822,7 +1824,7 @@ BOXING_START_TEST(afs_toc_file_set_date_test6)
 
     afs_toc_file_set_date(toc_data_file, date);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->date, "some date") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->date, "some date") == 0);
 
     afs_toc_file_free(toc_data_file);
 }
@@ -1833,7 +1835,7 @@ END_TEST
 BOXING_START_TEST(afs_toc_file_set_date_test7)
 {
     afs_toc_file * toc_data_file = get_afs_toc_file_instance();
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->date, "2016-11-22 09:07:11") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->date, "2016-11-22 09:07:11") == 0);
 
     const char * date = NULL;
 
@@ -1850,13 +1852,13 @@ END_TEST
 BOXING_START_TEST(afs_toc_file_set_date_test8)
 {
     afs_toc_file * toc_data_file = get_afs_toc_file_instance();
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->date, "2016-11-22 09:07:11") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->date, "2016-11-22 09:07:11") == 0);
 
     const char * date = "";
 
     afs_toc_file_set_date(toc_data_file, date);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->date, "") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->date, "") == 0);
 
     afs_toc_file_free(toc_data_file);
 }
@@ -1867,13 +1869,13 @@ END_TEST
 BOXING_START_TEST(afs_toc_file_set_date_test9)
 {
     afs_toc_file * toc_data_file = get_afs_toc_file_instance();
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->date, "2016-11-22 09:07:11") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->date, "2016-11-22 09:07:11") == 0);
 
     const char * date = "some date";
 
     afs_toc_file_set_date(toc_data_file, date);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->date, "some date") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->date, "some date") == 0);
 
     afs_toc_file_free(toc_data_file);
 }
@@ -1903,7 +1905,7 @@ BOXING_START_TEST(afs_toc_file_set_checksum_test2)
     afs_toc_file_set_checksum(toc_data_file, checksum);
 
     BOXING_ASSERT(toc_data_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(checksum, "") == DTRUE);
+    BOXING_ASSERT(strcmp(checksum, "") == 0);
 }
 END_TEST
 
@@ -1917,7 +1919,7 @@ BOXING_START_TEST(afs_toc_file_set_checksum_test3)
     afs_toc_file_set_checksum(toc_data_file, checksum);
 
     BOXING_ASSERT(toc_data_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(checksum, "some checksum") == DTRUE);
+    BOXING_ASSERT(strcmp(checksum, "some checksum") == 0);
 }
 END_TEST
 
@@ -1947,7 +1949,7 @@ BOXING_START_TEST(afs_toc_file_set_checksum_test5)
 
     afs_toc_file_set_checksum(toc_data_file, checksum);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->checksum, "") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->checksum, "") == 0);
 
     afs_toc_file_free(toc_data_file);
 }
@@ -1964,7 +1966,7 @@ BOXING_START_TEST(afs_toc_file_set_checksum_test6)
 
     afs_toc_file_set_checksum(toc_data_file, checksum);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->checksum, "some checksum") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->checksum, "some checksum") == 0);
 
     afs_toc_file_free(toc_data_file);
 }
@@ -1975,7 +1977,7 @@ END_TEST
 BOXING_START_TEST(afs_toc_file_set_checksum_test7)
 {
     afs_toc_file * toc_data_file = get_afs_toc_file_instance();
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->checksum, "f2eb0d6c6964d206012695a10ea6cd877c95c340") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->checksum, "f2eb0d6c6964d206012695a10ea6cd877c95c340") == 0);
 
     const char * checksum = NULL;
 
@@ -1992,13 +1994,13 @@ END_TEST
 BOXING_START_TEST(afs_toc_file_set_checksum_test8)
 {
     afs_toc_file * toc_data_file = get_afs_toc_file_instance();
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->checksum, "f2eb0d6c6964d206012695a10ea6cd877c95c340") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->checksum, "f2eb0d6c6964d206012695a10ea6cd877c95c340") == 0);
 
     const char * checksum = "";
 
     afs_toc_file_set_checksum(toc_data_file, checksum);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->checksum, "") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->checksum, "") == 0);
 
     afs_toc_file_free(toc_data_file);
 }
@@ -2009,13 +2011,13 @@ END_TEST
 BOXING_START_TEST(afs_toc_file_set_checksum_test9)
 {
     afs_toc_file * toc_data_file = get_afs_toc_file_instance();
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->checksum, "f2eb0d6c6964d206012695a10ea6cd877c95c340") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->checksum, "f2eb0d6c6964d206012695a10ea6cd877c95c340") == 0);
 
     const char * checksum = "some checksum";
 
     afs_toc_file_set_checksum(toc_data_file, checksum);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->checksum, "some checksum") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->checksum, "some checksum") == 0);
 
     afs_toc_file_free(toc_data_file);
 }
@@ -2045,7 +2047,7 @@ BOXING_START_TEST(afs_toc_file_set_unique_id_test2)
     afs_toc_file_set_unique_id(toc_data_file, unique_id);
 
     BOXING_ASSERT(toc_data_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(unique_id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(unique_id, "") == 0);
 }
 END_TEST
 
@@ -2059,7 +2061,7 @@ BOXING_START_TEST(afs_toc_file_set_unique_id_test3)
     afs_toc_file_set_unique_id(toc_data_file, unique_id);
 
     BOXING_ASSERT(toc_data_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(unique_id, "some unique id") == DTRUE);
+    BOXING_ASSERT(strcmp(unique_id, "some unique id") == 0);
 }
 END_TEST
 
@@ -2089,7 +2091,7 @@ BOXING_START_TEST(afs_toc_file_set_unique_id_test5)
 
     afs_toc_file_set_unique_id(toc_data_file, unique_id);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->unique_id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->unique_id, "") == 0);
 
     afs_toc_file_free(toc_data_file);
 }
@@ -2106,7 +2108,7 @@ BOXING_START_TEST(afs_toc_file_set_unique_id_test6)
 
     afs_toc_file_set_unique_id(toc_data_file, unique_id);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->unique_id, "some unique id") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->unique_id, "some unique id") == 0);
 
     afs_toc_file_free(toc_data_file);
 }
@@ -2117,7 +2119,7 @@ END_TEST
 BOXING_START_TEST(afs_toc_file_set_unique_id_test7)
 {
     afs_toc_file * toc_data_file = get_afs_toc_file_instance();
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->unique_id, "38A0AAAB-16B2-640C-5353-6DB8AE4367B9") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->unique_id, "38A0AAAB-16B2-640C-5353-6DB8AE4367B9") == 0);
 
     const char * unique_id = NULL;
 
@@ -2134,13 +2136,13 @@ END_TEST
 BOXING_START_TEST(afs_toc_file_set_unique_id_test8)
 {
     afs_toc_file * toc_data_file = get_afs_toc_file_instance();
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->unique_id, "38A0AAAB-16B2-640C-5353-6DB8AE4367B9") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->unique_id, "38A0AAAB-16B2-640C-5353-6DB8AE4367B9") == 0);
 
     const char * unique_id = "";
 
     afs_toc_file_set_unique_id(toc_data_file, unique_id);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->unique_id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->unique_id, "") == 0);
 
     afs_toc_file_free(toc_data_file);
 }
@@ -2151,13 +2153,13 @@ END_TEST
 BOXING_START_TEST(afs_toc_file_set_unique_id_test9)
 {
     afs_toc_file * toc_data_file = get_afs_toc_file_instance();
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->unique_id, "38A0AAAB-16B2-640C-5353-6DB8AE4367B9") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->unique_id, "38A0AAAB-16B2-640C-5353-6DB8AE4367B9") == 0);
 
     const char * unique_id = "some unique id";
 
     afs_toc_file_set_unique_id(toc_data_file, unique_id);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->unique_id, "some unique id") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->unique_id, "some unique id") == 0);
 
     afs_toc_file_free(toc_data_file);
 }
@@ -2187,7 +2189,7 @@ BOXING_START_TEST(afs_toc_file_set_file_format_test2)
     afs_toc_file_set_file_format(toc_data_file, file_format);
 
     BOXING_ASSERT(toc_data_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(file_format, "") == DTRUE);
+    BOXING_ASSERT(strcmp(file_format, "") == 0);
 }
 END_TEST
 
@@ -2201,7 +2203,7 @@ BOXING_START_TEST(afs_toc_file_set_file_format_test3)
     afs_toc_file_set_file_format(toc_data_file, file_format);
 
     BOXING_ASSERT(toc_data_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(file_format, "some file format") == DTRUE);
+    BOXING_ASSERT(strcmp(file_format, "some file format") == 0);
 }
 END_TEST
 
@@ -2231,7 +2233,7 @@ BOXING_START_TEST(afs_toc_file_set_file_format_test5)
 
     afs_toc_file_set_file_format(toc_data_file, file_format);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->file_format, "") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->file_format, "") == 0);
 
     afs_toc_file_free(toc_data_file);
 }
@@ -2248,7 +2250,7 @@ BOXING_START_TEST(afs_toc_file_set_file_format_test6)
 
     afs_toc_file_set_file_format(toc_data_file, file_format);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->file_format, "some file format") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->file_format, "some file format") == 0);
 
     afs_toc_file_free(toc_data_file);
 }
@@ -2259,7 +2261,7 @@ END_TEST
 BOXING_START_TEST(afs_toc_file_set_file_format_test7)
 {
     afs_toc_file * toc_data_file = get_afs_toc_file_instance();
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->file_format, "file_format") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->file_format, "file_format") == 0);
 
     const char * file_format = NULL;
 
@@ -2276,13 +2278,13 @@ END_TEST
 BOXING_START_TEST(afs_toc_file_set_file_format_test8)
 {
     afs_toc_file * toc_data_file = get_afs_toc_file_instance();
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->file_format, "file_format") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->file_format, "file_format") == 0);
 
     const char * file_format = "";
 
     afs_toc_file_set_file_format(toc_data_file, file_format);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->file_format, "") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->file_format, "") == 0);
 
     afs_toc_file_free(toc_data_file);
 }
@@ -2293,13 +2295,13 @@ END_TEST
 BOXING_START_TEST(afs_toc_file_set_file_format_test9)
 {
     afs_toc_file * toc_data_file = get_afs_toc_file_instance();
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->file_format, "file_format") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->file_format, "file_format") == 0);
 
     const char * file_format = "some file format";
 
     afs_toc_file_set_file_format(toc_data_file, file_format);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->file_format, "some file format") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->file_format, "some file format") == 0);
 
     afs_toc_file_free(toc_data_file);
 }
@@ -2565,7 +2567,7 @@ BOXING_START_TEST(afs_toc_file_set_metadata_test3)
     afs_toc_file * toc_data_file = NULL;
     afs_toc_data_file_metadata * toc_data_file_metadata = get_afs_toc_data_file_metadata_instance(3);
 
-    boxing_string_free(GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data);
+    free(GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data);
     GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data = NULL;
     GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->file_id = -1;
 
@@ -2637,7 +2639,7 @@ BOXING_START_TEST(afs_toc_file_set_metadata_test7)
 
     afs_toc_data_file_metadata * toc_data_file_metadata = get_afs_toc_data_file_metadata_instance(3);
 
-    boxing_string_free(GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data);
+    free(GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data);
     GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data = NULL;
     GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->file_id = -1;
 
@@ -2713,7 +2715,7 @@ BOXING_START_TEST(afs_toc_file_set_metadata_test11)
 
     afs_toc_data_file_metadata * toc_data_file_metadata = get_afs_toc_data_file_metadata_instance(3);
 
-    boxing_string_free(GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data);
+    free(GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data);
     GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data = NULL;
     GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->file_id = -1;
 
@@ -3228,7 +3230,7 @@ BOXING_START_TEST(afs_toc_file_is_valid_test4)
     afs_toc_file* toc_data_file = get_afs_toc_file_instance();
 
     toc_data_file->types = AFS_TOC_FILE_TYPE_DIGITAL;
-    boxing_string_free(toc_data_file->name);
+    free(toc_data_file->name);
     toc_data_file->name = NULL;
 
     DBOOL result = afs_toc_file_is_valid(toc_data_file);
@@ -3247,7 +3249,7 @@ BOXING_START_TEST(afs_toc_file_is_valid_test5)
     afs_toc_file* toc_data_file = get_afs_toc_file_instance();
 
     toc_data_file->types = AFS_TOC_FILE_TYPE_DIGITAL;
-    boxing_string_free(toc_data_file->date);
+    free(toc_data_file->date);
     toc_data_file->date = NULL;
 
     DBOOL result = afs_toc_file_is_valid(toc_data_file);
@@ -3338,7 +3340,7 @@ BOXING_START_TEST(afs_toc_file_is_valid_test10)
     afs_toc_file* toc_data_file = get_afs_toc_file_instance();
 
     toc_data_file->types = AFS_TOC_FILE_TYPE_DIGITAL;
-    boxing_string_free(toc_data_file->checksum);
+    free(toc_data_file->checksum);
     toc_data_file->checksum = NULL;
 
     DBOOL result = afs_toc_file_is_valid(toc_data_file);
@@ -3416,7 +3418,7 @@ BOXING_START_TEST(afs_toc_file_is_valid_test13)
 
     afs_toc_data_file_metadata * toc_data_file_metadata = get_afs_toc_data_file_metadata_instance(3);
 
-    boxing_string_free(GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data);
+    free(GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data);
     GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data = NULL;
     GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->file_id = -1;
 
@@ -3863,11 +3865,11 @@ BOXING_START_TEST(afs_toc_file_save_string_test3)
 
     BOXING_ASSERT(toc_data_file != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_file_free(toc_data_file);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -3885,11 +3887,11 @@ BOXING_START_TEST(afs_toc_file_save_string_test4)
 
     BOXING_ASSERT(toc_data_file != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_file_free(toc_data_file);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -3907,11 +3909,11 @@ BOXING_START_TEST(afs_toc_file_save_string_test5)
 
     BOXING_ASSERT(toc_data_file != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_file_free(toc_data_file);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -3929,11 +3931,11 @@ BOXING_START_TEST(afs_toc_file_save_string_test6)
 
     BOXING_ASSERT(toc_data_file != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_file_free(toc_data_file);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -4017,7 +4019,7 @@ BOXING_START_TEST(afs_toc_file_load_file_test5)
     BOXING_ASSERT(result == DTRUE);
 
     afs_toc_file* toc_data_file2 = get_afs_toc_file_instance();
-    boxing_string_free(toc_data_file2->checksum);
+    free(toc_data_file2->checksum);
     toc_data_file2->checksum = boxing_string_clone("");
 
     BOXING_ASSERT(afs_toc_file_equal(toc_data_file1, toc_data_file2) == DTRUE);
@@ -4064,7 +4066,7 @@ BOXING_START_TEST(afs_toc_file_load_file_test7)
     BOXING_ASSERT(result == DTRUE);
 
     afs_toc_file* toc_data_file2 = get_afs_toc_file_instance();
-    boxing_string_free(toc_data_file2->checksum);
+    free(toc_data_file2->checksum);
     toc_data_file2->checksum = boxing_string_clone("");
 
     BOXING_ASSERT(afs_toc_file_equal(toc_data_file1, toc_data_file2) == DTRUE);
@@ -4111,7 +4113,7 @@ BOXING_START_TEST(afs_toc_file_load_file_test9)
     BOXING_ASSERT(result == DTRUE);
 
     afs_toc_file * toc_data_file2 = get_afs_toc_file_instance();
-    boxing_string_free(toc_data_file2->checksum);
+    free(toc_data_file2->checksum);
     toc_data_file2->checksum = boxing_string_clone("");
     afs_toc_file_add_type(toc_data_file2, AFS_TOC_FILE_TYPE_ALL);
 
@@ -4168,7 +4170,7 @@ BOXING_START_TEST(afs_toc_file_load_string_test3)
     BOXING_ASSERT(toc_data_file == NULL);
     BOXING_ASSERT(result == DFALSE);
 
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -4204,14 +4206,14 @@ BOXING_START_TEST(afs_toc_file_load_string_test5)
     BOXING_ASSERT(result == DTRUE);
 
     afs_toc_file* toc_data_file2 = get_afs_toc_file_instance();
-    boxing_string_free(toc_data_file2->checksum);
+    free(toc_data_file2->checksum);
     toc_data_file2->checksum = boxing_string_clone("");
 
     BOXING_ASSERT(afs_toc_file_equal(toc_data_file1, toc_data_file2) == DTRUE);
 
     afs_toc_file_free(toc_data_file1);
     afs_toc_file_free(toc_data_file2);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -4235,7 +4237,7 @@ BOXING_START_TEST(afs_toc_file_load_string_test6)
 
     afs_toc_file_free(toc_data_file1);
     afs_toc_file_free(toc_data_file2);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -4253,14 +4255,14 @@ BOXING_START_TEST(afs_toc_file_load_string_test7)
     BOXING_ASSERT(result == DTRUE);
 
     afs_toc_file* toc_data_file2 = get_afs_toc_file_instance();
-    boxing_string_free(toc_data_file2->checksum);
+    free(toc_data_file2->checksum);
     toc_data_file2->checksum = boxing_string_clone("");
 
     BOXING_ASSERT(afs_toc_file_equal(toc_data_file1, toc_data_file2) == DTRUE);
 
     afs_toc_file_free(toc_data_file1);
     afs_toc_file_free(toc_data_file2);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -4284,7 +4286,7 @@ BOXING_START_TEST(afs_toc_file_load_string_test8)
 
     afs_toc_file_free(toc_data_file1);
     afs_toc_file_free(toc_data_file2);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -4371,7 +4373,7 @@ BOXING_START_TEST(afs_toc_file_load_xml_test5)
     BOXING_ASSERT(result == DTRUE);
 
     afs_toc_file * toc_data_file2 = get_afs_toc_file_instance();
-    boxing_string_free(toc_data_file2->checksum);
+    free(toc_data_file2->checksum);
     toc_data_file2->checksum = boxing_string_clone("");
 
     BOXING_ASSERT(afs_toc_file_equal(toc_data_file1, toc_data_file2) == DTRUE);
@@ -4420,7 +4422,7 @@ BOXING_START_TEST(afs_toc_file_load_xml_test7)
     BOXING_ASSERT(result == DTRUE);
 
     afs_toc_file* toc_data_file2 = get_afs_toc_file_instance();
-    boxing_string_free(toc_data_file2->checksum);
+    free(toc_data_file2->checksum);
     toc_data_file2->checksum = boxing_string_clone("");
 
     BOXING_ASSERT(afs_toc_file_equal(toc_data_file1, toc_data_file2) == DTRUE);
@@ -4593,7 +4595,7 @@ BOXING_START_TEST(afs_toc_file_load_data_v2_test4)
     BOXING_ASSERT(result == DTRUE);
 
     BOXING_ASSERT(toc_data_file->size == 29672);
-    BOXING_ASSERT(boxing_string_equal(toc_data_file->checksum, "f2eb0d6c6964d206012695a10ea6cd877c95c340") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data_file->checksum, "f2eb0d6c6964d206012695a10ea6cd877c95c340") == 0);
     BOXING_ASSERT(toc_data_file->start_frame == 2);
     BOXING_ASSERT(toc_data_file->start_byte == 0);
     BOXING_ASSERT(toc_data_file->end_frame == 2);

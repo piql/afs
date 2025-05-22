@@ -5,6 +5,8 @@
 #include "boxing/utils.h"
 #include "mxml.h"
 
+#include <string.h>
+
 #if defined ( D_OS_WIN32 )
 #define DFSEEK _fseeki64
 #define DFTELL _ftelli64
@@ -249,7 +251,7 @@ afs_toc_data * get_afs_toc_data_different_reel_parent(unsigned int reel_count)
 static void test_afs_toc_data_reel(afs_toc_data_reel * toc_data_reel, const char * id, const size_t files_count, unsigned int reel_number)
 {
     BOXING_ASSERT(toc_data_reel != NULL);
-    BOXING_ASSERT(boxing_string_equal(id, toc_data_reel->id) == DTRUE);
+    BOXING_ASSERT(strcmp(id, toc_data_reel->id) == 0);
     BOXING_ASSERT(afs_toc_files_get_tocs_count(toc_data_reel->files) == files_count);
 
     for (size_t i = 0; i < files_count; i++)
@@ -328,10 +330,10 @@ static void test_afs_toc_data(
     int definitions_count)
 {
     BOXING_ASSERT(afs_toc_data != NULL);
-    BOXING_ASSERT(boxing_string_equal(afs_toc_data->version, version) == DTRUE);
-    BOXING_ASSERT(boxing_string_equal(afs_toc_data->index_type, index_type) == DTRUE);
-    BOXING_ASSERT(boxing_string_equal(afs_toc_data->job_id, job_id) == DTRUE);
-    BOXING_ASSERT(boxing_string_equal(afs_toc_data->reel_id, reel_id) == DTRUE);
+    BOXING_ASSERT(strcmp(afs_toc_data->version, version) == 0);
+    BOXING_ASSERT(strcmp(afs_toc_data->index_type, index_type) == 0);
+    BOXING_ASSERT(strcmp(afs_toc_data->job_id, job_id) == 0);
+    BOXING_ASSERT(strcmp(afs_toc_data->reel_id, reel_id) == 0);
 
     if (reels_count == -1)
     {
@@ -400,7 +402,7 @@ static char * read_xml_toc_data(const char * file_name)
     }
 
     // Creates a vector vor the input data
-    char * xml_string = boxing_string_allocate((size_t)size + 1);
+    char * xml_string = malloc((size_t)size + 1);
 
     // Reads the data from the input file
     if (1 != fread(xml_string, (size_t)size, 1, file))
@@ -635,7 +637,7 @@ BOXING_START_TEST(afs_toc_data_get_new_reference_test2)
 
     toc_data1->reel_id = boxing_string_clone("Some other reel id!");;
 
-    BOXING_ASSERT(boxing_string_equal(toc_data2->reel_id, "Some other reel id!") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data2->reel_id, "Some other reel id!") == 0);
 
     afs_toc_data_free(toc_data1);
     afs_toc_data_free(toc_data1);
@@ -658,10 +660,10 @@ BOXING_START_TEST(afs_toc_data_get_new_reference_test3)
     BOXING_ASSERT(toc_data2->reference_count == 2);
     BOXING_ASSERT(toc_data1 == toc_data2);
 
-    boxing_string_free(toc_data1->reel_id);
+    free(toc_data1->reel_id);
     toc_data1->reel_id = boxing_string_clone("Some other reel id!");
 
-    BOXING_ASSERT(boxing_string_equal(toc_data2->reel_id, "Some other reel id!") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data2->reel_id, "Some other reel id!") == 0);
 
     afs_toc_data_free(toc_data1);
     afs_toc_data_free(toc_data1);
@@ -684,10 +686,10 @@ BOXING_START_TEST(afs_toc_data_get_new_reference_test4)
     BOXING_ASSERT(toc_data2->reference_count == 2);
     BOXING_ASSERT(toc_data1 == toc_data2);
 
-    boxing_string_free(toc_data1->reel_id);
+    free(toc_data1->reel_id);
     toc_data1->reel_id = boxing_string_clone("Some other reel id!");
 
-    BOXING_ASSERT(boxing_string_equal(toc_data2->reel_id, "Some other reel id!") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data2->reel_id, "Some other reel id!") == 0);
 
     afs_toc_data_free(toc_data1);
     afs_toc_data_free(toc_data1);
@@ -710,10 +712,10 @@ BOXING_START_TEST(afs_toc_data_get_new_reference_test5)
     BOXING_ASSERT(toc_data2->reference_count == 2);
     BOXING_ASSERT(toc_data1 == toc_data2);
 
-    boxing_string_free(toc_data1->reel_id);
+    free(toc_data1->reel_id);
     toc_data1->reel_id = boxing_string_clone("Some other reel id!");
 
-    BOXING_ASSERT(boxing_string_equal(toc_data2->reel_id, "Some other reel id!") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data2->reel_id, "Some other reel id!") == 0);
 
     afs_toc_data_free(toc_data1);
     afs_toc_data_free(toc_data1);
@@ -736,10 +738,10 @@ BOXING_START_TEST(afs_toc_data_get_new_reference_test6)
     BOXING_ASSERT(toc_data2->reference_count == 2);
     BOXING_ASSERT(toc_data1 == toc_data2);
 
-    boxing_string_free(toc_data1->reel_id);
+    free(toc_data1->reel_id);
     toc_data1->reel_id = boxing_string_clone("Some other reel id!");
 
-    BOXING_ASSERT(boxing_string_equal(toc_data2->reel_id, "Some other reel id!") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data2->reel_id, "Some other reel id!") == 0);
 
     afs_toc_data_free(toc_data1);
     afs_toc_data_free(toc_data1);
@@ -1172,7 +1174,7 @@ BOXING_START_TEST(afs_toc_data_get_reel_by_id_test2)
 
     BOXING_ASSERT(toc_data == NULL);
     BOXING_ASSERT(toc_data_reel == NULL);
-    BOXING_ASSERT(boxing_string_equal(id_string, "") == DTRUE);
+    BOXING_ASSERT(strcmp(id_string, "") == 0);
 }
 END_TEST
 
@@ -1186,7 +1188,7 @@ BOXING_START_TEST(afs_toc_data_get_reel_by_id_test3)
 
     BOXING_ASSERT(toc_data == NULL);
     BOXING_ASSERT(toc_data_reel == NULL);
-    BOXING_ASSERT(boxing_string_equal(id_string, "Reel id 0") == DTRUE);
+    BOXING_ASSERT(strcmp(id_string, "Reel id 0") == 0);
 }
 END_TEST
 
@@ -1216,7 +1218,7 @@ BOXING_START_TEST(afs_toc_data_get_reel_by_id_test5)
 
     test_afs_toc_data(toc_data, NULL, NULL, NULL, NULL, -1, -1, -1);
     BOXING_ASSERT(toc_data_reel == NULL);
-    BOXING_ASSERT(boxing_string_equal(id_string, "") == DTRUE);
+    BOXING_ASSERT(strcmp(id_string, "") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -1232,7 +1234,7 @@ BOXING_START_TEST(afs_toc_data_get_reel_by_id_test6)
 
     test_afs_toc_data(toc_data, NULL, NULL, NULL, NULL, -1, -1, -1);
     BOXING_ASSERT(toc_data_reel == NULL);
-    BOXING_ASSERT(boxing_string_equal(id_string, "Reel id 0") == DTRUE);
+    BOXING_ASSERT(strcmp(id_string, "Reel id 0") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -1264,7 +1266,7 @@ BOXING_START_TEST(afs_toc_data_get_reel_by_id_test8)
 
     test_afs_toc_data(toc_data, "Sove version", "Some index type", "Some job id", "Some reel id", 2, 2, 2);
     BOXING_ASSERT(toc_data_reel == NULL);
-    BOXING_ASSERT(boxing_string_equal(id_string, "") == DTRUE);
+    BOXING_ASSERT(strcmp(id_string, "") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -1280,7 +1282,7 @@ BOXING_START_TEST(afs_toc_data_get_reel_by_id_test9)
 
     test_afs_toc_data(toc_data, "Sove version", "Some index type", "Some job id", "Some reel id", 2, 2, 2);
     BOXING_ASSERT(toc_data_reel == NULL);
-    BOXING_ASSERT(boxing_string_equal(id_string, "Reel id 2") == DTRUE);
+    BOXING_ASSERT(strcmp(id_string, "Reel id 2") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -1488,7 +1490,7 @@ BOXING_START_TEST(afs_toc_data_get_file_by_unique_id_test2)
 
     BOXING_ASSERT(toc_data == NULL);
     BOXING_ASSERT(toc_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(unique_id_string, "") == DTRUE);
+    BOXING_ASSERT(strcmp(unique_id_string, "") == 0);
 }
 END_TEST
 
@@ -1502,7 +1504,7 @@ BOXING_START_TEST(afs_toc_data_get_file_by_unique_id_test3)
 
     BOXING_ASSERT(toc_data == NULL);
     BOXING_ASSERT(toc_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(unique_id_string, "38A0AAAB-16B2-640C-5353-6DB8AE436700") == DTRUE);
+    BOXING_ASSERT(strcmp(unique_id_string, "38A0AAAB-16B2-640C-5353-6DB8AE436700") == 0);
 }
 END_TEST
 
@@ -1532,7 +1534,7 @@ BOXING_START_TEST(afs_toc_data_get_file_by_unique_id_test5)
 
     test_afs_toc_data(toc_data, NULL, NULL, NULL, NULL, -1, -1, -1);
     BOXING_ASSERT(toc_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(unique_id_string, "") == DTRUE);
+    BOXING_ASSERT(strcmp(unique_id_string, "") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -1548,7 +1550,7 @@ BOXING_START_TEST(afs_toc_data_get_file_by_unique_id_test6)
 
     test_afs_toc_data(toc_data, NULL, NULL, NULL, NULL, -1, -1, -1);
     BOXING_ASSERT(toc_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(unique_id_string, "38A0AAAB-16B2-640C-5353-6DB8AE436700") == DTRUE);
+    BOXING_ASSERT(strcmp(unique_id_string, "38A0AAAB-16B2-640C-5353-6DB8AE436700") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -1580,7 +1582,7 @@ BOXING_START_TEST(afs_toc_data_get_file_by_unique_id_test8)
 
     test_afs_toc_data(toc_data, "Sove version", "Some index type", "Some job id", "Some reel id", 2, 2, 2);
     BOXING_ASSERT(toc_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(unique_id_string, "") == DTRUE);
+    BOXING_ASSERT(strcmp(unique_id_string, "") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -1596,7 +1598,7 @@ BOXING_START_TEST(afs_toc_data_get_file_by_unique_id_test9)
 
     test_afs_toc_data(toc_data, "Sove version", "Some index type", "Some job id", "Some reel id", 2, 2, 2);
     BOXING_ASSERT(toc_file == NULL);
-    BOXING_ASSERT(boxing_string_equal(unique_id_string, "38A0AAAB-16B2-640C-5353-6DB8AE436703") == DTRUE);
+    BOXING_ASSERT(strcmp(unique_id_string, "38A0AAAB-16B2-640C-5353-6DB8AE436703") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -1925,7 +1927,7 @@ BOXING_START_TEST(afs_toc_data_get_used_preview_layout_definitions_test11)
 	for (unsigned int i = 0; i < layout_definitions_count; i++)
 	{
 		afs_toc_preview_layout_definition * current_layout_definition = afs_toc_preview_layout_definitions_get_layout_definition_by_index(toc_data->preview_layout_definitions, i);
-		boxing_string_free(current_layout_definition->id);
+		free(current_layout_definition->id);
 		current_layout_definition->id = boxing_string_clone("Do not match layout id");
 	}
 
@@ -2007,7 +2009,7 @@ BOXING_START_TEST(afs_toc_data_set_version_test2)
     afs_toc_data_set_version(toc_data, version);
 
     BOXING_ASSERT(toc_data == NULL);
-    BOXING_ASSERT(boxing_string_equal(version, "") == DTRUE);
+    BOXING_ASSERT(strcmp(version, "") == 0);
 }
 END_TEST
 
@@ -2021,7 +2023,7 @@ BOXING_START_TEST(afs_toc_data_set_version_test3)
     afs_toc_data_set_version(toc_data, version);
 
     BOXING_ASSERT(toc_data == NULL);
-    BOXING_ASSERT(boxing_string_equal(version, "some version string") == DTRUE);
+    BOXING_ASSERT(strcmp(version, "some version string") == 0);
 }
 END_TEST
 
@@ -2051,7 +2053,7 @@ BOXING_START_TEST(afs_toc_data_set_version_test5)
 
     afs_toc_data_set_version(toc_data, version);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data->version, "") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->version, "") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -2068,7 +2070,7 @@ BOXING_START_TEST(afs_toc_data_set_version_test6)
 
     afs_toc_data_set_version(toc_data, version);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data->version, "some version string") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->version, "some version string") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -2079,7 +2081,7 @@ END_TEST
 BOXING_START_TEST(afs_toc_data_set_version_test7)
 {
     afs_toc_data * toc_data = get_afs_toc_data_instance8("Some version", "Some index type", "Some job id", "Some reel id", 5, 5, 5);
-    BOXING_ASSERT(boxing_string_equal(toc_data->version, "Some version") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->version, "Some version") == 0);
 
     const char * version = NULL;
 
@@ -2096,13 +2098,13 @@ END_TEST
 BOXING_START_TEST(afs_toc_data_set_version_test8)
 {
     afs_toc_data * toc_data = get_afs_toc_data_instance8("Some version", "Some index type", "Some job id", "Some reel id", 5, 5, 5);
-    BOXING_ASSERT(boxing_string_equal(toc_data->version, "Some version") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->version, "Some version") == 0);
 
     const char * version = "";
 
     afs_toc_data_set_version(toc_data, version);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data->version, "") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->version, "") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -2113,13 +2115,13 @@ END_TEST
 BOXING_START_TEST(afs_toc_data_set_version_test9)
 {
     afs_toc_data * toc_data = get_afs_toc_data_instance8("Some version", "Some index type", "Some job id", "Some reel id", 5, 5, 5);
-    BOXING_ASSERT(boxing_string_equal(toc_data->version, "Some version") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->version, "Some version") == 0);
 
     const char * version = "Some other version";
 
     afs_toc_data_set_version(toc_data, version);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data->version, "Some other version") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->version, "Some other version") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -2149,7 +2151,7 @@ BOXING_START_TEST(afs_toc_data_set_index_type_test2)
     afs_toc_data_set_index_type(toc_data, index_type);
 
     BOXING_ASSERT(toc_data == NULL);
-    BOXING_ASSERT(boxing_string_equal(index_type, "") == DTRUE);
+    BOXING_ASSERT(strcmp(index_type, "") == 0);
 }
 END_TEST
 
@@ -2163,7 +2165,7 @@ BOXING_START_TEST(afs_toc_data_set_index_type_test3)
     afs_toc_data_set_index_type(toc_data, index_type);
 
     BOXING_ASSERT(toc_data == NULL);
-    BOXING_ASSERT(boxing_string_equal(index_type, "some index type string") == DTRUE);
+    BOXING_ASSERT(strcmp(index_type, "some index type string") == 0);
 }
 END_TEST
 
@@ -2193,7 +2195,7 @@ BOXING_START_TEST(afs_toc_data_set_index_type_test5)
 
     afs_toc_data_set_index_type(toc_data, index_type);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data->index_type, "") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->index_type, "") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -2210,7 +2212,7 @@ BOXING_START_TEST(afs_toc_data_set_index_type_test6)
 
     afs_toc_data_set_index_type(toc_data, index_type);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data->index_type, "some index type string") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->index_type, "some index type string") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -2221,7 +2223,7 @@ END_TEST
 BOXING_START_TEST(afs_toc_data_set_index_type_test7)
 {
     afs_toc_data * toc_data = get_afs_toc_data_instance8("Some version", "Some index type", "Some job id", "Some reel id", 5, 5, 5);
-    BOXING_ASSERT(boxing_string_equal(toc_data->index_type, "Some index type") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->index_type, "Some index type") == 0);
 
     const char * index_type = NULL;
 
@@ -2238,13 +2240,13 @@ END_TEST
 BOXING_START_TEST(afs_toc_data_set_index_type_test8)
 {
     afs_toc_data * toc_data = get_afs_toc_data_instance8("Some version", "Some index type", "Some job id", "Some reel id", 5, 5, 5);
-    BOXING_ASSERT(boxing_string_equal(toc_data->index_type, "Some index type") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->index_type, "Some index type") == 0);
 
     const char * index_type = "";
 
     afs_toc_data_set_index_type(toc_data, index_type);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data->index_type, "") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->index_type, "") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -2255,13 +2257,13 @@ END_TEST
 BOXING_START_TEST(afs_toc_data_set_index_type_test9)
 {
     afs_toc_data * toc_data = get_afs_toc_data_instance8("Some version", "Some index type", "Some job id", "Some reel id", 5, 5, 5);
-    BOXING_ASSERT(boxing_string_equal(toc_data->index_type, "Some index type") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->index_type, "Some index type") == 0);
 
     const char * index_type = "Some other index type";
 
     afs_toc_data_set_index_type(toc_data, index_type);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data->index_type, "Some other index type") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->index_type, "Some other index type") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -2291,7 +2293,7 @@ BOXING_START_TEST(afs_toc_data_set_job_id_test2)
     afs_toc_data_set_job_id(toc_data, job_id);
 
     BOXING_ASSERT(toc_data == NULL);
-    BOXING_ASSERT(boxing_string_equal(job_id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(job_id, "") == 0);
 }
 END_TEST
 
@@ -2305,7 +2307,7 @@ BOXING_START_TEST(afs_toc_data_set_job_id_test3)
     afs_toc_data_set_job_id(toc_data, job_id);
 
     BOXING_ASSERT(toc_data == NULL);
-    BOXING_ASSERT(boxing_string_equal(job_id, "some job id string") == DTRUE);
+    BOXING_ASSERT(strcmp(job_id, "some job id string") == 0);
 }
 END_TEST
 
@@ -2335,7 +2337,7 @@ BOXING_START_TEST(afs_toc_data_set_job_id_test5)
 
     afs_toc_data_set_job_id(toc_data, job_id);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data->job_id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->job_id, "") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -2352,7 +2354,7 @@ BOXING_START_TEST(afs_toc_data_set_job_id_test6)
 
     afs_toc_data_set_job_id(toc_data, job_id);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data->job_id, "some job id string") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->job_id, "some job id string") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -2363,7 +2365,7 @@ END_TEST
 BOXING_START_TEST(afs_toc_data_set_job_id_test7)
 {
     afs_toc_data * toc_data = get_afs_toc_data_instance8("Some version", "Some index type", "Some job id", "Some reel id", 5, 5, 5);
-    BOXING_ASSERT(boxing_string_equal(toc_data->job_id, "Some job id") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->job_id, "Some job id") == 0);
 
     const char * job_id = NULL;
 
@@ -2380,13 +2382,13 @@ END_TEST
 BOXING_START_TEST(afs_toc_data_set_job_id_test8)
 {
     afs_toc_data * toc_data = get_afs_toc_data_instance8("Some version", "Some index type", "Some job id", "Some reel id", 5, 5, 5);
-    BOXING_ASSERT(boxing_string_equal(toc_data->job_id, "Some job id") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->job_id, "Some job id") == 0);
 
     const char * job_id = "";
 
     afs_toc_data_set_job_id(toc_data, job_id);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data->job_id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->job_id, "") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -2397,13 +2399,13 @@ END_TEST
 BOXING_START_TEST(afs_toc_data_set_job_id_test9)
 {
     afs_toc_data * toc_data = get_afs_toc_data_instance8("Some version", "Some index type", "Some job id", "Some reel id", 5, 5, 5);
-    BOXING_ASSERT(boxing_string_equal(toc_data->job_id, "Some job id") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->job_id, "Some job id") == 0);
 
     const char * job_id = "Some other job id";
 
     afs_toc_data_set_job_id(toc_data, job_id);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data->job_id, "Some other job id") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->job_id, "Some other job id") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -2433,7 +2435,7 @@ BOXING_START_TEST(afs_toc_data_set_reel_id_test2)
     afs_toc_data_set_reel_id(toc_data, reel_id);
 
     BOXING_ASSERT(toc_data == NULL);
-    BOXING_ASSERT(boxing_string_equal(reel_id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(reel_id, "") == 0);
 }
 END_TEST
 
@@ -2447,7 +2449,7 @@ BOXING_START_TEST(afs_toc_data_set_reel_id_test3)
     afs_toc_data_set_reel_id(toc_data, reel_id);
 
     BOXING_ASSERT(toc_data == NULL);
-    BOXING_ASSERT(boxing_string_equal(reel_id, "some reel id string") == DTRUE);
+    BOXING_ASSERT(strcmp(reel_id, "some reel id string") == 0);
 }
 END_TEST
 
@@ -2477,7 +2479,7 @@ BOXING_START_TEST(afs_toc_data_set_reel_id_test5)
 
     afs_toc_data_set_reel_id(toc_data, reel_id);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data->reel_id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->reel_id, "") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -2494,7 +2496,7 @@ BOXING_START_TEST(afs_toc_data_set_reel_id_test6)
 
     afs_toc_data_set_reel_id(toc_data, reel_id);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data->reel_id, "some reel id string") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->reel_id, "some reel id string") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -2505,7 +2507,7 @@ END_TEST
 BOXING_START_TEST(afs_toc_data_set_reel_id_test7)
 {
     afs_toc_data * toc_data = get_afs_toc_data_instance8("Some version", "Some index type", "Some job id", "Some reel id", 5, 5, 5);
-    BOXING_ASSERT(boxing_string_equal(toc_data->reel_id, "Some reel id") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->reel_id, "Some reel id") == 0);
 
     const char * reel_id = NULL;
 
@@ -2522,13 +2524,13 @@ END_TEST
 BOXING_START_TEST(afs_toc_data_set_reel_id_test8)
 {
     afs_toc_data * toc_data = get_afs_toc_data_instance8("Some version", "Some index type", "Some job id", "Some reel id", 5, 5, 5);
-    BOXING_ASSERT(boxing_string_equal(toc_data->reel_id, "Some reel id") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->reel_id, "Some reel id") == 0);
 
     const char * reel_id = "";
 
     afs_toc_data_set_reel_id(toc_data, reel_id);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data->reel_id, "") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->reel_id, "") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -2539,13 +2541,13 @@ END_TEST
 BOXING_START_TEST(afs_toc_data_set_reel_id_test9)
 {
     afs_toc_data * toc_data = get_afs_toc_data_instance8("Some version", "Some index type", "Some job id", "Some reel id", 5, 5, 5);
-    BOXING_ASSERT(boxing_string_equal(toc_data->reel_id, "Some reel id") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->reel_id, "Some reel id") == 0);
 
     const char * reel_id = "Some other reel id";
 
     afs_toc_data_set_reel_id(toc_data, reel_id);
 
-    BOXING_ASSERT(boxing_string_equal(toc_data->reel_id, "Some other reel id") == DTRUE);
+    BOXING_ASSERT(strcmp(toc_data->reel_id, "Some other reel id") == 0);
 
     afs_toc_data_free(toc_data);
 }
@@ -3313,7 +3315,7 @@ BOXING_START_TEST(afs_toc_data_add_preview_layout_definitions_test3)
     afs_toc_data * toc_data = NULL;
     afs_toc_preview_layout_definitions * toc_preview_layout_definitions = get_afs_toc_preview_layout_definitions_instance8(1);
     afs_toc_preview_layout_definition * toc_preview_layout_definition = afs_toc_preview_layout_definitions_get_layout_definition_by_index(toc_preview_layout_definitions, 0);
-    boxing_string_free(toc_preview_layout_definition->id);
+    free(toc_preview_layout_definition->id);
     toc_preview_layout_definition->id = NULL;
 
     DBOOL result = afs_toc_data_add_preview_layout_definitions(toc_data, toc_preview_layout_definitions);
@@ -3346,7 +3348,7 @@ BOXING_START_TEST(afs_toc_data_add_preview_layout_definitions_test5)
     afs_toc_data * toc_data = NULL;
     afs_toc_preview_layout_definitions * toc_preview_layout_definitions = get_afs_toc_preview_layout_definitions_instance8(3);
     afs_toc_preview_layout_definition * toc_preview_layout_definition = afs_toc_preview_layout_definitions_get_layout_definition_by_index(toc_preview_layout_definitions, 1);
-    boxing_string_free(toc_preview_layout_definition->id);
+    free(toc_preview_layout_definition->id);
     toc_preview_layout_definition->id = NULL;
 
     DBOOL result = afs_toc_data_add_preview_layout_definitions(toc_data, toc_preview_layout_definitions);
@@ -3410,7 +3412,7 @@ BOXING_START_TEST(afs_toc_data_add_preview_layout_definitions_test9)
     afs_toc_data * toc_data = afs_toc_data_create();
     afs_toc_preview_layout_definitions * toc_preview_layout_definitions = get_afs_toc_preview_layout_definitions_instance8(1);
     afs_toc_preview_layout_definition * toc_preview_layout_definition = afs_toc_preview_layout_definitions_get_layout_definition_by_index(toc_preview_layout_definitions, 0);
-    boxing_string_free(toc_preview_layout_definition->id);
+    free(toc_preview_layout_definition->id);
     toc_preview_layout_definition->id = NULL;
 
     DBOOL result = afs_toc_data_add_preview_layout_definitions(toc_data, toc_preview_layout_definitions);
@@ -3447,7 +3449,7 @@ BOXING_START_TEST(afs_toc_data_add_preview_layout_definitions_test11)
     afs_toc_data * toc_data = afs_toc_data_create();
     afs_toc_preview_layout_definitions * toc_preview_layout_definitions = get_afs_toc_preview_layout_definitions_instance8(3);
     afs_toc_preview_layout_definition * toc_preview_layout_definition = afs_toc_preview_layout_definitions_get_layout_definition_by_index(toc_preview_layout_definitions, 1);
-    boxing_string_free(toc_preview_layout_definition->id);
+    free(toc_preview_layout_definition->id);
     toc_preview_layout_definition->id = NULL;
 
     DBOOL result = afs_toc_data_add_preview_layout_definitions(toc_data, toc_preview_layout_definitions);
@@ -3515,7 +3517,7 @@ BOXING_START_TEST(afs_toc_data_add_preview_layout_definitions_test15)
     afs_toc_data * toc_data = get_afs_toc_data_instance8("Some version", "Some index type", "Some job id", "Some reel id", 3, 3, 0);
     afs_toc_preview_layout_definitions * toc_preview_layout_definitions = get_afs_toc_preview_layout_definitions_instance8(1);
     afs_toc_preview_layout_definition * toc_preview_layout_definition = afs_toc_preview_layout_definitions_get_layout_definition_by_index(toc_preview_layout_definitions, 0);
-    boxing_string_free(toc_preview_layout_definition->id);
+    free(toc_preview_layout_definition->id);
     toc_preview_layout_definition->id = NULL;
 
     DBOOL result = afs_toc_data_add_preview_layout_definitions(toc_data, toc_preview_layout_definitions);
@@ -3552,7 +3554,7 @@ BOXING_START_TEST(afs_toc_data_add_preview_layout_definitions_test17)
     afs_toc_data * toc_data = get_afs_toc_data_instance8("Some version", "Some index type", "Some job id", "Some reel id", 3, 3, 0);
     afs_toc_preview_layout_definitions * toc_preview_layout_definitions = get_afs_toc_preview_layout_definitions_instance8(3);
     afs_toc_preview_layout_definition * toc_preview_layout_definition = afs_toc_preview_layout_definitions_get_layout_definition_by_index(toc_preview_layout_definitions, 1);
-    boxing_string_free(toc_preview_layout_definition->id);
+    free(toc_preview_layout_definition->id);
     toc_preview_layout_definition->id = NULL;
 
     DBOOL result = afs_toc_data_add_preview_layout_definitions(toc_data, toc_preview_layout_definitions);
@@ -3620,7 +3622,7 @@ BOXING_START_TEST(afs_toc_data_add_preview_layout_definitions_test21)
     afs_toc_data * toc_data = get_afs_toc_data_instance8("Some version", "Some index type", "Some job id", "Some reel id", 3, 3, 3);
     afs_toc_preview_layout_definitions * toc_preview_layout_definitions = get_afs_toc_preview_layout_definitions_instance8(1);
     afs_toc_preview_layout_definition * toc_preview_layout_definition = afs_toc_preview_layout_definitions_get_layout_definition_by_index(toc_preview_layout_definitions, 0);
-    boxing_string_free(toc_preview_layout_definition->id);
+    free(toc_preview_layout_definition->id);
     toc_preview_layout_definition->id = NULL;
 
     DBOOL result = afs_toc_data_add_preview_layout_definitions(toc_data, toc_preview_layout_definitions);
@@ -3659,7 +3661,7 @@ BOXING_START_TEST(afs_toc_data_add_preview_layout_definitions_test23)
     afs_toc_data * toc_data = get_afs_toc_data_instance8("Some version", "Some index type", "Some job id", "Some reel id", 3, 3, 3);
     afs_toc_preview_layout_definitions * toc_preview_layout_definitions = get_afs_toc_preview_layout_definitions_instance8(3);
     afs_toc_preview_layout_definition * toc_preview_layout_definition = afs_toc_preview_layout_definitions_get_layout_definition_by_index(toc_preview_layout_definitions, 1);
-    boxing_string_free(toc_preview_layout_definition->id);
+    free(toc_preview_layout_definition->id);
     toc_preview_layout_definition->id = NULL;
 
     DBOOL result = afs_toc_data_add_preview_layout_definitions(toc_data, toc_preview_layout_definitions);
@@ -4432,7 +4434,7 @@ END_TEST
 BOXING_START_TEST(afs_toc_data_is_valid_test17)
 {
     afs_toc_data * toc_data = get_afs_toc_data_instance8("Some version", "reel", "Some job id", "Some reel id", 3, 3, 3);
-    boxing_string_free(GVECTORN(toc_data->preview_layout_definitions->layout_definitions, afs_toc_preview_layout_definition *, 1)->id);
+    free(GVECTORN(toc_data->preview_layout_definitions->layout_definitions, afs_toc_preview_layout_definition *, 1)->id);
     GVECTORN(toc_data->preview_layout_definitions->layout_definitions, afs_toc_preview_layout_definition *, 1)->id = NULL;
 
     DBOOL result = afs_toc_data_is_valid(toc_data);
@@ -5046,11 +5048,11 @@ BOXING_START_TEST(afs_toc_data_save_string_test3)
 
     BOXING_ASSERT(toc_data != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_data_free(toc_data);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -5066,11 +5068,11 @@ BOXING_START_TEST(afs_toc_data_save_string_test4)
 
     BOXING_ASSERT(toc_data != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_data_free(toc_data);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -5086,11 +5088,11 @@ BOXING_START_TEST(afs_toc_data_save_string_test5)
 
     BOXING_ASSERT(toc_data != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_data_free(toc_data);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -5121,11 +5123,11 @@ BOXING_START_TEST(afs_toc_data_save_string_test7)
 
     BOXING_ASSERT(toc_data != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_data_free(toc_data);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -5141,11 +5143,11 @@ BOXING_START_TEST(afs_toc_data_save_string_test8)
 
     BOXING_ASSERT(toc_data != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_data_free(toc_data);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -5515,7 +5517,7 @@ BOXING_START_TEST(afs_toc_data_load_string_test3)
     BOXING_ASSERT(toc_data == NULL);
     BOXING_ASSERT(result == DFALSE);
 
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -5553,7 +5555,7 @@ BOXING_START_TEST(afs_toc_data_load_string_test5)
     test_afs_toc_data(toc_data, "Some version", "job", "Some job id", "Some reel id", -1, 3, 3);
 
     afs_toc_data_free(toc_data);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -5573,7 +5575,7 @@ BOXING_START_TEST(afs_toc_data_load_string_test6)
     test_afs_toc_data(toc_data, "Some version", "job", "Some job id", "Some reel id", 3, -1, 3);
 
     afs_toc_data_free(toc_data);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -5593,7 +5595,7 @@ BOXING_START_TEST(afs_toc_data_load_string_test7)
     test_afs_toc_data(toc_data, "Some version", "job", "Some job id", "Some reel id", 3, 3, -1);
 
     afs_toc_data_free(toc_data);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -5613,7 +5615,7 @@ BOXING_START_TEST(afs_toc_data_load_string_test8)
     test_afs_toc_data(toc_data, "Some version", "job", "Some job id", "Some reel id", 3, 3, 3);
 
     afs_toc_data_free(toc_data);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -5633,7 +5635,7 @@ BOXING_START_TEST(afs_toc_data_load_string_test9)
     test_afs_toc_data(toc_data, "Some version", "job", "Some job id", "Some reel id", 3, 3, 3);
 
     afs_toc_data_free(toc_data);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 

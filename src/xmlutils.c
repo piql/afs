@@ -77,7 +77,7 @@ void afs_xmlutils_set_node_text(const char* text, mxml_node_t* node)
  *  \param[in]      end_index    The index after which the function needs to truncate the end of the string.
  */
 
-static void afs_xmlutils_string_cut(char** string, size_t start_index, size_t end_index)
+void afs_xmlutils_string_cut(char** string, size_t start_index, size_t end_index)
 {
     if (*string == NULL || start_index > end_index)
     {

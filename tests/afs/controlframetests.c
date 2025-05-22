@@ -6,6 +6,8 @@
 #include "boxing/utils.h"
 #include "mxml.h"
 
+#include <string.h>
+
 #if defined ( D_OS_WIN32 )
 #define DFSEEK _fseeki64
 #define DFTELL _ftelli64
@@ -45,7 +47,7 @@ static unsigned int get_configuration_number(const char * config_name)
 
     for (unsigned int i = 1; i <= configurations_count; i++)
     {
-        if (boxing_string_equal(configurations[i - 1], config_name) == DTRUE)
+        if (strcmp(configurations[i - 1], config_name) == 0)
         {
             return i;
         }
@@ -70,7 +72,7 @@ static void test_not_empty_afs_boxing_format(afs_boxing_format * boxing_format, 
 
     BOXING_ASSERT(boxing_format != NULL);
     BOXING_ASSERT(boxing_format->config != NULL);
-    BOXING_ASSERT(boxing_string_equal(boxing_format->name, config_name) == DTRUE);
+    BOXING_ASSERT(strcmp(boxing_format->name, config_name) == 0);
 
     unsigned int configuration_number = get_configuration_number(config_name);
 
@@ -177,7 +179,7 @@ static char * read_xml_config_file(const char* file_name)
     }
 
     // Creates a vector vor the input data
-    char * xml_string = boxing_string_allocate((size_t)size + 1);
+    char * xml_string = malloc((size_t)size + 1);
 
     // Reads the data from the input file
     if (1 != fread(xml_string, (size_t)size, 1, file))
@@ -2550,10 +2552,10 @@ BOXING_START_TEST(afs_boxing_format_save_string_test2)
     
     BOXING_ASSERT(boxing_format != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, "<?xml version=\"1.0\" encoding=\"utf-8\"?><NULL />\n") == DTRUE);
+    BOXING_ASSERT(strcmp(result, "<?xml version=\"1.0\" encoding=\"utf-8\"?><NULL />\n") == 0);
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(result);
+    free(result);
 }
 END_TEST
 
@@ -2571,11 +2573,11 @@ BOXING_START_TEST(afs_boxing_format_save_string_test3)
 
     BOXING_ASSERT(boxing_format != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -2591,11 +2593,11 @@ BOXING_START_TEST(afs_boxing_format_save_string_test4)
 
     BOXING_ASSERT(boxing_format != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -2611,11 +2613,11 @@ BOXING_START_TEST(afs_boxing_format_save_string_test5)
 
     BOXING_ASSERT(boxing_format != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -2631,11 +2633,11 @@ BOXING_START_TEST(afs_boxing_format_save_string_test6)
 
     BOXING_ASSERT(boxing_format != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -2651,11 +2653,11 @@ BOXING_START_TEST(afs_boxing_format_save_string_test7)
 
     BOXING_ASSERT(boxing_format != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -2671,11 +2673,11 @@ BOXING_START_TEST(afs_boxing_format_save_string_test8)
 
     BOXING_ASSERT(boxing_format != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -2691,11 +2693,11 @@ BOXING_START_TEST(afs_boxing_format_save_string_test9)
 
     BOXING_ASSERT(boxing_format != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -2711,11 +2713,11 @@ BOXING_START_TEST(afs_boxing_format_save_string_test10)
 
     BOXING_ASSERT(boxing_format != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -2731,11 +2733,11 @@ BOXING_START_TEST(afs_boxing_format_save_string_test11)
 
     BOXING_ASSERT(boxing_format != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -2751,11 +2753,11 @@ BOXING_START_TEST(afs_boxing_format_save_string_test12)
 
     BOXING_ASSERT(boxing_format != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -2771,11 +2773,11 @@ BOXING_START_TEST(afs_boxing_format_save_string_test13)
 
     BOXING_ASSERT(boxing_format != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -2825,7 +2827,7 @@ BOXING_START_TEST(afs_boxing_format_load_string_test3)
     BOXING_ASSERT(boxing_format == NULL);
     BOXING_ASSERT(result == DFALSE);
 
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -2862,7 +2864,7 @@ BOXING_START_TEST(afs_boxing_format_load_string_test5)
     test_empty_afs_boxing_format(boxing_format);
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -2882,7 +2884,7 @@ BOXING_START_TEST(afs_boxing_format_load_string_test6)
     test_not_empty_afs_boxing_format(boxing_format, NULL);
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -2903,7 +2905,7 @@ BOXING_START_TEST(afs_boxing_format_load_string_test7)
     test_not_empty_afs_boxing_format(boxing_format, "4kv6");
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -2924,7 +2926,7 @@ BOXING_START_TEST(afs_boxing_format_load_string_test8)
     test_not_empty_afs_boxing_format(boxing_format, "4kv6");
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -2945,7 +2947,7 @@ BOXING_START_TEST(afs_boxing_format_load_string_test9)
     test_not_empty_afs_boxing_format(boxing_format, "4kv7");
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -2966,7 +2968,7 @@ BOXING_START_TEST(afs_boxing_format_load_string_test10)
     test_not_empty_afs_boxing_format(boxing_format, "4kv7");
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -2987,7 +2989,7 @@ BOXING_START_TEST(afs_boxing_format_load_string_test11)
     test_not_empty_afs_boxing_format(boxing_format, "4kv8");
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -3008,7 +3010,7 @@ BOXING_START_TEST(afs_boxing_format_load_string_test12)
     test_not_empty_afs_boxing_format(boxing_format, "4kv8");
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -3029,7 +3031,7 @@ BOXING_START_TEST(afs_boxing_format_load_string_test13)
     test_not_empty_afs_boxing_format(boxing_format, "4kv9");
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -3050,7 +3052,7 @@ BOXING_START_TEST(afs_boxing_format_load_string_test14)
     test_not_empty_afs_boxing_format(boxing_format, "4kv9");
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -3071,7 +3073,7 @@ BOXING_START_TEST(afs_boxing_format_load_string_test15)
     test_not_empty_afs_boxing_format(boxing_format, "4kv10");
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -3092,7 +3094,7 @@ BOXING_START_TEST(afs_boxing_format_load_string_test16)
     test_not_empty_afs_boxing_format(boxing_format, "4kv10");
 
     afs_boxing_format_free(boxing_format);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 

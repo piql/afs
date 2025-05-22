@@ -7,6 +7,8 @@
 #include "boxing/string.h"
 #include "mxml.h"
 
+#include <string.h>
+
 #if defined ( D_OS_WIN32 )
 #define DFSEEK _fseeki64
 #define DFTELL _ftelli64
@@ -37,7 +39,7 @@ static void test_not_empty_afs_toc_file_preview_page2(afs_toc_file_preview_page 
     BOXING_ASSERT(toc_file_preview_page != NULL);
     char current_id[10];
     sprintf(current_id, "id %u", page_number);
-    BOXING_ASSERT(boxing_string_equal(toc_file_preview_page->layout_id, current_id) == DTRUE);
+    BOXING_ASSERT(strcmp(toc_file_preview_page->layout_id, current_id) == 0);
     BOXING_ASSERT(toc_file_preview_page->start_frame == 9 + page_number);
     BOXING_ASSERT(toc_file_preview_page->start_section == 8 + page_number);
     BOXING_ASSERT(toc_file_preview_page->section_count == 7 + page_number);
@@ -110,7 +112,7 @@ static afs_toc_file_preview * get_preview_with_null_layout_id(unsigned int pages
 {
     afs_toc_file_preview_pages* pages = get_filled_pages_vector(pages_count);
     afs_toc_file_preview * toc_file_preview = afs_toc_file_preview_create2(pages);
-    boxing_string_free(GVECTORN(toc_file_preview->pages, afs_toc_file_preview_page *, 1)->layout_id);
+    free(GVECTORN(toc_file_preview->pages, afs_toc_file_preview_page *, 1)->layout_id);
     GVECTORN(toc_file_preview->pages, afs_toc_file_preview_page *, 1)->layout_id = NULL;
 
     return toc_file_preview;
@@ -196,7 +198,7 @@ static char * read_xml_preview_file(const char* file_name)
     }
 
     // Creates a vector vor the input data
-    char * xml_string = boxing_string_allocate((size_t)size + 1);
+    char * xml_string = malloc((size_t)size + 1);
 
     // Reads the data from the input file
     if (1 != fread(xml_string, (size_t)size, 1, file))
@@ -1740,11 +1742,11 @@ BOXING_START_TEST(afs_toc_file_preview_save_string_test5)
 
     BOXING_ASSERT(toc_file_preview != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_file_preview_free(toc_file_preview);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1761,11 +1763,11 @@ BOXING_START_TEST(afs_toc_file_preview_save_string_test6)
 
     BOXING_ASSERT(toc_file_preview != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_file_preview_free(toc_file_preview);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1782,11 +1784,11 @@ BOXING_START_TEST(afs_toc_file_preview_save_string_test7)
 
     BOXING_ASSERT(toc_file_preview != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_file_preview_free(toc_file_preview);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1804,11 +1806,11 @@ BOXING_START_TEST(afs_toc_file_preview_save_string_test8)
 
     BOXING_ASSERT(toc_file_preview != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_file_preview_free(toc_file_preview);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -2109,7 +2111,7 @@ BOXING_START_TEST(afs_toc_file_preview_load_string_test3)
     BOXING_ASSERT(toc_file_preview == NULL);
     BOXING_ASSERT(result == DFALSE);
 
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -2147,7 +2149,7 @@ BOXING_START_TEST(afs_toc_file_preview_load_string_test5)
     test_not_empty_afs_toc_file_preview(toc_file_preview, 3);
 
     afs_toc_file_preview_free(toc_file_preview);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -2167,7 +2169,7 @@ BOXING_START_TEST(afs_toc_file_preview_load_string_test6)
     test_not_empty_afs_toc_file_preview(toc_file_preview, 3);
 
     afs_toc_file_preview_free(toc_file_preview);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -2186,7 +2188,7 @@ BOXING_START_TEST(afs_toc_file_preview_load_string_test7)
     BOXING_ASSERT(toc_file_preview->dpi == 1080);
 
     afs_toc_file_preview_free(toc_file_preview);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -2205,7 +2207,7 @@ BOXING_START_TEST(afs_toc_file_preview_load_string_test8)
     BOXING_ASSERT(toc_file_preview->dpi == 1080);
 
     afs_toc_file_preview_free(toc_file_preview);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 

@@ -2,6 +2,7 @@
 
 #include "unittests.h"
 #include "tocdatafilemetadata_c.h"
+#include "xmlutils.h"
 #include "boxing/platform/types.h"
 #include "boxing/utils.h"
 #include "mxml.h"
@@ -115,7 +116,7 @@ static char * read_xml_toc_data_file_metadata_file(const char* file_name)
     }
 
     // Creates a vector vor the input data
-    char * xml_string = boxing_string_allocate((size_t)size + 1);
+    char * xml_string = malloc((size_t)size + 1);
 
     // Reads the data from the input file
     if (1 != fread(xml_string, (size_t)size, 1, file))
@@ -1130,7 +1131,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_is_valid_test4)
 
     test_not_empty_afs_toc_data_file_metadata(toc_data_file_metadata, 3);
 
-    boxing_string_free(GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data);
+    free(GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data);
     GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data = NULL;
     GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->file_id = -1;
 
@@ -1247,7 +1248,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_save_file_test6)
     const char * file_name = "afs_toc_data_file_metadata_save_file_not_valid_test.xml";
     afs_toc_data_file_metadata * toc_data_file_metadata = get_afs_toc_data_file_metadata_instance(5);
 
-    boxing_string_free(GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data);
+    free(GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data);
     GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data = NULL;
     GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->file_id = -1;
 
@@ -1315,7 +1316,7 @@ END_TEST
 BOXING_START_TEST(afs_toc_data_file_metadata_save_string_test2)
 {
     char * test_string = read_xml_toc_data_file_metadata_file("afs_toc_data_file_metadata_save_file_empty_test.xml");
-    boxing_string_cut(&test_string, boxing_string_length("<?xml version=\"1.0\" encoding=\"utf-8\"?>"), boxing_string_length(test_string));
+    afs_xmlutils_string_cut(&test_string, strlen("<?xml version=\"1.0\" encoding=\"utf-8\"?>"), strlen(test_string));
 
     afs_toc_data_file_metadata * toc_data_file_metadata = afs_toc_data_file_metadata_create();
 
@@ -1326,8 +1327,8 @@ BOXING_START_TEST(afs_toc_data_file_metadata_save_string_test2)
     BOXING_ASSERT_STR_EQ(result, test_string);
 
     afs_toc_data_file_metadata_free(toc_data_file_metadata);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1336,7 +1337,7 @@ END_TEST
 BOXING_START_TEST(afs_toc_data_file_metadata_save_string_test3)
 {
     char * test_string = read_xml_toc_data_file_metadata_file("afs_toc_data_file_metadata_save_file_empty_test.xml");
-    boxing_string_cut(&test_string, boxing_string_length("<?xml version=\"1.0\" encoding=\"utf-8\"?>"), boxing_string_length(test_string));
+    afs_xmlutils_string_cut(&test_string, strlen("<?xml version=\"1.0\" encoding=\"utf-8\"?>"), strlen(test_string));
 
     afs_toc_data_file_metadata_sources * sources = gvector_create_pointers(0);
     afs_toc_data_file_metadata * toc_data_file_metadata = afs_toc_data_file_metadata_create2(sources);
@@ -1348,8 +1349,8 @@ BOXING_START_TEST(afs_toc_data_file_metadata_save_string_test3)
     BOXING_ASSERT_STR_EQ(result, test_string);
 
     afs_toc_data_file_metadata_free(toc_data_file_metadata);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1359,7 +1360,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_save_string_test4)
 {
     afs_toc_data_file_metadata * toc_data_file_metadata = get_afs_toc_data_file_metadata_instance(5);
 
-    boxing_string_free(GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data);
+    free(GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data);
     GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data = NULL;
     GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->file_id = -1;
 
@@ -1377,7 +1378,7 @@ END_TEST
 BOXING_START_TEST(afs_toc_data_file_metadata_save_string_test5)
 {
     char * test_string = read_xml_toc_data_file_metadata_file("afs_toc_data_file_metadata_save_file_compact_test.xml");
-    boxing_string_cut(&test_string, boxing_string_length("<?xml version=\"1.0\" encoding=\"utf-8\"?>"), boxing_string_length(test_string));
+    afs_xmlutils_string_cut(&test_string, strlen("<?xml version=\"1.0\" encoding=\"utf-8\"?>"), strlen(test_string));
 
     afs_toc_data_file_metadata * toc_data_file_metadata = get_afs_toc_data_file_metadata_instance(5);
 
@@ -1388,8 +1389,8 @@ BOXING_START_TEST(afs_toc_data_file_metadata_save_string_test5)
     BOXING_ASSERT_STR_EQ(result, test_string);
 
     afs_toc_data_file_metadata_free(toc_data_file_metadata);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1398,7 +1399,7 @@ END_TEST
 BOXING_START_TEST(afs_toc_data_file_metadata_save_string_test6)
 {
     char * test_string = read_xml_toc_data_file_metadata_file("afs_toc_data_file_metadata_save_file_not_compact_test.xml");
-    boxing_string_cut(&test_string, boxing_string_length("<?xml version=\"1.0\" encoding=\"utf-8\"?>"), boxing_string_length(test_string));
+    afs_xmlutils_string_cut(&test_string, strlen("<?xml version=\"1.0\" encoding=\"utf-8\"?>"), strlen(test_string));
 
     afs_toc_data_file_metadata * toc_data_file_metadata = get_afs_toc_data_file_metadata_instance(5);
 
@@ -1409,8 +1410,8 @@ BOXING_START_TEST(afs_toc_data_file_metadata_save_string_test6)
     BOXING_ASSERT_STR_EQ(result, test_string);
 
     afs_toc_data_file_metadata_free(toc_data_file_metadata);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1443,7 +1444,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_save_as_table_test2)
     BOXING_ASSERT_STR_EQ(table_string, test_string);
 
     afs_toc_data_file_metadata_free(toc_data_file_metadata);
-    boxing_string_free(table_string);
+    free(table_string);
 }
 END_TEST
 
@@ -1467,7 +1468,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_save_as_table_test3)
     BOXING_ASSERT_STR_EQ(table_string, test_string);
 
     afs_toc_data_file_metadata_free(toc_data_file_metadata);
-    boxing_string_free(table_string);
+    free(table_string);
 }
 END_TEST
 
@@ -1546,7 +1547,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_save_xml_test5)
     mxml_node_t *tree = mxmlNewXML("1.0");
     afs_toc_data_file_metadata * toc_data_file_metadata = get_afs_toc_data_file_metadata_instance(3);
 
-    boxing_string_free(GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data);
+    free(GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data);
     GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->data = NULL;
     GVECTORN(toc_data_file_metadata->sources, afs_toc_data_file_metadata_source *, 1)->file_id = -1;
 
@@ -1746,7 +1747,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_load_string_test3)
     BOXING_ASSERT(toc_data_file_metadata == NULL);
     BOXING_ASSERT(result == DFALSE);
 
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -1784,7 +1785,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_load_string_test5)
     test_not_empty_afs_toc_data_file_metadata(toc_data_file_metadata, 5);
 
     afs_toc_data_file_metadata_free(toc_data_file_metadata);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -1804,7 +1805,7 @@ BOXING_START_TEST(afs_toc_data_file_metadata_load_string_test6)
     test_not_empty_afs_toc_data_file_metadata(toc_data_file_metadata, 5);
 
     afs_toc_data_file_metadata_free(toc_data_file_metadata);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 

@@ -7,6 +7,8 @@
 #include "boxing/string.h"
 #include "mxml.h"
 
+#include <string.h>
+
 #if defined ( D_OS_WIN32 )
 #define DFSEEK _fseeki64
 #define DFTELL _ftelli64
@@ -54,7 +56,7 @@ static char * read_xml_toc_preview_sections_file(const char* file_name)
     }
 
     // Creates a vector vor the input data
-    char * xml_string = boxing_string_allocate((size_t)size + 1);
+    char * xml_string = malloc((size_t)size + 1);
 
     // Reads the data from the input file
     if (1 != fread(xml_string, (size_t)size, 1, file))
@@ -1035,11 +1037,11 @@ BOXING_START_TEST(afs_toc_preview_sections_save_string_test4)
 
     BOXING_ASSERT(toc_preview_sections != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_preview_sections_free(toc_preview_sections);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1055,11 +1057,11 @@ BOXING_START_TEST(afs_toc_preview_sections_save_string_test5)
 
     BOXING_ASSERT(toc_preview_sections != NULL);
     BOXING_ASSERT(result != NULL);
-    BOXING_ASSERT(boxing_string_equal(result, test_string) == DTRUE);
+    BOXING_ASSERT(strcmp(result, test_string) == 0);
 
     afs_toc_preview_sections_free(toc_preview_sections);
-    boxing_string_free(test_string);
-    boxing_string_free(result);
+    free(test_string);
+    free(result);
 }
 END_TEST
 
@@ -1318,7 +1320,7 @@ BOXING_START_TEST(afs_toc_preview_sections_load_string_test3)
     BOXING_ASSERT(toc_preview_sections == NULL);
     BOXING_ASSERT(result == DFALSE);
 
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -1356,7 +1358,7 @@ BOXING_START_TEST(afs_toc_preview_sections_load_string_test5)
     test_not_empty_afs_toc_preview_sections(toc_preview_sections, 5);
 
     afs_toc_preview_sections_free(toc_preview_sections);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
@@ -1376,7 +1378,7 @@ BOXING_START_TEST(afs_toc_preview_sections_load_string_test6)
     test_not_empty_afs_toc_preview_sections(toc_preview_sections, 5);
 
     afs_toc_preview_sections_free(toc_preview_sections);
-    boxing_string_free(input_string);
+    free(input_string);
 }
 END_TEST
 
