@@ -682,7 +682,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
             return ("\n                    ");
         }
 
-        if (where == MXML_WS_AFTER_OPEN && !strcmp("start", name) == 0 && !strcmp("end", name) == 0)
+        if (where == MXML_WS_AFTER_OPEN && strcmp("start", name) != 0 && strcmp("end", name) != 0)
         {
             return ("\n                        ");
         }
