@@ -1485,6 +1485,7 @@ mxml_load_data(
 	      }
 	      break;
 	    }
+		// fallthrough
 
         default : /* Ignore... */
 	    node = NULL;
@@ -2944,6 +2945,7 @@ mxml_write_node(mxml_node_t     *node,	/* I - Node to write */
 	    free(data);
 	    break;
 	  }
+	  // fallthrough
 
       default : /* Should never happen */
 	  return (-1);

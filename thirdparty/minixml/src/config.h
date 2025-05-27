@@ -88,13 +88,6 @@
 
 
 /*
- * Do we have the strXXX() functions?
- */
-
-#define HAVE_STRDUP 1
-
-
-/*
  * Define prototypes for string functions as needed...
  */
 
