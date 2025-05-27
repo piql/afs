@@ -61,7 +61,7 @@ static void afs_frame_range_init2(afs_frame_range * frame_range, afs_frame_range
  *  \return instance of allocated afs_frame_range structure.
  */
 
-afs_frame_range * afs_frame_range_create()
+afs_frame_range * afs_frame_range_create(void)
 {
     afs_frame_range * frame_range = malloc(sizeof(afs_frame_range));
     afs_frame_range_init(frame_range);

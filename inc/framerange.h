@@ -33,7 +33,7 @@ typedef struct afs_frame_range_s
 } afs_frame_range;
 
 
-afs_frame_range * afs_frame_range_create();
+afs_frame_range * afs_frame_range_create(void);
 afs_frame_range * afs_frame_range_create2(afs_frame_range_type start, afs_frame_range_type count);
 void              afs_frame_range_free(afs_frame_range * frame_range);
 

@@ -30,7 +30,7 @@ typedef struct afs_toc_preview_layout_definition_s
     int reference_count;
 } afs_toc_preview_layout_definition;
 
-afs_toc_preview_layout_definition * afs_toc_preview_layout_definition_create();
+afs_toc_preview_layout_definition * afs_toc_preview_layout_definition_create(void);
 afs_toc_preview_layout_definition * afs_toc_preview_layout_definition_create2(const char * id, const char * name);
 afs_toc_preview_layout_definition * afs_toc_preview_layout_definition_create3(const char * id, const char * name, afs_toc_preview_sections * sections);
 afs_toc_preview_layout_definition * afs_toc_preview_layout_definition_create4(struct mxml_node_s * definition_node);

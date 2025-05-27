@@ -31,7 +31,7 @@ typedef struct afs_toc_metadata_s
     int reference_count;
 } afs_toc_metadata;
 
-afs_toc_metadata * afs_toc_metadata_create();
+afs_toc_metadata * afs_toc_metadata_create(void);
 afs_toc_metadata * afs_toc_metadata_create2(afs_toc_metadata_sources * sources);
 afs_toc_metadata * afs_toc_metadata_create3(struct mxml_node_s* sources_node);
 

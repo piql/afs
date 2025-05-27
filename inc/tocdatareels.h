@@ -33,7 +33,7 @@ typedef struct afs_toc_data_reels_s
     int reference_count;
 } afs_toc_data_reels;
 
-afs_toc_data_reels * afs_toc_data_reels_create();
+afs_toc_data_reels * afs_toc_data_reels_create(void);
 afs_toc_data_reels * afs_toc_data_reels_create2(afs_toc_data_reels_vector * reels);
 
 void                 afs_toc_data_reels_free(afs_toc_data_reels * toc_data_reels);

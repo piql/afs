@@ -34,7 +34,7 @@ typedef struct afs_control_data_s
     int reference_count;
 } afs_control_data;
 
-afs_control_data * afs_control_data_create();
+afs_control_data * afs_control_data_create(void);
 afs_control_data * afs_control_data_create2(afs_administrative_metadata * administrative_metadata, afs_technical_metadata * technical_metadata);
 void               afs_control_data_free(afs_control_data * control_data);
 

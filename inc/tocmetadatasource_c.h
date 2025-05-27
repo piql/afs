@@ -51,7 +51,7 @@ typedef struct afs_toc_metadata_source_s
     int reference_count;
 } afs_toc_metadata_source;
 
-afs_toc_metadata_source * afs_toc_metadata_source_create();
+afs_toc_metadata_source * afs_toc_metadata_source_create(void);
 afs_toc_metadata_source * afs_toc_metadata_source_create2(const char * format, int file_id);
 afs_toc_metadata_source * afs_toc_metadata_source_create3(const char * format, int file_id, int id);
 afs_toc_metadata_source * afs_toc_metadata_source_create4(const char * format, int file_id, const char * data);

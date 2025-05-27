@@ -41,7 +41,7 @@ typedef struct afs_toc_data_reel_s
 } afs_toc_data_reel;
 
 
-afs_toc_data_reel * afs_toc_data_reel_create();
+afs_toc_data_reel * afs_toc_data_reel_create(void);
 afs_toc_data_reel * afs_toc_data_reel_create2(const char * id);
 void                afs_toc_data_reel_free(afs_toc_data_reel * toc_data_reel);
 

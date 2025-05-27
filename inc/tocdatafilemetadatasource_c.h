@@ -36,7 +36,7 @@ typedef struct afs_toc_data_file_metadata_source_s
     int reference_count;
 } afs_toc_data_file_metadata_source;
 
-afs_toc_data_file_metadata_source * afs_toc_data_file_metadata_source_create();
+afs_toc_data_file_metadata_source * afs_toc_data_file_metadata_source_create(void);
 afs_toc_data_file_metadata_source * afs_toc_data_file_metadata_source_create2(const char * data, const char * format_id, const int file_id, const int source_id);
 void                                afs_toc_data_file_metadata_source_init(afs_toc_data_file_metadata_source * toc_data_file_metadata_source, const char * data, const char * format_id, const int file_id, const int source_id);
 void                                afs_toc_data_file_metadata_source_free(afs_toc_data_file_metadata_source * toc_data_file_metadata_source);

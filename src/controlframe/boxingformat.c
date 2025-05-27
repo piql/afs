@@ -80,7 +80,7 @@ static unsigned int get_ceil(const size_t dividend, const unsigned int divisor);
  *  \return instance of allocated afs_boxing_format structure.
  */
 
-afs_boxing_format * afs_boxing_format_create()
+afs_boxing_format * afs_boxing_format_create(void)
 {
     afs_boxing_format * boxing_format = malloc(sizeof(afs_boxing_format));
 

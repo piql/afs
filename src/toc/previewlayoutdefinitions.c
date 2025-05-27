@@ -82,7 +82,7 @@ static layout_definitions_lengths get_max_layout_id_lenght(const afs_toc_preview
  *  \return instance of allocated afs_toc_preview_layout_definitions structure.
  */
 
-afs_toc_preview_layout_definitions * afs_toc_preview_layout_definitions_create()
+afs_toc_preview_layout_definitions * afs_toc_preview_layout_definitions_create(void)
 {
     afs_toc_preview_layout_definitions * toc_preview_layout_definitions = malloc(sizeof(afs_toc_preview_layout_definitions));
     toc_preview_layout_definitions->layout_definitions = NULL;
@@ -665,7 +665,7 @@ char * afs_toc_preview_layout_definitions_save_as_table(const afs_toc_preview_la
         current_string += sprintf(current_string, "%.*s%s %0*u %s\n", (int)(lengths.layout_id_length - strlen(toc_preview_layout_definition->id)), string_id_pad, toc_preview_layout_definition->id, lengths.sections_length, sections_count, toc_preview_layout_definition->name);
     }
 
-    current_string += sprintf(current_string, layout_columns);
+    current_string += sprintf(current_string, "%s", layout_columns);
 
     for (unsigned int i = 0; i < definitions_count; i++)
     {

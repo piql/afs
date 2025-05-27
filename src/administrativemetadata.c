@@ -75,7 +75,7 @@ static const char *                      whitespace_cb(mxml_node_t *node, int wh
  *  \return instance of allocated afs_administrative_metadata structure.
  */
 
-afs_administrative_metadata * afs_administrative_metadata_create()
+afs_administrative_metadata * afs_administrative_metadata_create(void)
 {
     afs_administrative_metadata * administrative_metadata = malloc(sizeof(afs_administrative_metadata));
     

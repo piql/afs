@@ -30,7 +30,7 @@ typedef struct afs_toc_preview_layout_definitions_s
     int reference_count;
 } afs_toc_preview_layout_definitions;
 
-afs_toc_preview_layout_definitions * afs_toc_preview_layout_definitions_create();
+afs_toc_preview_layout_definitions * afs_toc_preview_layout_definitions_create(void);
 void                                 afs_toc_preview_layout_definitions_free(afs_toc_preview_layout_definitions * toc_preview_layout_definitions);
 
 afs_toc_preview_layout_definitions * afs_toc_preview_layout_definitions_clone(const afs_toc_preview_layout_definitions * toc_preview_layout_definitions);

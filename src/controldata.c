@@ -71,7 +71,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
  *  \return instance of allocated afs_control_data structure.
  */
 
-afs_control_data *  afs_control_data_create()
+afs_control_data *  afs_control_data_create(void)
 {
     afs_control_data* control_data = malloc(sizeof(afs_control_data));
 

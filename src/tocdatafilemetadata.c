@@ -66,7 +66,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
  *  \return instance of allocated afs_toc_data_file_metadata structure.
  */
 
-afs_toc_data_file_metadata * afs_toc_data_file_metadata_create()
+afs_toc_data_file_metadata * afs_toc_data_file_metadata_create(void)
 {
     afs_toc_data_file_metadata * toc_data_file_metadata = malloc(sizeof(afs_toc_data_file_metadata));
     afs_toc_data_file_metadata_init(toc_data_file_metadata);

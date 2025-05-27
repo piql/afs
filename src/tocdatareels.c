@@ -58,7 +58,7 @@ static const char *               whitespace_cb(mxml_node_t *node, int where);
  *  \return instance of allocated afs_toc_data_reels structure.
  */
 
-afs_toc_data_reels * afs_toc_data_reels_create()
+afs_toc_data_reels * afs_toc_data_reels_create(void)
 {
     afs_toc_data_reels * toc_data_reels = malloc(sizeof(afs_toc_data_reels));
     toc_data_reels->reels = NULL;

@@ -119,7 +119,7 @@ static void sort_preview_layout_definitions_by_id(afs_toc_preview_layout_definit
  *  \return instance of allocated afs_toc_data structure.
  */
 
-afs_toc_data * afs_toc_data_create()
+afs_toc_data * afs_toc_data_create(void)
 {
     afs_toc_data * toc_data = malloc(sizeof(afs_toc_data));
 

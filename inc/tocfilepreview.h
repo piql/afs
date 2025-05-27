@@ -34,7 +34,7 @@ typedef struct afs_toc_file_preview_s
 } afs_toc_file_preview;
 
 
-afs_toc_file_preview * afs_toc_file_preview_create();
+afs_toc_file_preview * afs_toc_file_preview_create(void);
 afs_toc_file_preview * afs_toc_file_preview_create2(afs_toc_file_preview_pages* pages);
 
 void  afs_toc_file_preview_init(afs_toc_file_preview * toc_file_preview);

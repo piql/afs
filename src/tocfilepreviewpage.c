@@ -75,7 +75,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
  *  \return instance of allocated afs_toc_file_preview_page structure.
  */
 
-afs_toc_file_preview_page* afs_toc_file_preview_page_create()
+afs_toc_file_preview_page* afs_toc_file_preview_page_create(void)
 {
     afs_toc_file_preview_page* toc_file_preview_page = malloc(sizeof(afs_toc_file_preview_page));
     afs_toc_file_preview_page_init(toc_file_preview_page);

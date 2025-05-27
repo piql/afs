@@ -63,7 +63,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
  *  \return instance of allocated afs_toc_preview_layout_definition structure.
  */
 
-afs_toc_preview_layout_definition * afs_toc_preview_layout_definition_create()
+afs_toc_preview_layout_definition * afs_toc_preview_layout_definition_create(void)
 {
     afs_toc_preview_layout_definition * toc_preview_layout_definition = malloc(sizeof(afs_toc_preview_layout_definition));
     afs_toc_preview_layout_definition_init2(toc_preview_layout_definition, NULL, NULL, NULL);

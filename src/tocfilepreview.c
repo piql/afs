@@ -67,7 +67,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
  *  \return instance of allocated afs_toc_file_preview structure.
  */
 
-afs_toc_file_preview* afs_toc_file_preview_create()
+afs_toc_file_preview* afs_toc_file_preview_create(void)
 {
     afs_toc_file_preview * toc_file_preview = malloc(sizeof(afs_toc_file_preview));
     afs_toc_file_preview_init(toc_file_preview);

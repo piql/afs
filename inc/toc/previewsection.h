@@ -38,7 +38,7 @@ typedef struct afs_toc_preview_section_s
     int reference_count;
 } afs_toc_preview_section;
 
-afs_toc_preview_section *  afs_toc_preview_section_create();
+afs_toc_preview_section *  afs_toc_preview_section_create(void);
 afs_toc_preview_section *  afs_toc_preview_section_create2( unsigned int id, unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsigned int r );
 void                       afs_toc_preview_section_init(afs_toc_preview_section * toc_preview_section, unsigned int id, unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsigned int r);
 void                       afs_toc_preview_section_free(afs_toc_preview_section * toc_preview_section);

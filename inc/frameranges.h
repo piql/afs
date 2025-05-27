@@ -31,7 +31,7 @@ typedef struct afs_frame_ranges_s
     int reference_count;
 } afs_frame_ranges;
 
-afs_frame_ranges * afs_frame_ranges_create();
+afs_frame_ranges * afs_frame_ranges_create(void);
 void               afs_frame_ranges_free(afs_frame_ranges * frame_ranges);
 
 afs_frame_ranges * afs_frame_ranges_clone(const afs_frame_ranges * frame_ranges);

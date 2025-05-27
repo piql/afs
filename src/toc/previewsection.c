@@ -62,7 +62,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
  *  \return instance of allocated afs_toc_preview_section structure.
  */
 
-afs_toc_preview_section * afs_toc_preview_section_create()
+afs_toc_preview_section * afs_toc_preview_section_create(void)
 {
     afs_toc_preview_section * toc_preview_section = malloc(sizeof(afs_toc_preview_section));
     afs_toc_preview_section_init(toc_preview_section, 0, 0, 0, 0, 0, 0);

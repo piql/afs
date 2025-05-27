@@ -44,7 +44,7 @@ typedef struct afs_boxing_format_s
     int reference_count;
 } afs_boxing_format;
 
-afs_boxing_format * afs_boxing_format_create();
+afs_boxing_format * afs_boxing_format_create(void);
 afs_boxing_format * afs_boxing_format_create2(const boxing_config *);
 void                afs_boxing_format_init(afs_boxing_format *boxing_format);
 void                afs_boxing_format_init2(afs_boxing_format *boxing_format, const boxing_config *config);

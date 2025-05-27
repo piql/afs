@@ -38,7 +38,7 @@ typedef struct afs_toc_file_preview_page_s
 } afs_toc_file_preview_page;
 
 
-afs_toc_file_preview_page * afs_toc_file_preview_page_create();
+afs_toc_file_preview_page * afs_toc_file_preview_page_create(void);
 afs_toc_file_preview_page * afs_toc_file_preview_page_create2(
     const char *  layout_id,
     unsigned int  start_frame,

@@ -37,7 +37,7 @@ typedef struct afs_administrative_metadata_s
 } afs_administrative_metadata;
 
 
-afs_administrative_metadata * afs_administrative_metadata_create();
+afs_administrative_metadata * afs_administrative_metadata_create(void);
 afs_administrative_metadata * afs_administrative_metadata_create2(
                                   const char * reel_id,
                                   const char * print_reel_id,

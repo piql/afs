@@ -70,7 +70,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
  *  \return instance of allocated afs_technical_metadata structure.
  */
 
-afs_technical_metadata * afs_technical_metadata_create()
+afs_technical_metadata * afs_technical_metadata_create(void)
 {
     afs_technical_metadata * technical_metadata = malloc(sizeof(afs_technical_metadata));
 

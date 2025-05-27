@@ -117,7 +117,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
  *  \return instance of allocated afs_toc_metadata_source structure.
  */
 
-afs_toc_metadata_source * afs_toc_metadata_source_create()
+afs_toc_metadata_source * afs_toc_metadata_source_create(void)
 {
     afs_toc_metadata_source * toc_metadata_source = malloc(sizeof(afs_toc_metadata_source));
     afs_toc_metadata_source_init(toc_metadata_source);

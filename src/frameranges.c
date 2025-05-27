@@ -61,7 +61,7 @@
  *  \return instance of allocated afs_frame_ranges structure or NULL.
  */
 
-afs_frame_ranges * afs_frame_ranges_create()
+afs_frame_ranges * afs_frame_ranges_create(void)
 {
     afs_frame_ranges * frame_ranges = malloc(sizeof(afs_frame_ranges));
     frame_ranges->frame_ranges = NULL;

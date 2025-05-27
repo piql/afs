@@ -28,7 +28,7 @@ typedef struct afs_toc_data_file_metadata_s
     int reference_count;
 } afs_toc_data_file_metadata;
 
-afs_toc_data_file_metadata * afs_toc_data_file_metadata_create();
+afs_toc_data_file_metadata * afs_toc_data_file_metadata_create(void);
 afs_toc_data_file_metadata * afs_toc_data_file_metadata_create2(afs_toc_data_file_metadata_sources * sources);
 
 void                         afs_toc_data_file_metadata_init(afs_toc_data_file_metadata * toc_data_file_metadata);

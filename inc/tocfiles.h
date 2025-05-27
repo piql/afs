@@ -33,7 +33,7 @@ typedef struct afs_toc_files_s
     int reference_count;
 } afs_toc_files;
 
-afs_toc_files * afs_toc_files_create();
+afs_toc_files * afs_toc_files_create(void);
 afs_toc_files * afs_toc_files_create2(afs_toc_indices * tocs);
 
 void            afs_toc_files_init(afs_toc_files * toc_files);

@@ -122,7 +122,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where);
  *  \return instance of allocated afs_toc_file structure.
  */
 
-afs_toc_file* afs_toc_file_create()
+afs_toc_file* afs_toc_file_create(void)
 {
     afs_toc_file * toc_data_file = malloc(sizeof(afs_toc_file));
     afs_toc_file_init(toc_data_file);

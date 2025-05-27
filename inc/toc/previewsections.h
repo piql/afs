@@ -33,7 +33,7 @@ typedef struct afs_toc_preview_sections_s
     int reference_count;
 } afs_toc_preview_sections;
 
-afs_toc_preview_sections * afs_toc_preview_sections_create();
+afs_toc_preview_sections * afs_toc_preview_sections_create(void);
 afs_toc_preview_sections * afs_toc_preview_sections_create2(struct mxml_node_s * sections_node);
 
 void                       afs_toc_preview_sections_free(afs_toc_preview_sections * toc_preview_sections);

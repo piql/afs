@@ -111,7 +111,7 @@ void                              string_copy_strip_newline(char* destination, c
  *  \return instance of allocated afs_toc_files structure.
  */
 
-afs_toc_files* afs_toc_files_create()
+afs_toc_files* afs_toc_files_create(void)
 {
     afs_toc_files* toc_files = malloc(sizeof(afs_toc_files));
     afs_toc_files_init(toc_files);

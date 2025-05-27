@@ -69,7 +69,7 @@ typedef struct afs_toc_file_s
 } afs_toc_file;
 
 
-afs_toc_file * afs_toc_file_create();
+afs_toc_file * afs_toc_file_create(void);
 afs_toc_file * afs_toc_file_create2(
     const char *                 name,
     const char *                 date,

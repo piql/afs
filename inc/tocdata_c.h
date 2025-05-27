@@ -35,7 +35,7 @@ typedef struct afs_toc_data_s
     int reference_count;
 } afs_toc_data;
 
-afs_toc_data * afs_toc_data_create();
+afs_toc_data * afs_toc_data_create(void);
 afs_toc_data * afs_toc_data_create2(const char * version, const char * index_type, const char * job_id, const char * reel_id);
 void           afs_toc_data_free(afs_toc_data * toc_data);
 
