@@ -58,7 +58,9 @@
 #define open		_open
 #define read	        _read
 #define snprintf 	_snprintf
+#if defined(HAVE_STRDUP)
 #define strdup		_strdup
+#endif
 #define vsnprintf 	_vsnprintf
 #define write		_write
 
