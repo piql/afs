@@ -761,6 +761,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
 
     name = mxmlGetElement(node);
     parent_name = mxmlGetElement(node->parent);
+    if (!parent_name) parent_name = "";
 
     if (strcmp("metadata", name) == 0)
     {

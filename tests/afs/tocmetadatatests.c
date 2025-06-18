@@ -1533,6 +1533,7 @@ END_TEST
 BOXING_START_TEST(afs_toc_metadata_save_string_test6)
 {
     char * test_string = read_xml_toc_metadata_file("afs_toc_metadata_save_file_not_compact_test.xml");
+    BOXING_ASSERT(test_string != NULL);
     afs_xmlutils_string_cut(&test_string, strlen("<?xml version=\"1.0\" encoding=\"utf-8\"?>"), strlen(test_string));
 
     afs_toc_metadata * toc_metadata = get_afs_toc_metadata_instance(5);
