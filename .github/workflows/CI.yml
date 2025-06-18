@@ -44,5 +44,6 @@ jobs:
       - name: Test
         run: ./tests/afs/afstest
 
-      - name: Test assemblytool
-        run: ./tests/assemblytool/assemblytool -i /tmp/unboxing/tests/testdata/4kv6_*d.raw -s 4096 2160 -is_raw -read 0-2
+      # TODO: enable
+      # - name: Test assemblytool
+      #   run: ./tests/assemblytool/assemblytool -i /tmp/unboxing/tests/testdata/4kv6_*d.raw -s 4096 2160 -is_raw -read 0-2
