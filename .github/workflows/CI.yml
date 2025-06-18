@@ -6,11 +6,11 @@ jobs:
   build:
     name: Build & Test
     runs-on: ubuntu-24.04
-    container: gcc:15.1.0
 
     steps:
       - name: Install dependencies
         run: |
+          apt install check
           git clone --recurse-submodules --depth=1 https://github.com/piql/unboxing /root/unboxing
 
       - name: Checkout
