@@ -211,7 +211,7 @@ DBOOL afs_toc_data_reel_equal(const afs_toc_data_reel * toc_data_reel1, const af
         return DFALSE;
     }
 
-    if (strcmp(toc_data_reel1->id, toc_data_reel2->id) == 0 &&
+    if (strcmp(toc_data_reel1->id ? toc_data_reel1->id : "", toc_data_reel2->id ? toc_data_reel2->id : "") == 0 &&
         afs_toc_files_equal(toc_data_reel1->files, toc_data_reel2->files))
     {
         return DTRUE;
@@ -1316,6 +1316,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
 
     name = mxmlGetElement(node);
     parent_name = mxmlGetElement(node->parent);
+    if (!parent_name) parent_name = "";
 
     if (strcmp("reel", name) == 0)
     {
@@ -1375,7 +1376,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (strcmp("data", parent_name) == 0 && strcmp("file", mxmlGetElement(node->parent->parent)) == 0)
+    if (strcmp("data", parent_name) == 0 && strcmp("file", mxmlGetElement(node->parent->parent) ? mxmlGetElement(node->parent->parent) : "") == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -1428,7 +1429,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (strcmp("data", parent_name) == 0 && strcmp("source", mxmlGetElement(node->parent->parent)) == 0)
+    if (strcmp("data", parent_name) == 0 && strcmp("source", mxmlGetElement(node->parent->parent) ? mxmlGetElement(node->parent->parent) : "") == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN)
         {

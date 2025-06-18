@@ -675,7 +675,9 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
 
     name = mxmlGetElement(node);
     parent_name = mxmlGetElement(node->parent);
-    parent_parent_name = (node->parent != NULL) ? mxmlGetElement(node->parent->parent) : NULL;
+    if (!parent_name) parent_name = "";
+    parent_parent_name = (node->parent != NULL) ? mxmlGetElement(node->parent->parent) : "";
+    if (!parent_parent_name) parent_parent_name = "";
 
     if (strcmp("reels", name) == 0)
     {

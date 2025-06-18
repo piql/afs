@@ -1,6 +1,9 @@
 AM_CFLAGS = $(all_includes)
 
-SUBDIRS = src
+SUBDIRS = \
+    src \
+    tests/afs \
+    tests/assemblytool
 
 afsincludedir = $(includedir)/afs
 afsinclude_HEADERS = \

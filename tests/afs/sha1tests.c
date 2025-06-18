@@ -6,6 +6,7 @@
 #include "boxing/string.h"
 #include <stdio.h>
 #include <string.h>
+#include <check.h>
 
 // Test function afs_sha1_test to test sha1 core
 BOXING_START_TEST(afs_sha1_test_test1)

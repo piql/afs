@@ -278,10 +278,10 @@ DBOOL afs_toc_data_equal(afs_toc_data * toc_data1, afs_toc_data * toc_data2)
         return DFALSE;
     }
 
-    if (strcmp(toc_data1->version, toc_data2->version) == 0 &&
-        strcmp(toc_data1->index_type, toc_data2->index_type) == 0 &&
-        strcmp(toc_data1->job_id, toc_data2->job_id) == 0 &&
-        strcmp(toc_data1->reel_id, toc_data2->reel_id) == 0 &&
+    if (strcmp(toc_data1->version ? toc_data1->version : "", toc_data2->version ? toc_data2->version : "") == 0 &&
+        strcmp(toc_data1->index_type ? toc_data1->index_type : "", toc_data2->index_type ? toc_data2->index_type : "") == 0 &&
+        strcmp(toc_data1->job_id ? toc_data1->job_id : "", toc_data2->job_id ? toc_data2->job_id : "") == 0 &&
+        strcmp(toc_data1->reel_id ? toc_data1->reel_id : "", toc_data2->reel_id ? toc_data2->reel_id : "") == 0 &&
         (afs_toc_data_reels_equal(toc_data1->reels, toc_data2->reels) || (afs_toc_data_reel_count(toc_data1) == 0 && afs_toc_data_reel_count(toc_data2) == 0)) &&
         (afs_toc_metadata_equal(toc_data1->metadata, toc_data2->metadata) || (afs_toc_data_metadata_source_count(toc_data1) == 0 && afs_toc_data_metadata_source_count(toc_data2) == 0)) &&
         (afs_toc_preview_layout_definitions_equal(toc_data1->preview_layout_definitions, toc_data2->preview_layout_definitions) || (afs_toc_data_preview_layout_definition_count(toc_data1) == 0 && afs_toc_data_preview_layout_definition_count(toc_data2) == 0)))
@@ -349,7 +349,7 @@ afs_toc_data_reel * afs_toc_data_get_reel_by_id(const afs_toc_data * toc_data, c
     {
         afs_toc_data_reel * toc_data_reel = afs_toc_data_reels_get_reel(toc_data->reels, i);
 
-        if (strcmp(toc_data_reel->id, id) == 0)
+        if (strcmp(toc_data_reel->id ? toc_data_reel->id : "", id ? id : "") == 0)
         {
             return toc_data_reel;
         }
@@ -1082,8 +1082,8 @@ DBOOL afs_toc_data_is_valid(const afs_toc_data * toc_data)
         return DFALSE;
     }
 
-    if (strcmp(toc_data->index_type, AFS_TOC_INDEX_TYPE_JOB) != 0 &&
-        strcmp(toc_data->index_type, AFS_TOC_INDEX_TYPE_REEL) != 0)
+    if (strcmp(toc_data->index_type ? toc_data->index_type : "", AFS_TOC_INDEX_TYPE_JOB) != 0 &&
+        strcmp(toc_data->index_type ? toc_data->index_type : "", AFS_TOC_INDEX_TYPE_REEL) != 0)
     {
         return DFALSE;
     }
@@ -1584,8 +1584,11 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
 
     name = mxmlGetElement(node);
     parent_name = mxmlGetElement(node->parent);
-    parent_parent_name = (node->parent != NULL) ? mxmlGetElement(node->parent->parent) : NULL;
-    parent_parent_parent_name = (parent_parent_name != NULL) ? mxmlGetElement(node->parent->parent->parent) : NULL;
+    if (!parent_name) parent_name = "";
+    parent_parent_name = (node->parent != NULL) ? mxmlGetElement(node->parent->parent) : "";
+    if (!parent_parent_name) parent_parent_name = "";
+    parent_parent_parent_name = (node->parent->parent != NULL) ? mxmlGetElement(node->parent->parent->parent) : "";
+    if (!parent_parent_parent_name) parent_parent_parent_name = "";
 
     if (strcmp("Index", name) == 0)
     {

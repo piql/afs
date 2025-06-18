@@ -330,10 +330,10 @@ static void test_afs_toc_data(
     int definitions_count)
 {
     BOXING_ASSERT(afs_toc_data != NULL);
-    BOXING_ASSERT(strcmp(afs_toc_data->version, version) == 0);
-    BOXING_ASSERT(strcmp(afs_toc_data->index_type, index_type) == 0);
-    BOXING_ASSERT(strcmp(afs_toc_data->job_id, job_id) == 0);
-    BOXING_ASSERT(strcmp(afs_toc_data->reel_id, reel_id) == 0);
+    BOXING_ASSERT(strcmp(afs_toc_data->version ? afs_toc_data->version : "", version ? version : "") == 0);
+    BOXING_ASSERT(strcmp(afs_toc_data->index_type ? afs_toc_data->index_type : "", index_type ? index_type : "") == 0);
+    BOXING_ASSERT(strcmp(afs_toc_data->job_id ? afs_toc_data->job_id : "", job_id ? job_id : "") == 0);
+    BOXING_ASSERT(strcmp(afs_toc_data->reel_id ? afs_toc_data->reel_id : "", reel_id ? reel_id : "") == 0);
 
     if (reels_count == -1)
     {

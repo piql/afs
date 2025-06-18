@@ -239,8 +239,8 @@ DBOOL afs_toc_data_file_metadata_source_equal(afs_toc_data_file_metadata_source 
         return DFALSE;
     }
 
-    if (strcmp(toc_data_file_metadata_source1->data, toc_data_file_metadata_source2->data) != 0 ||
-        strcmp(toc_data_file_metadata_source1->format_id, toc_data_file_metadata_source2->format_id) != 0 ||
+    if (strcmp(toc_data_file_metadata_source1->data ? toc_data_file_metadata_source1->data : "", toc_data_file_metadata_source2->data ? toc_data_file_metadata_source2->data : "") != 0 ||
+        strcmp(toc_data_file_metadata_source1->format_id ? toc_data_file_metadata_source1->format_id : "", toc_data_file_metadata_source2->format_id ? toc_data_file_metadata_source2->format_id : "") != 0 ||
         toc_data_file_metadata_source1->file_id != toc_data_file_metadata_source2->file_id ||
         toc_data_file_metadata_source1->source_id != toc_data_file_metadata_source2->source_id)
     {
@@ -678,6 +678,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
 
     name = mxmlGetElement(node);
     parent_name = mxmlGetElement(node->parent);
+    if (!parent_name) parent_name = "";
 
     if (strcmp("source", name) == 0)
     {

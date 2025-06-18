@@ -296,8 +296,8 @@ DBOOL afs_toc_preview_layout_definition_equal(const afs_toc_preview_layout_defin
     DBOOL sections_identity = afs_toc_preview_sections_equal(toc_preview_layout_definition1->sections, toc_preview_layout_definition2->sections);
 
     if (sections_identity == DFALSE ||
-        strcmp(toc_preview_layout_definition1->id, toc_preview_layout_definition2->id) != 0 ||
-        strcmp(toc_preview_layout_definition1->name, toc_preview_layout_definition2->name) != 0)
+        strcmp(toc_preview_layout_definition1->id ? toc_preview_layout_definition1->id : "", toc_preview_layout_definition2->id ? toc_preview_layout_definition2->id : "") != 0 ||
+        strcmp(toc_preview_layout_definition1->name ? toc_preview_layout_definition1->name : "", toc_preview_layout_definition2->name ? toc_preview_layout_definition2->name : "") != 0)
     {
         return DFALSE;
     }
@@ -755,6 +755,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
 
     name = mxmlGetElement(node);
     parent_name = mxmlGetElement(node->parent);
+    if (!parent_name) parent_name = "";
 
     if (strcmp("previewLayout", name) == 0)
     {

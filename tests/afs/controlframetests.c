@@ -72,7 +72,7 @@ static void test_not_empty_afs_boxing_format(afs_boxing_format * boxing_format, 
 
     BOXING_ASSERT(boxing_format != NULL);
     BOXING_ASSERT(boxing_format->config != NULL);
-    BOXING_ASSERT(strcmp(boxing_format->name, config_name) == 0);
+    BOXING_ASSERT(strcmp(boxing_format->name ? boxing_format->name : "", config_name ? config_name : "") == 0);
 
     unsigned int configuration_number = get_configuration_number(config_name);
 

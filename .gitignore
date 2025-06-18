@@ -14,3 +14,5 @@ missing
 *.dirstamp
 doc/
 src/libafs.a
+tests/afs/afstest
+*.xml

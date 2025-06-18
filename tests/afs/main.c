@@ -49,29 +49,26 @@ int main(int argc, char *argv[])
 
     suiteFp suites[] =
     {
+        controldata_tests,
+        controlframe_tests,
+        framerange_tests,
+        frameranges_tests,
         preview_tests,
-        tocpreviewsection_tests,
-        tocpreviewsections_tests,
-        tocpreviewlayoutdefinition_tests,
-        tocpreviewlayoutdefinitions_tests,
-        tocdatafilemetadatasource_tests,
-        tocdatafilemetadata_tests,
         sha1_tests,
         sha256_tests,
-        controlframe_tests,
-        controldata_tests,
-        tocdatafile_tests,
-        tocdatafiles_tests,
+        tocdata_tests,
+        tocdatafilemetadata_tests,
+        tocdatafilemetadatasource_tests,
+        tocdatareel_tests,
+        tocdatareels_tests,
         tocfilepreview_tests,
         tocfilepreviewpage_tests,
         tocmetadata_tests,
         tocmetadatasource_tests,
-        zeroreferencemark_tests,
-        framerange_tests,
-        frameranges_tests,
-        tocdatareel_tests,
-        tocdatareels_tests,
-        tocdata_tests
+        tocpreviewlayoutdefinition_tests,
+        tocpreviewlayoutdefinitions_tests,
+        tocpreviewsection_tests,
+        tocpreviewsections_tests,
     };
     
     // Add all test suites here

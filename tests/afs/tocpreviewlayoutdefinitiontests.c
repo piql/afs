@@ -137,8 +137,8 @@ static void test_not_empty_afs_toc_preview_sections(afs_toc_preview_sections * t
 static void test_not_empty_afs_toc_preview_layout_definition(afs_toc_preview_layout_definition * toc_preview_layout_definition, const char * id, const char * name, unsigned int sections_count, DBOOL sections_is_null)
 {
     BOXING_ASSERT(toc_preview_layout_definition != NULL);
-    BOXING_ASSERT(strcmp(toc_preview_layout_definition->id, id) == 0);
-    BOXING_ASSERT(strcmp(toc_preview_layout_definition->name, name) == 0);
+    BOXING_ASSERT(strcmp(toc_preview_layout_definition->id ? toc_preview_layout_definition->id : "", id ? id : "") == 0);
+    BOXING_ASSERT(strcmp(toc_preview_layout_definition->name ? toc_preview_layout_definition->name : "", name ? name : "") == 0);
 
     if (sections_is_null == DTRUE)
     {

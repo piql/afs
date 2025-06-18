@@ -107,10 +107,10 @@ static void test_empty_afs_toc_metadata_source(afs_toc_metadata_source* toc_meta
 static void test_not_empty_afs_toc_metadata_source(afs_toc_metadata_source* toc_metadata_source, const char * format, int file_id, const char * data, const char * tags, int id)
 {
     BOXING_ASSERT(toc_metadata_source != NULL);
-    BOXING_ASSERT(strcmp(toc_metadata_source->format, format) == 0);
-    BOXING_ASSERT(strcmp(toc_metadata_source->data, data) == 0);
+    BOXING_ASSERT(strcmp(toc_metadata_source->format ? toc_metadata_source->format : "", format ? format : "") == 0);
+    BOXING_ASSERT(strcmp(toc_metadata_source->data ? toc_metadata_source->data : "", data ? data : "") == 0);
     char * source_tags = afs_toc_metadata_source_get_tags(toc_metadata_source);
-    BOXING_ASSERT(strcmp(source_tags, tags) == 0);
+    BOXING_ASSERT(strcmp(source_tags ? source_tags : "", tags ? tags : "") == 0);
     free(source_tags);
 
     BOXING_ASSERT(toc_metadata_source->id == id);

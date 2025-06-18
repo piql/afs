@@ -592,6 +592,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
 
     name = mxmlGetElement(node);
     parent_name = mxmlGetElement(node->parent);
+    if (!parent_name) parent_name = "";
 
     if (strcmp("TechnicalMetadata", name) == 0)
     {
@@ -675,7 +676,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (strcmp("data", parent_name) == 0 && strcmp("file", mxmlGetElement(node->parent->parent)) == 0)
+    if (strcmp("data", parent_name) == 0 && strcmp("file", mxmlGetElement(node->parent->parent) ? mxmlGetElement(node->parent->parent) : "") == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
         {
@@ -728,7 +729,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
         }
     }
 
-    if (strcmp("data", parent_name) == 0 && strcmp("source", mxmlGetElement(node->parent->parent)) == 0)
+    if (strcmp("data", parent_name) == 0 && strcmp("source", mxmlGetElement(node->parent->parent) ? mxmlGetElement(node->parent->parent) : "") == 0)
     {
         if (where == MXML_WS_BEFORE_OPEN)
         {

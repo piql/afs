@@ -300,7 +300,7 @@ DBOOL afs_toc_file_preview_page_equal(afs_toc_file_preview_page * toc_file_previ
         return DFALSE;
     }
 
-    if (strcmp(toc_file_preview_page1->layout_id, toc_file_preview_page2->layout_id) == 0 &&
+    if (strcmp(toc_file_preview_page1->layout_id ? toc_file_preview_page1->layout_id : "", toc_file_preview_page2->layout_id ? toc_file_preview_page2->layout_id : "") == 0 &&
         toc_file_preview_page1->start_frame == toc_file_preview_page2->start_frame &&
         toc_file_preview_page1->start_section == toc_file_preview_page2->start_section &&
         toc_file_preview_page1->section_count == toc_file_preview_page2->section_count &&

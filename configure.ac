@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([libafs], [0.5], [boxing@piql.com])
+AC_INIT([libafs],[0.5],[boxing@piql.com])
 AM_INIT_AUTOMAKE([
 	foreign
 	1.11
@@ -23,7 +23,6 @@ AC_CONFIG_SRCDIR([src/afs.c])
 
 # Checks for programs.
 AC_PROG_CC
-AC_PROG_CC_C99
 AC_PROG_RANLIB
 AC_PROG_LN_S
 
@@ -59,12 +58,9 @@ AC_ARG_VAR(LIBUNBOXING_DIR, path to unboxing lib)
 
 AC_CONFIG_FILES([
     Makefile
-    src/Makefile])
-#    tests/Makefile
-#    tests/unboxingdata/Makefile
-#    tests/testutils/Makefile
-#    tests/unboxer/Makefile
-#    tests/boxer/Makefile])
+    src/Makefile
+    tests/afs/Makefile
+    tests/assemblytool/Makefile])
 AC_OUTPUT
 AC_MSG_RESULT([
         $PACKAGE $VERSION

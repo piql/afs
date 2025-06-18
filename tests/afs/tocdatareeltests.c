@@ -104,7 +104,7 @@ afs_toc_data_reel * get_afs_toc_data_reel_instance6(const char * id, unsigned in
 static void test_afs_toc_data_reel(afs_toc_data_reel * toc_data_reel, const char * id, const size_t files_count)
 {
     BOXING_ASSERT(toc_data_reel != NULL);
-    BOXING_ASSERT(strcmp(id, toc_data_reel->id) == 0);
+    BOXING_ASSERT(strcmp(id ? id : "", toc_data_reel->id ? toc_data_reel->id : "") == 0);
     BOXING_ASSERT(afs_toc_files_get_tocs_count(toc_data_reel->files) == files_count);
 
     for (size_t i = 0; i < files_count; i++)
