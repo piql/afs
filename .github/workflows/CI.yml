@@ -14,6 +14,19 @@ jobs:
           sudo apt-get -y install check
           git clone --recurse-submodules --depth=1 https://github.com/piql/unboxing /tmp/unboxing
 
+      - name: Configure unboxing
+        run: |
+          pushd /tmp/unboxing
+          ./autogen.sh
+          ./configure
+          popd
+
+      - name: Build unboxing
+        run: |
+          pushd /tmp/unboxing
+          make
+          popd
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
