@@ -15,4 +15,5 @@ missing
 doc/
 src/libafs.a
 tests/afs/afstest
+tests/assemblytool/assemblytool
 *.xml

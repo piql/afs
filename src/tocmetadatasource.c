@@ -640,6 +640,7 @@ char * afs_toc_metadata_source_get_tags(afs_toc_metadata_source * toc_metadata_s
     }
 
     char * return_string = malloc(string_size + 1);
+    memset(return_string, '\0', string_size + 1);
 
     for (unsigned int i = 0; i < toc_metadata_source->tags->size; i++)
     {

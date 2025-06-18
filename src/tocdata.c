@@ -1587,7 +1587,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
     if (!parent_name) parent_name = "";
     parent_parent_name = (node->parent != NULL) ? mxmlGetElement(node->parent->parent) : "";
     if (!parent_parent_name) parent_parent_name = "";
-    parent_parent_parent_name = (node->parent->parent != NULL) ? mxmlGetElement(node->parent->parent->parent) : "";
+    parent_parent_parent_name = (node->parent != NULL && node->parent->parent != NULL) ? mxmlGetElement(node->parent->parent->parent) : "";
     if (!parent_parent_parent_name) parent_parent_parent_name = "";
 
     if (strcmp("Index", name) == 0)
