@@ -189,15 +189,8 @@ char* afs_xmlutils_get_node_text(mxml_node_t* node)
 
     afs_xmlutils_string_trim(&text);
 
-    if (strlen(text) != 0)
-    {
-        return text;
-    }
-    else
-    {
-        free(text);
-        return boxing_string_clone("");
-    }
+
+    return text;
 }
 
 //----------------------------------------------------------------------------

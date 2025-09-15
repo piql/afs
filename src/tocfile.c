@@ -1591,11 +1591,13 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
             {
                 return ("\n            ");
             }
-
-            if (where == MXML_WS_AFTER_OPEN && strcmp("checksum", name) == 0 && strlen(afs_xmlutils_get_node_text(node)) != 0)
+            char *node_text = afs_xmlutils_get_node_text(node);
+            if (where == MXML_WS_AFTER_OPEN && strcmp("checksum", name) == 0 && node_text && strlen(node_text) != 0)
             {
+                free(node_text);
                 return ("\n            ");
             }
+            free(node_text);
         }
     }
 
