@@ -71,7 +71,7 @@ static afs_toc_file_preview_pages * get_filled_pages_vector(unsigned int pages_c
 
     for (unsigned int i = 0; i < pages_count; i++)
     {
-        char current_id[10];
+        char current_id[14];
         sprintf(current_id, "id %u", i);
 
         GVECTORN(pages, afs_toc_file_preview_page *, i) = afs_toc_file_preview_page_create2(current_id, 9 + i, 8 + i, 7 + i, 6 + i, 5 + i, 4 + i, 3 + i);
@@ -88,7 +88,7 @@ static afs_toc_file_preview_pages * get_realistic_pages_vector( unsigned int pag
 
     for ( unsigned int i = 0; i < pages_count; i++ )
     {
-        char current_id[10];
+        char current_id[14];
         sprintf( current_id, "id %u", i );
 
         unsigned int current_frame = 10 + section_index / frame_sections;
