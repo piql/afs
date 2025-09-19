@@ -44,6 +44,20 @@ jobs:
       - name: Test
         run: ./tests/afs/afstest
 
+      - name: Upload libafs
+        uses: actions/upload-artifact@v4
+        with:
+          name: libafs
+          path: src/libafs.a
+
+      - name: Upload tool binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: tools
+          path: |
+            tests/afs/afstest
+            tests/assemblytool/assemblytool
+
       # TODO: enable
       # - name: Test assemblytool
       #   run: ./tests/assemblytool/assemblytool -i /tmp/unboxing/tests/testdata/4kv6_*d.raw -s 4096 2160 -is_raw -read 0-2
