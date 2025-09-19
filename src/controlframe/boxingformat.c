@@ -273,7 +273,7 @@ DBOOL afs_boxing_format_equal(const afs_boxing_format * boxing_format1, const af
     }
 
     if (boxing_config_is_equal(boxing_format1->config, boxing_format2->config) == DTRUE &&
-        (boxing_format1->name == boxing_format2->name || boxing_format1->name && boxing_format2->name && strcmp(boxing_format1->name, boxing_format2->name) == 0) &&
+        (boxing_format1->name == boxing_format2->name || (boxing_format1->name && boxing_format2->name && strcmp(boxing_format1->name, boxing_format2->name) == 0)) &&
         boxing_format1->bytes_per_frame == boxing_format2->bytes_per_frame &&
         boxing_format1->data_bytes_per_frame == boxing_format2->data_bytes_per_frame &&
         boxing_format1->data_stripe_size == boxing_format2->data_stripe_size &&

@@ -4891,7 +4891,7 @@ Suite * tocdatafile_tests(void)
     
     for (size_t t = 0; t < sizeof(tests)/sizeof(tests[0]); t++)
     {
-        tcase_add_test_l(tc_tocdatafile_functions_tests, tests[t]);
+        tcase_add_test(tc_tocdatafile_functions_tests, tests[t]);
     }
     
     Suite * s = suite_create("tocdatafile_test_util");

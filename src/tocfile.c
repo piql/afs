@@ -416,20 +416,20 @@ DBOOL afs_toc_file_equal(afs_toc_file * toc_data_file1, afs_toc_file * toc_data_
         return DFALSE;
     }
 
-    if (strcmp(toc_data_file1->name, toc_data_file2->name) == 0 &&
-        strcmp(toc_data_file1->date, toc_data_file2->date) == 0 &&
-        strcmp(toc_data_file1->checksum, toc_data_file2->checksum) == 0 &&
+    if (strcmp(toc_data_file1->name ? toc_data_file1->name : "", toc_data_file2->name ? toc_data_file2->name : "") == 0 &&
+        strcmp(toc_data_file1->date ? toc_data_file1->date : "", toc_data_file2->date ? toc_data_file2->date : "") == 0 &&
+        strcmp(toc_data_file1->checksum ? toc_data_file1->checksum : "", toc_data_file2->checksum ? toc_data_file2->checksum : "") == 0 &&
         toc_data_file1->size == toc_data_file2->size &&
         toc_data_file1->id == toc_data_file2->id &&
         toc_data_file1->start_frame == toc_data_file2->start_frame &&
         toc_data_file1->start_byte == toc_data_file2->start_byte &&
         toc_data_file1->end_frame == toc_data_file2->end_frame &&
         toc_data_file1->end_byte == toc_data_file2->end_byte &&
-        strcmp(toc_data_file1->unique_id, toc_data_file2->unique_id) == 0 &&
+        strcmp(toc_data_file1->unique_id ? toc_data_file1->unique_id : "", toc_data_file2->unique_id ? toc_data_file2->unique_id : "") == 0 &&
         toc_data_file1->parent_id == toc_data_file2->parent_id &&
         toc_data_file1->types == toc_data_file2->types &&
         afs_toc_file_preview_equal(toc_data_file1->preview, toc_data_file2->preview) &&
-        strcmp(toc_data_file1->file_format, toc_data_file2->file_format) == 0 &&
+        strcmp(toc_data_file1->file_format ? toc_data_file1->file_format : "", toc_data_file2->file_format ? toc_data_file2->file_format : "") == 0 &&
         afs_toc_data_file_metadata_equal(toc_data_file1->metadata, toc_data_file2->metadata))
     {
         return DTRUE;
@@ -1591,11 +1591,13 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
             {
                 return ("\n            ");
             }
-
-            if (where == MXML_WS_AFTER_OPEN && strcmp("checksum", name) == 0 && strlen(afs_xmlutils_get_node_text(node)) != 0)
+            char *node_text = afs_xmlutils_get_node_text(node);
+            if (where == MXML_WS_AFTER_OPEN && strcmp("checksum", name) == 0 && node_text && strlen(node_text) != 0)
             {
+                free(node_text);
                 return ("\n            ");
             }
+            free(node_text);
         }
     }
 

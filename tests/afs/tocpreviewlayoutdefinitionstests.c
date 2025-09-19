@@ -163,8 +163,8 @@ static void test_not_empty_afs_toc_preview_layout_definitions(afs_toc_preview_la
     {
         afs_toc_preview_layout_definition * toc_preview_layout_definition = afs_toc_preview_layout_definitions_get_layout_definition_by_index(toc_preview_layout_definitions, i);
 
-        char current_id[10];
-        char current_name[10];
+        char current_id[14];
+        char current_name[16];
 
         sprintf(current_id, "id %u", i);
         sprintf(current_name, "name %u", i);
