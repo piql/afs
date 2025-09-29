@@ -1316,6 +1316,7 @@ char * afs_toc_files_save_as_metadata_table(afs_toc_files * toc_files)
                 }
 
                 n = snprintf(current_string, "%0*d %0*d %s %-*s %s\n",
+                    current_string_remaining_size,
                     lengths.file_id_length, toc_file->id,
                     lengths.source_file_id_length, metadata_source->file_id,
                     source_id,
