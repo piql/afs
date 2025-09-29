@@ -79,7 +79,7 @@ static unsigned int               get_digits_count(int number);
 static unsigned int               get_unsigned_digits_count(unsigned int number);
 static unsigned int               get_digits_count_64(boxing_int64 number);
 static const char *               whitespace_cb(mxml_node_t *node, int where);
-void                              string_copy_strip_newline(char* destination, const char* source, unsigned int destination_length);
+static void                       string_copy_strip_newline(char* destination, const char* source, unsigned int destination_length);
 
 /*! 
   * \addtogroup file
@@ -1233,7 +1233,10 @@ char * afs_toc_files_save_as_metadata_table(afs_toc_files * toc_files)
         lengths.source_id_length + lengths.source_format_id_length + lengths.source_data_length + (unsigned int)5 + (unsigned int)strlen("\n");
     unsigned int metadata_table_length = metadata_header_length + metadata_table_width * lengths.metadata_sources_count + 1;
 
-    size_t current_string_remaining_size = metadata_table_length + 1;
+    const size_t metadata_table_allocation_epsilon = 1024 * 1024;
+
+    // FIXME: This is kind of a hack, maybe just do a resizing allocation as prints get added
+    size_t current_string_remaining_size = metadata_table_length + 1 + metadata_table_allocation_epsilon;
     char * return_string = malloc(current_string_remaining_size);
     char * current_string = return_string;
 
@@ -1651,7 +1654,7 @@ static const char * whitespace_cb(mxml_node_t *node, int where)
     return (NULL);
 }
 
-void string_copy_strip_newline( char* destination, const char* source, unsigned int destination_length )
+static void string_copy_strip_newline( char* destination, const char* source, unsigned int destination_length )
 {
     unsigned int count = 0;
     while ( *source && count < (destination_length-1) )
