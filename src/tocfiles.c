@@ -1267,11 +1267,11 @@ char * afs_toc_files_save_as_metadata_table(afs_toc_files * toc_files)
                 if (metadata_header_done == DFALSE)
                 {
                     n = snprintf(current_string, current_string_remaining_size, "%s", metadata_header);
-                    assert(n >= 0 && n < current_string_remaining_size);
+                    assert(n >= 0 && n < (int)current_string_remaining_size);
                     current_string_remaining_size -= n;
                     current_string += n;
                     n = snprintf(current_string, current_string_remaining_size, "%s", metadata_columns);
-                    assert(n >= 0 && n < current_string_remaining_size);
+                    assert(n >= 0 && n < (int)current_string_remaining_size);
                     current_string_remaining_size -= n;
                     current_string += n;
                     metadata_header_done = DTRUE;
@@ -1315,14 +1315,14 @@ char * afs_toc_files_save_as_metadata_table(afs_toc_files * toc_files)
                     }
                 }
 
-                n = snprintf(current_string, "%0*d %0*d %s %-*s %s\n",
-                    current_string_remaining_size,
+                n = snprintf(current_string, current_string_remaining_size,
+                    "%0*d %0*d %s %-*s %s\n",
                     lengths.file_id_length, toc_file->id,
                     lengths.source_file_id_length, metadata_source->file_id,
                     source_id,
                     lengths.source_format_id_length, metadata_source->format_id,
                     data);
-                assert(n >= 0 && n < current_string_remaining_size);
+                assert(n >= 0 && n < (int)current_string_remaining_size);
                 current_string_remaining_size -= n;
                 current_string += n;
 
