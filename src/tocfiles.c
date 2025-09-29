@@ -1233,10 +1233,13 @@ char * afs_toc_files_save_as_metadata_table(afs_toc_files * toc_files)
         lengths.source_id_length + lengths.source_format_id_length + lengths.source_data_length + (unsigned int)5 + (unsigned int)strlen("\n");
     unsigned int metadata_table_length = metadata_header_length + metadata_table_width * lengths.metadata_sources_count + 1;
 
-    char * return_string = malloc(metadata_table_length + 1);
+    size_t current_string_remaining_size = metadata_table_length + 1;
+    char * return_string = malloc(current_string_remaining_size);
     char * current_string = return_string;
 
     DBOOL metadata_header_done = DFALSE;
+
+    int n;
 
     for (unsigned int i = 0; i < toc_files->tocs->size; i++)
     {
@@ -1263,8 +1266,14 @@ char * afs_toc_files_save_as_metadata_table(afs_toc_files * toc_files)
 
                 if (metadata_header_done == DFALSE)
                 {
-                    current_string += sprintf(current_string, "%s", metadata_header);
-                    current_string += sprintf(current_string, "%s", metadata_columns);
+                    n = snprintf(current_string, current_string_remaining_size, "%s", metadata_header);
+                    assert(n >= 0 && n < current_string_remaining_size);
+                    current_string_remaining_size -= n;
+                    current_string += n;
+                    n = snprintf(current_string, current_string_remaining_size, "%s", metadata_columns);
+                    assert(n >= 0 && n < current_string_remaining_size);
+                    current_string_remaining_size -= n;
+                    current_string += n;
                     metadata_header_done = DTRUE;
                 }
 
@@ -1306,12 +1315,15 @@ char * afs_toc_files_save_as_metadata_table(afs_toc_files * toc_files)
                     }
                 }
 
-                current_string += sprintf(current_string, "%0*d %0*d %s %-*s %s\n",
+                n = snprintf(current_string, "%0*d %0*d %s %-*s %s\n",
                     lengths.file_id_length, toc_file->id,
                     lengths.source_file_id_length, metadata_source->file_id,
                     source_id,
                     lengths.source_format_id_length, metadata_source->format_id,
                     data);
+                assert(n >= 0 && n < current_string_remaining_size);
+                current_string_remaining_size -= n;
+                current_string += n;
 
             }
         }
