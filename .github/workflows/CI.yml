@@ -29,15 +29,15 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: libafs
-          path: src/libafs.a
+          path: build/libafs.a
 
       - name: Upload tool binaries
         uses: actions/upload-artifact@v4
         with:
           name: tools
           path: |
-            tests/afs/afstest
-            tests/assemblytool/assemblytool
+            build/afstest
+            build/assemblytool
 
       - name: Test
         run: ctest --test-dir build
