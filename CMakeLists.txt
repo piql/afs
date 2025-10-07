@@ -79,15 +79,17 @@ if(BUILD_TESTING)
         tests/afs/tocdatatests.c
         tests/afs/tocfilepreviewpagetests.c
         tests/afs/tocfilepreviewtests.c
+        tests/afs/tocfilestests.c
+        tests/afs/tocfiletests.c
         tests/afs/tocmetadatasourcetests.c
         tests/afs/tocmetadatatests.c
         tests/afs/tocpreviewlayoutdefinitionstests.c
         tests/afs/tocpreviewlayoutdefinitiontests.c
         tests/afs/tocpreviewsectionstests.c
         tests/afs/tocpreviewsectiontests.c
+        tests/afs/zeroreferenceframetests.c
     )
 
-    target_compile_definitions(afstest PRIVATE UNIT_TESTS_ENABLED)
     target_link_libraries(afstest afs testutils -lcheck -lsubunit)
 
     add_executable(assemblytool

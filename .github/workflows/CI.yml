@@ -40,7 +40,8 @@ jobs:
             build/assemblytool
 
       - name: Test
-        run: ctest --test-dir build
+        working-directory: ./build
+        run: ./afstest
 
       # TODO: enable when we have testdata for a controlframe v3 or v4 or v5 or v6 or v7
       # - name: Test assemblytool

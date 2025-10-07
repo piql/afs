@@ -2,9 +2,7 @@
 #include "boxing/utils.h"
 
 #include <stdarg.h>
-#if defined (LOGGING_ENABLED)
 #include <stdio.h>
-#endif
 
 extern Suite * preview_tests();
 extern Suite * tocpreviewsection_tests();
@@ -86,7 +84,6 @@ int main(int argc, char *argv[])
                 EXIT_FAILURE;
 }
 
-#if defined (LOGGING_ENABLED)
 void boxing_log( int log_level, const char * string )
 {
     printf( "%d : %s\n", log_level, string );
@@ -103,7 +100,3 @@ void boxing_log_args( int log_level, const char * format, ... )
 
     va_end(args);
 }
-#else
-void boxing_log(int log_level, const char * string) {}
-void boxing_log_args(int log_level, const char * format, ...) {}
-#endif // LOGGING_ENABLED

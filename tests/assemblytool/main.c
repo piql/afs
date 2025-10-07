@@ -25,10 +25,6 @@
 #include <ctype.h>
 #include <string.h>
 
-//  DEFINES
-//
-#define LOGGING_ENABLED // Enables log output from the unboxing library
-
 static DBOOL  boxing_is_digit(const char * string);
 static DBOOL  boxing_is_range(const char * input_string);
 static char * boxing_get_substring(char* input_string, size_t start_index, size_t end_index);
@@ -496,7 +492,6 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-#if defined (LOGGING_ENABLED)
 void boxing_log(int log_level, const char * string)
 {
     printf("%d : %s\n", log_level, string);
@@ -513,10 +508,6 @@ void boxing_log_args(int log_level, const char * format, ...)
 
     va_end(args);
 }
-#else
-void boxing_log(int log_level, const char * string) { BOXING_UNUSED_PARAMETER(log_level); BOXING_UNUSED_PARAMETER(string); }
-void boxing_log_args(int log_level, const char * format, ...) { BOXING_UNUSED_PARAMETER(log_level); BOXING_UNUSED_PARAMETER(format); }
-#endif // LOGGING_ENABLED
 
 void(*boxing_log_custom)(int log_level, const char * string) = NULL;
 void(*boxing_log_args_custom)(int log_level, const char * format, va_list args) = NULL;
