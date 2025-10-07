@@ -12,20 +12,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get -y install check doxygen emacs
-          git clone --recurse-submodules --depth=1 https://github.com/piql/unboxing /tmp/unboxing
-
-      - name: Configure unboxing
-        run: |
-          pushd /tmp/unboxing
-          ./autogen.sh
-          ./configure
-          popd
-
-      - name: Build unboxing
-        run: |
-          pushd /tmp/unboxing
-          make
-          popd
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,15 +20,10 @@ jobs:
           submodules: "recursive"
 
       - name: Configure
-        run: |
-          ./autogen.sh
-          ./configure LIBUNBOXING_DIR=/tmp/unboxing
+        run: cmake -Bbuild
 
       - name: Build
-        run: make
-
-      - name: Test
-        run: ./tests/afs/afstest
+        run: cmake --build build -j
 
       - name: Upload libafs
         uses: actions/upload-artifact@v4
@@ -58,6 +39,9 @@ jobs:
             tests/afs/afstest
             tests/assemblytool/assemblytool
 
-      # TODO: enable
+      - name: Test
+        run: ctest --test-dir build
+
+      # TODO: enable when we have testdata for a controlframe v3 or v4 or v5 or v6 or v7
       # - name: Test assemblytool
       #   run: ./tests/assemblytool/assemblytool -i /tmp/unboxing/tests/testdata/4kv6_*d.raw -s 4096 2160 -is_raw -read 0-2
