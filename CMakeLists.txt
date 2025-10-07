@@ -100,4 +100,9 @@ if(BUILD_TESTING)
     target_link_libraries(assemblytool afs testutils)
 
     add_test(NAME afstest COMMAND afstest)
+
+    add_custom_command(OUTPUT ../README.md WORKING_DIRECTORY .. COMMAND emacs README.org --batch -f org-md-export-to-markdown DEPENDS README.org)
+    add_custom_target(readme ALL DEPENDS README.md)
+    add_custom_command(OUTPUT ../doc/html/index.html WORKING_DIRECTORY .. COMMAND doxygen doxygen.dox DEPENDS doxygen.dox)
+    add_custom_target(doxygen ALL DEPENDS doc/html/index.html)
 endif()
