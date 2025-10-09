@@ -1238,6 +1238,7 @@ char * afs_toc_files_save_as_metadata_table(afs_toc_files * toc_files)
     // FIXME: This is kind of a hack, maybe just do a resizing allocation as prints get added
     size_t current_string_remaining_size = metadata_table_length + 1 + metadata_table_allocation_epsilon;
     char * return_string = malloc(current_string_remaining_size);
+    memset(return_string, '\0', current_string_remaining_size);
     char * current_string = return_string;
 
     DBOOL metadata_header_done = DFALSE;
