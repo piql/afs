@@ -1019,7 +1019,7 @@ char * afs_toc_files_save_as_table(afs_toc_files * toc_files)
     char * return_string = malloc(current_string_remaining_size);
     char * current_string = return_string;
 
-    int n = snprintf(current_string, "%s\n", header);
+    int n = snprintf(current_string, current_string_remaining_size, "%s\n", header);
     assert(n >= 0 && n < (int)current_string_remaining_size);
     current_string_remaining_size -= n;
     current_string += n;
@@ -1251,6 +1251,7 @@ char * afs_toc_files_save_as_metadata_table(afs_toc_files * toc_files)
 
     size_t current_string_remaining_size = metadata_table_length + 1 + table_allocation_epsilon;
     char * return_string = malloc(current_string_remaining_size);
+    memset(return_string, '\0', current_string_remaining_size);
     char * current_string = return_string;
 
     DBOOL metadata_header_done = DFALSE;
