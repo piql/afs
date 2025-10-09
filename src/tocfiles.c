@@ -975,6 +975,12 @@ DBOOL afs_toc_files_load_xml(afs_toc_files * toc_files, mxml_node_t* node)
     return DTRUE;
 }
 
+/**
+ * FIXME: This is kind of a hack, both `afs_toc_files_save_as_table`and
+ * `afs_toc_files_save_as_metadata_table` need rewriting
+ */
+static const size_t table_allocation_epsilon = 1024 * 1024;
+
 
 //----------------------------------------------------------------------------
 /*!
@@ -1009,10 +1015,14 @@ char * afs_toc_files_save_as_table(afs_toc_files * toc_files)
         lengths.format_id_length + lengths.file_name_length + 5;
     size_t table1_length = header_length + table1_width * tocs_count + 1;
 
-    char * return_string = malloc(table1_length + 1);
+    size_t current_string_remaining_size = table1_length + 1 + table_allocation_epsilon;
+    char * return_string = malloc(current_string_remaining_size);
     char * current_string = return_string;
-    
-    current_string += sprintf(current_string, "%s\n", header);
+
+    int n = snprintf(current_string, current_string_remaining_size, "%s\n", header);
+    assert(n >= 0 && n < (int)current_string_remaining_size);
+    current_string_remaining_size -= n;
+    current_string += n;
 
     for (size_t i = 0; i < tocs_count; i++)
     {
@@ -1042,8 +1052,14 @@ char * afs_toc_files_save_as_table(afs_toc_files * toc_files)
             sprintf(file_format_string, "%s", "N");
         }
 
-        current_string += sprintf(current_string, "%0*d %-*s %s %-*s %s\n", lengths.id_length, toc_file->id, 36, toc_file->unique_id,
-            parent_id_string, lengths.format_id_length, file_format_string, toc_file->name);
+        n = snprintf(current_string, current_string_remaining_size,
+                     "%0*d %-*s %s %-*s %s\n", lengths.id_length, toc_file->id,
+                     36, toc_file->unique_id, parent_id_string,
+                     lengths.format_id_length, file_format_string,
+                     toc_file->name);
+        assert(n >= 0 && n < (int)current_string_remaining_size);
+        current_string_remaining_size -= n;
+        current_string += n;
     }
 
     return return_string;
@@ -1233,10 +1249,7 @@ char * afs_toc_files_save_as_metadata_table(afs_toc_files * toc_files)
         lengths.source_id_length + lengths.source_format_id_length + lengths.source_data_length + (unsigned int)5 + (unsigned int)strlen("\n");
     unsigned int metadata_table_length = metadata_header_length + metadata_table_width * lengths.metadata_sources_count + 1;
 
-    const size_t metadata_table_allocation_epsilon = 1024 * 1024;
-
-    // FIXME: This is kind of a hack, maybe just do a resizing allocation as prints get added
-    size_t current_string_remaining_size = metadata_table_length + 1 + metadata_table_allocation_epsilon;
+    size_t current_string_remaining_size = metadata_table_length + 1 + table_allocation_epsilon;
     char * return_string = malloc(current_string_remaining_size);
     memset(return_string, '\0', current_string_remaining_size);
     char * current_string = return_string;
