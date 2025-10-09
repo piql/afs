@@ -1019,7 +1019,7 @@ char * afs_toc_files_save_as_table(afs_toc_files * toc_files)
     char * return_string = malloc(current_string_remaining_size);
     char * current_string = return_string;
 
-    int n = snprintf(current_string, "%s\n", header);
+    int n = snprintf(current_string, current_string_remaining_size, "%s\n", header);
     assert(n >= 0 && n < (int)current_string_remaining_size);
     current_string_remaining_size -= n;
     current_string += n;
