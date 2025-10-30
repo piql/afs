@@ -20,7 +20,7 @@ jobs:
           submodules: "recursive"
 
       - name: Configure
-        run: cmake -Bbuild
+        run: cmake -DCMAKE_BUILD_TYPE=Debug -Bbuild
 
       - name: Build
         run: cmake --build build -j
