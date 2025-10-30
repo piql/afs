@@ -14,22 +14,13 @@
 
 //  PROJECT INCLUDES
 //
+#include "platform/io.h"
 #include "unboxingtool.h"
 #include <stdio.h>
 #include <string.h>
 #include "boxing_config.h"
 #include "boxing/utils.h"
 #include "boxing/unboxer_utility.h"
-
-//  DEFINES
-//
-#if defined ( D_OS_WIN32 )
-#define DFSEEK _fseeki64
-#define DFTELL _ftelli64
-#else
-#define DFSEEK fseeko
-#define DFTELL ftello
-#endif
 
 static unsigned int metadata_content_type = BOXING_METADATA_CONTENT_TYPES_UNKNOWN;
 

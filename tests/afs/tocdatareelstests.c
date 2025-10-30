@@ -11,8 +11,8 @@
 #define DFSEEK _fseeki64
 #define DFTELL _ftelli64
 #else
-#define DFSEEK fseeko
-#define DFTELL ftello
+#define DFSEEK fseek
+#define DFTELL ftell
 #endif
 
 static afs_toc_file_preview_pages* get_filled_pages_vector7(unsigned int pages_count)

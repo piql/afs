@@ -2725,7 +2725,7 @@ mxml_write_node(mxml_node_t     *node,	/* I - Node to write */
   int		i,			/* Looping var */
 		width;			/* Width of attr + value */
   mxml_attr_t	*attr;			/* Current attribute */
-  char		s[255];			/* Temporary string */
+  char		s[384];			/* Temporary string */
 
 
  /*

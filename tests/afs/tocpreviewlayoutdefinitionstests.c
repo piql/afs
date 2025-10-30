@@ -6,15 +6,7 @@
 #include "boxing/utils.h"
 #include "boxing/string.h"
 #include "mxml.h"
-
-#if defined ( D_OS_WIN32 )
-#define DFSEEK _fseeki64
-#define DFTELL _ftelli64
-#else
-#define DFSEEK fseeko
-#define DFTELL ftello
-#endif
-
+#include "platform/io.h"
 
 static char * read_xml_toc_preview_layout_definitions_file(const char* file_name)
 {

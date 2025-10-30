@@ -4,16 +4,9 @@
 #include "tocdatareel_c.h"
 #include "boxing/utils.h"
 #include "mxml.h"
+#include "platform/io.h"
 
 #include <string.h>
-
-#if defined ( D_OS_WIN32 )
-#define DFSEEK _fseeki64
-#define DFTELL _ftelli64
-#else
-#define DFSEEK fseeko
-#define DFTELL ftello
-#endif
 
 static afs_toc_file_preview_pages* get_filled_pages_vector6(unsigned int pages_count)
 {

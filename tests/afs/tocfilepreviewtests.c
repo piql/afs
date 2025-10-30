@@ -6,16 +6,9 @@
 #include "boxing/utils.h"
 #include "boxing/string.h"
 #include "mxml.h"
+#include "platform/io.h"
 
 #include <string.h>
-
-#if defined ( D_OS_WIN32 )
-#define DFSEEK _fseeki64
-#define DFTELL _ftelli64
-#else
-#define DFSEEK fseeko
-#define DFTELL ftello
-#endif
 
 static void test_null_afs_toc_file_preview(afs_toc_file_preview * toc_file_preview)
 {

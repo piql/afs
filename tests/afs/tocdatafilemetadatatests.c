@@ -6,15 +6,7 @@
 #include "boxing/platform/types.h"
 #include "boxing/utils.h"
 #include "mxml.h"
-
-#if defined ( D_OS_WIN32 )
-#define DFSEEK _fseeki64
-#define DFTELL _ftelli64
-#else
-#define DFSEEK fseeko
-#define DFTELL ftello
-#endif
-
+#include "platform/io.h"
 
 static void test_afs_toc_data_file_metadata_source(afs_toc_data_file_metadata_source * toc_data_file_metadata_source, const char * data, const char * format_id, int file_id, int source_id)
 {

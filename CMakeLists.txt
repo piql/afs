@@ -1,8 +1,10 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 
-project(afs)
+project(afs C)
 
 add_subdirectory(unboxing EXCLUDE_FROM_ALL)
+
+set(WARNINGS -Wall -Wextra -Wpedantic -pedantic-errors -Wformat-overflow=1 -Wstrict-overflow=2 -Werror)
 
 add_library(minixml
     thirdparty/minixml/src/mxml-attr.c
@@ -16,7 +18,7 @@ add_library(minixml
     thirdparty/minixml/src/mxml-set.c
     thirdparty/minixml/src/mxml-string.c
 )
-
+target_compile_options(minixml PRIVATE ${WARNINGS})
 target_include_directories(minixml PUBLIC thirdparty/minixml/inc)
 
 add_library(afs
@@ -51,10 +53,15 @@ add_library(afs
     src/xmlutils.c
     src/zeroreferenceframe.c
 )
-
+target_compile_options(afs PRIVATE ${WARNINGS})
 target_include_directories(afs PUBLIC inc)
-
 target_link_libraries(afs unboxing minixml)
+
+set_target_properties(afs minixml PROPERTIES
+    C_EXTENSIONS OFF
+    C_STANDARD 99
+    C_STANDARD_REQUIRED ON
+)
 
 if(PROJECT_IS_TOP_LEVEL)
     set(BUILD_TESTING ON)
@@ -89,20 +96,30 @@ if(BUILD_TESTING)
         tests/afs/tocpreviewsectiontests.c
         tests/afs/zeroreferenceframetests.c
     )
-
-    target_link_libraries(afstest afs testutils -lcheck -lsubunit)
+    target_compile_options(afstest PRIVATE ${WARNINGS})
+    target_link_libraries(afstest afs testutils check subunit)
 
     add_executable(assemblytool
         tests/assemblytool/main.c
         tests/assemblytool/unboxingtool.c
     )
-
+    target_compile_options(assemblytool PRIVATE ${WARNINGS})
     target_include_directories(assemblytool PRIVATE inc)
-
     target_link_libraries(assemblytool afs testutils)
+
+    set_target_properties(afstest assemblytool PROPERTIES
+        C_EXTENSIONS OFF
+        C_STANDARD 99
+        C_STANDARD_REQUIRED ON
+    )
 
     add_test(NAME afstest COMMAND afstest)
 
-    add_custom_command(OUTPUT ../doc/html/index.html WORKING_DIRECTORY .. COMMAND doxygen doxygen.dox DEPENDS doxygen.dox)
+    add_custom_command(
+        OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/doc/html/index.html"
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+        COMMAND doxygen doxygen.dox
+        DEPENDS doxygen.dox
+    )
     add_custom_target(doxygen ALL DEPENDS doc/html/index.html)
 endif()

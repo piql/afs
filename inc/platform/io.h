@@ -44,8 +44,8 @@ extern "C" {
 #define DFSEEK _fseeki64
 #define DFTELL _ftelli64
 #else
-#define DFSEEK fseeko
-#define DFTELL ftello
+#define DFSEEK fseek
+#define DFTELL ftell
 #endif
 
 

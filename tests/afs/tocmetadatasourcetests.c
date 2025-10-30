@@ -4,18 +4,9 @@
 #include "tocmetadatasource_c.h"
 #include "boxing/utils.h"
 #include "mxml.h"
+#include "platform/io.h"
 
 #include <string.h>
-
-
-#if defined ( D_OS_WIN32 )
-#define DFSEEK _fseeki64
-#define DFTELL _ftelli64
-#else
-#define DFSEEK fseeko
-#define DFTELL ftello
-#endif
-
 
 static char * read_xml_toc_metadata_source_file(const char* file_name)
 {

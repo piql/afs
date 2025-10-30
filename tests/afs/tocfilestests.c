@@ -11,8 +11,8 @@
 #define DFSEEK _fseeki64
 #define DFTELL _ftelli64
 #else
-#define DFSEEK fseeko
-#define DFTELL ftello
+#define DFSEEK fseek
+#define DFTELL ftell
 #endif
 
 static void test_null_afs_toc_files(afs_toc_files * toc_files)

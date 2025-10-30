@@ -4,17 +4,9 @@
 #include "tocfile.h"
 #include "boxing/utils.h"
 #include "mxml.h"
+#include "platform/io.h"
 
 #include <string.h>
-
-
-#if defined ( D_OS_WIN32 )
-#define DFSEEK _fseeki64
-#define DFTELL _ftelli64
-#else
-#define DFSEEK fseeko
-#define DFTELL ftello
-#endif
 
 static void test_empty_afs_toc_file(afs_toc_file* toc_data_file)
 {
