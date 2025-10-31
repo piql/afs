@@ -5,10 +5,30 @@ on: [push, pull_request]
 jobs:
   build:
     name: Build & Test
-    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+      os: [ubuntu-24.04, windows-2025]
+      include:
+        - os: ubuntu-24.04
+          configure: cmake -DCMAKE_BUILD_TYPE=Debug -Bbuild
+          build: cmake --build build -j
+          artifact_name: afs-debug-x86_64-linux
+          artifacts: |
+            build/libafs.a
+            build/afstest
+            build/assemblytool
+        - os: windows-2025
+          configure: cmake -Bbuild
+          build: cmake --build build -j
+          artifact_name: afs-debug-x86_64-win32
+          artifacts: build/Debug/*
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Install dependencies
+        if: ${{ matrix.os == 'ubuntu-24.04' }}
         run: |
           sudo apt-get update
           sudo apt-get -y install check doxygen
@@ -20,16 +40,16 @@ jobs:
           submodules: "recursive"
 
       - name: Configure
-        run: cmake -DCMAKE_BUILD_TYPE=Debug -Bbuild
+        run: ${{ matrix.configure }}
 
       - name: Build
-        run: cmake --build build -j
+        run: ${{ matrix.build }}
 
-      - name: Upload libafs
+      - name: Upload binaries
         uses: actions/upload-artifact@v4
         with:
-          name: libafs
-          path: build/libafs.a
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifacts }}
 
       - name: Upload tool binaries
         uses: actions/upload-artifact@v4
@@ -40,6 +60,7 @@ jobs:
             build/assemblytool
 
       - name: Test
+        if: ${{ matrix.os == 'ubuntu-24.04' }}
         working-directory: ./build
         run: ./afstest
 

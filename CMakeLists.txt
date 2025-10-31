@@ -4,7 +4,11 @@ project(afs C)
 
 add_subdirectory(unboxing EXCLUDE_FROM_ALL)
 
-set(WARNINGS -Wall -Wextra -Wpedantic -pedantic-errors -Wformat-overflow=1 -Wstrict-overflow=2 -Werror)
+if(WIN32)
+    set(WARNINGS /MP)
+else()
+    set(WARNINGS -Wall -Wextra -Wpedantic -pedantic-errors -Wformat-overflow=1 -Wstrict-overflow=2 -Werror)
+endif()
 
 add_library(minixml
     thirdparty/minixml/src/mxml-attr.c
@@ -70,34 +74,46 @@ endif()
 if(BUILD_TESTING)
     enable_testing()
 
-    add_executable(afstest
-        tests/afs/controldatatests.c
-        tests/afs/controlframetests.c
-        tests/afs/framerangestests.c
-        tests/afs/framerangetests.c
-        tests/afs/main.c
-        tests/afs/previewtests.c
-        tests/afs/sha1tests.c
-        tests/afs/sha256tests.c
-        tests/afs/tocdatafilemetadatasourcetests.c
-        tests/afs/tocdatafilemetadatatests.c
-        tests/afs/tocdatareelstests.c
-        tests/afs/tocdatareeltests.c
-        tests/afs/tocdatatests.c
-        tests/afs/tocfilepreviewpagetests.c
-        tests/afs/tocfilepreviewtests.c
-        tests/afs/tocfilestests.c
-        tests/afs/tocfiletests.c
-        tests/afs/tocmetadatasourcetests.c
-        tests/afs/tocmetadatatests.c
-        tests/afs/tocpreviewlayoutdefinitionstests.c
-        tests/afs/tocpreviewlayoutdefinitiontests.c
-        tests/afs/tocpreviewsectionstests.c
-        tests/afs/tocpreviewsectiontests.c
-        tests/afs/zeroreferenceframetests.c
-    )
-    target_compile_options(afstest PRIVATE ${WARNINGS})
-    target_link_libraries(afstest afs testutils check subunit)
+    if(NOT WIN32)
+        add_executable(afstest
+            tests/afs/controldatatests.c
+            tests/afs/controlframetests.c
+            tests/afs/framerangestests.c
+            tests/afs/framerangetests.c
+            tests/afs/main.c
+            tests/afs/previewtests.c
+            tests/afs/sha1tests.c
+            tests/afs/sha256tests.c
+            tests/afs/tocdatafilemetadatasourcetests.c
+            tests/afs/tocdatafilemetadatatests.c
+            tests/afs/tocdatareelstests.c
+            tests/afs/tocdatareeltests.c
+            tests/afs/tocdatatests.c
+            tests/afs/tocfilepreviewpagetests.c
+            tests/afs/tocfilepreviewtests.c
+            tests/afs/tocfilestests.c
+            tests/afs/tocfiletests.c
+            tests/afs/tocmetadatasourcetests.c
+            tests/afs/tocmetadatatests.c
+            tests/afs/tocpreviewlayoutdefinitionstests.c
+            tests/afs/tocpreviewlayoutdefinitiontests.c
+            tests/afs/tocpreviewsectionstests.c
+            tests/afs/tocpreviewsectiontests.c
+            tests/afs/zeroreferenceframetests.c
+        )
+        target_compile_options(afstest PRIVATE ${WARNINGS})
+        target_link_libraries(afstest afs testutils check subunit)
+        add_test(NAME afstest COMMAND afstest)
+        set_target_properties(afstest PROPERTIES C_EXTENSIONS OFF C_STANDARD 99 C_STANDARD_REQUIRED ON)
+
+        add_custom_command(
+            OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/doc/html/index.html"
+            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+            COMMAND doxygen doxygen.dox
+            DEPENDS doxygen.dox
+        )
+        add_custom_target(doxygen ALL DEPENDS doc/html/index.html)
+    endif()
 
     add_executable(assemblytool
         tests/assemblytool/main.c
@@ -107,19 +123,5 @@ if(BUILD_TESTING)
     target_include_directories(assemblytool PRIVATE inc)
     target_link_libraries(assemblytool afs testutils)
 
-    set_target_properties(afstest assemblytool PROPERTIES
-        C_EXTENSIONS OFF
-        C_STANDARD 99
-        C_STANDARD_REQUIRED ON
-    )
-
-    add_test(NAME afstest COMMAND afstest)
-
-    add_custom_command(
-        OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/doc/html/index.html"
-        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-        COMMAND doxygen doxygen.dox
-        DEPENDS doxygen.dox
-    )
-    add_custom_target(doxygen ALL DEPENDS doc/html/index.html)
+    set_target_properties(assemblytool PROPERTIES C_EXTENSIONS OFF C_STANDARD 99 C_STANDARD_REQUIRED ON)
 endif()
