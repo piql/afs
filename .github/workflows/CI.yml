@@ -51,14 +51,6 @@ jobs:
           name: ${{ matrix.artifact_name }}
           path: ${{ matrix.artifacts }}
 
-      - name: Upload tool binaries
-        uses: actions/upload-artifact@v4
-        with:
-          name: tools
-          path: |
-            build/afstest
-            build/assemblytool
-
       - name: Test
         if: ${{ matrix.os == 'ubuntu-24.04' }}
         working-directory: ./build
