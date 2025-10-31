@@ -8,21 +8,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-      os: [ubuntu-24.04, windows-2025]
-      include:
-        - os: ubuntu-24.04
-          configure: cmake -DCMAKE_BUILD_TYPE=Debug -Bbuild
-          build: cmake --build build -j
-          artifact_name: afs-debug-x86_64-linux
-          artifacts: |
-            build/libafs.a
-            build/afstest
-            build/assemblytool
-        - os: windows-2025
-          configure: cmake -Bbuild
-          build: cmake --build build -j
-          artifact_name: afs-debug-x86_64-win32
-          artifacts: build/Debug/*
+        os: [ubuntu-24.04, windows-2025]
+        include:
+          - os: ubuntu-24.04
+            configure: cmake -DCMAKE_BUILD_TYPE=Debug -Bbuild
+            build: cmake --build build -j
+            artifact_name: afs-debug-x86_64-linux
+            artifacts: |
+              build/libafs.a
+              build/afstest
+              build/assemblytool
+          - os: windows-2025
+            configure: cmake -Bbuild
+            build: cmake --build build -j
+            artifact_name: afs-debug-x86_64-win32
+            artifacts: build/Debug/*
 
     runs-on: ${{ matrix.os }}
 
