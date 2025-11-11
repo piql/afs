@@ -29,7 +29,7 @@ static DBOOL  boxing_is_digit(const char * string);
 static DBOOL  boxing_is_range(const char * input_string);
 static char * boxing_get_substring(char* input_string, size_t start_index, size_t end_index);
 
-static void boxing_print_help_information()
+static void boxing_print_help_information(void)
 {
     printf(
         "Assembly example application - unbox files from and archival file system reel.\n"
