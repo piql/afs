@@ -1062,7 +1062,7 @@ static unsigned int get_ceil(const size_t dividend, const unsigned int divisor)
         return 0;
     }
 
-    unsigned int result = dividend / divisor;
+    unsigned int result = (unsigned)dividend / divisor;
     
     if (dividend % divisor)
     {

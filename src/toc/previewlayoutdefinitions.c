@@ -646,12 +646,12 @@ char * afs_toc_preview_layout_definitions_save_as_table(const afs_toc_preview_la
     layout_definitions_lengths lengths = get_max_layout_id_lenght(toc_preview_layout_definitions);
     unsigned int definitions_count = afs_toc_preview_layout_definitions_get_count(toc_preview_layout_definitions);
 
-    unsigned int header_length = (unsigned int)strlen(header);
+    unsigned int header_length = (unsigned)strlen(header);
     unsigned int table1_width =  lengths.layout_id_length + lengths.sections_length + lengths.name_length + 3;
-    unsigned int table1_length = strlen(definition_columns) + table1_width * definitions_count + 1;
+    unsigned int table1_length = (unsigned)strlen(definition_columns) + table1_width * definitions_count + 1;
     unsigned int table2_width =  lengths.layout_id_length + lengths.section_id_length + lengths.x_length + lengths.y_length +
                                  lengths.width_length + lengths.height_length + lengths.rotation_length + 7;
-    unsigned int table2_length = strlen(layout_columns) + table2_width * lengths.sections_count + 1;
+    unsigned int table2_length = (unsigned)strlen(layout_columns) + table2_width * lengths.sections_count + 1;
 
     char * return_string = malloc(header_length + table1_length + table2_length + strlen("\n") + 1);
     char * current_string = return_string;

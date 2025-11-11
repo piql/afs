@@ -558,7 +558,7 @@ char * afs_toc_data_file_metadata_save_as_table(const afs_toc_data_file_metadata
     unsigned int sources_count = afs_toc_data_file_metadata_get_sources_count(toc_data_file_metadata);
 
     unsigned int header_length = (unsigned int)strlen(header);
-    unsigned int table_width = lengths.id_length + lengths.file_id_length + lengths.source_id_length + lengths.format_id_length + lengths.data_length + 4 + strlen("\n");
+    unsigned int table_width = lengths.id_length + lengths.file_id_length + lengths.source_id_length + lengths.format_id_length + lengths.data_length + 4 + (unsigned)strlen("\n");
     unsigned int table_length = table_width * sources_count + 1;
 
     char * return_string = malloc(header_length + table_length + 1);

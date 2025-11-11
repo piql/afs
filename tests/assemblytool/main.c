@@ -344,7 +344,7 @@ static void boxing_print_technical_metadata(afs_technical_metadata * technical_m
     if (technical_metadata->afs_tocs != NULL)
     {
         size_t files_count = afs_toc_files_get_tocs_count(technical_metadata->afs_tocs);
-        printf("Reel has %lu TOC files:\n", files_count);
+        printf("Reel has %zu TOC files:\n", files_count);
         for (size_t i = 0; i < files_count; i++)
         {
             afs_toc_file * current_toc = afs_toc_files_get_toc(technical_metadata->afs_tocs, i);
@@ -458,7 +458,7 @@ int main(int argc, char *argv[])
 
             for (size_t i = 0; i < parameters.unbox_files_numbers->size; i++)
             {
-                printf("%lu", GVECTORN(parameters.unbox_files_numbers, size_t, i));
+                printf("%zu", GVECTORN(parameters.unbox_files_numbers, size_t, i));
                 if (i < parameters.unbox_files_numbers->size - 1)
                 {
                     printf(", ");

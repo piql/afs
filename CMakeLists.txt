@@ -62,6 +62,9 @@ add_library(afs
 target_compile_options(afs PRIVATE ${WARNINGS})
 target_include_directories(afs PUBLIC inc)
 target_link_libraries(afs unboxing minixml)
+if(WIN32)
+    target_compile_definitions(afs PRIVATE _CRT_SECURE_NO_WARNINGS)
+endif()
 
 set_target_properties(afs minixml PROPERTIES
     C_EXTENSIONS OFF
@@ -124,6 +127,9 @@ if(BUILD_TESTING)
     target_compile_options(assemblytool PRIVATE ${WARNINGS})
     target_include_directories(assemblytool PRIVATE inc)
     target_link_libraries(assemblytool afs testutils)
+    if(WIN32)
+        target_compile_definitions(assemblytool PRIVATE _CRT_SECURE_NO_WARNINGS)
+    endif()
 
     set_target_properties(assemblytool PROPERTIES C_EXTENSIONS OFF C_STANDARD 99 C_STANDARD_REQUIRED ON)
 endif()
