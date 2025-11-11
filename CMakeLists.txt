@@ -6,6 +6,8 @@ add_subdirectory(unboxing EXCLUDE_FROM_ALL)
 
 if(WIN32)
     set(WARNINGS /MP)
+elseif(APPLE)
+    set(WARNINGS -Wall -Wextra -Wpedantic -pedantic-errors -Wformat-overflow -Wstrict-overflow=2 -Werror)
 else()
     set(WARNINGS -Wall -Wextra -Wpedantic -pedantic-errors -Wformat-overflow=1 -Wstrict-overflow=2 -Werror)
 endif()
@@ -74,7 +76,7 @@ endif()
 if(BUILD_TESTING)
     enable_testing()
 
-    if(NOT WIN32)
+    if(NOT WIN32 AND NOT APPLE)
         add_executable(afstest
             tests/afs/controldatatests.c
             tests/afs/controlframetests.c

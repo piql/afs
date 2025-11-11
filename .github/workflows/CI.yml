@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, windows-2025]
+        os: [ubuntu-24.04, macos-15, windows-2025]
         include:
           - os: ubuntu-24.04
             configure: cmake -DCMAKE_BUILD_TYPE=Debug -Bbuild
@@ -17,6 +17,14 @@ jobs:
             artifacts: |
               build/libafs.a
               build/afstest
+              build/assemblytool
+          - os: macos-15
+            configure: cmake -DCMAKE_BUILD_TYPE=Debug -Bbuild
+            build: cmake --build build -j
+            artifact_name: afs-debug-arm64-macos
+            artifacts: |
+              builds/libafs.a
+              builds/afstest
               build/assemblytool
           - os: windows-2025
             configure: cmake -Bbuild
@@ -52,7 +60,7 @@ jobs:
           path: ${{ matrix.artifacts }}
 
       - name: Test
-        if: ${{ matrix.os == 'ubuntu-24.04' }}
+        if: ${{ matrix.os != 'windows-2025' }}
         working-directory: ./build
         run: ./afstest
 
