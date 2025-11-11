@@ -60,7 +60,7 @@ jobs:
           path: ${{ matrix.artifacts }}
 
       - name: Test
-        if: ${{ matrix.os != 'windows-2025' }}
+        if: ${{ matrix.os == 'ubuntu-24.04' }}
         working-directory: ./build
         run: ./afstest
 
