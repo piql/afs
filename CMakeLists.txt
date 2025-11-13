@@ -28,6 +28,8 @@ target_compile_options(minixml PRIVATE ${WARNINGS})
 target_include_directories(minixml PUBLIC thirdparty/minixml/inc)
 if(WIN32)
     target_compile_definitions(minixml PRIVATE _CRT_SECURE_NO_WARNINGS)
+else()
+    target_compile_options(minixml PRIVATE -Wno-use-after-free)
 endif()
 
 add_library(afs
