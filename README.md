@@ -47,7 +47,7 @@ A design goal is to have as few dependencies as possible.
 # Installation
 
 ```sh
-git clone https://github.com/piql/afs --recurse-submodules
+git clone --recursive https://github.com/piql/afs
 cd afs
 cmake -Bbuild
 cmake --build build -j
