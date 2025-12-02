@@ -4,6 +4,8 @@ project(afs C)
 
 add_subdirectory(unboxing EXCLUDE_FROM_ALL)
 
+option(AFS_TESTS "Build tests" ${PROJECT_IS_TOP_LEVEL})
+
 if(WIN32)
     set(WARNINGS /MP)
 elseif(APPLE)
@@ -77,11 +79,7 @@ set_target_properties(afs minixml PROPERTIES
     C_STANDARD_REQUIRED ON
 )
 
-if(PROJECT_IS_TOP_LEVEL)
-    set(BUILD_TESTING ON)
-endif()
-
-if(BUILD_TESTING)
+if(AFS_TESTS)
     enable_testing()
 
     if(NOT WIN32 AND NOT APPLE)
@@ -122,7 +120,7 @@ if(BUILD_TESTING)
             COMMAND doxygen doxygen.dox
             DEPENDS doxygen.dox
         )
-        add_custom_target(doxygen ALL DEPENDS doc/html/index.html)
+        add_custom_target(afs_doxygen ALL DEPENDS doc/html/index.html)
     endif()
 
     add_executable(assemblytool
