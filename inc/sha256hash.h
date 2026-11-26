@@ -16,52 +16,19 @@
 *****************************************************************************/
 
 #include <stdlib.h>
+#include "afs_hash_result.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*!
  *  \ingroup hash
  *
- *  SHA256 hash calculation resut types.
+ *  SHA256 hash calculation.
+ *
+ *  The result codes shared with the SHA-1 interface are in afs_hash_result.h.
  */
-
-enum {
-    CRYPT_OK = 0,
-    CRYPT_ERROR,
-    CRYPT_NOP,
-
-    CRYPT_INVALID_KEYSIZE,
-    CRYPT_INVALID_ROUNDS,
-    CRYPT_FAIL_TESTVECTOR,
-
-    CRYPT_BUFFER_OVERFLOW,
-    CRYPT_INVALID_PACKET,
-
-    CRYPT_INVALID_PRNGSIZE,
-    CRYPT_ERROR_READPRNG,
-
-    CRYPT_INVALID_CIPHER,
-    CRYPT_INVALID_HASH,
-    CRYPT_INVALID_PRNG,
-
-    CRYPT_MEM,
-
-    CRYPT_PK_TYPE_MISMATCH,
-    CRYPT_PK_NOT_PRIVATE,
-
-    CRYPT_INVALID_ARG,
-    CRYPT_FILE_NOTFOUND,
-
-    CRYPT_PK_INVALID_TYPE,
-    CRYPT_PK_INVALID_SYSTEM,
-    CRYPT_PK_DUP,
-    CRYPT_PK_NOT_FOUND,
-    CRYPT_PK_INVALID_SIZE,
-
-    CRYPT_INVALID_PRIME_SIZE,
-    CRYPT_PK_INVALID_PADDING,
-
-    CRYPT_HASH_OVERFLOW
-};
-
 
 struct afs_sha256_state
 {
@@ -97,5 +64,9 @@ int afs_sha256_done(afs_hash256_state * md, unsigned char *hash);
 int afs_sha256hash_test(void);
 
 extern const struct afs_ltc_hash256_descriptor sha256_desc;
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif // AFS_SHA256_HASH_H

@@ -16,56 +16,13 @@
 *****************************************************************************/
 
 #include "platform/io.h"
+#include "afs_hash_result.h"
 #include <string.h>
 #include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-
-/*!
- *  \ingroup hash
- *
- *  SHA1 hash calculation resut types.
- */
-
-enum {
-    CRYPT_OK = 0,
-    CRYPT_ERROR,
-    CRYPT_NOP,
-
-    CRYPT_INVALID_KEYSIZE,
-    CRYPT_INVALID_ROUNDS,
-    CRYPT_FAIL_TESTVECTOR,
-
-    CRYPT_BUFFER_OVERFLOW,
-    CRYPT_INVALID_PACKET,
-
-    CRYPT_INVALID_PRNGSIZE,
-    CRYPT_ERROR_READPRNG,
-
-    CRYPT_INVALID_CIPHER,
-    CRYPT_INVALID_HASH,
-    CRYPT_INVALID_PRNG,
-
-    CRYPT_MEM,
-
-    CRYPT_PK_TYPE_MISMATCH,
-    CRYPT_PK_NOT_PRIVATE,
-
-    CRYPT_INVALID_ARG,
-    CRYPT_FILE_NOTFOUND,
-
-    CRYPT_PK_INVALID_TYPE,
-    CRYPT_PK_INVALID_SYSTEM,
-    CRYPT_PK_DUP,
-    CRYPT_PK_NOT_FOUND,
-    CRYPT_PK_INVALID_SIZE,
-
-    CRYPT_INVALID_PRIME_SIZE,
-    CRYPT_PK_INVALID_PADDING
-};
 
 
 struct afs_sha1_state
